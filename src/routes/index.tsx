@@ -9,10 +9,10 @@ function Index() {
     <div className="min-h-screen bg-[#f7f7f5] text-[#1b1b1b]">
       <TopBar />
       <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-2xl">
           <div className="mb-8 text-center">
             <p className="text-sm font-medium text-black/45">Painel de gestão</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">Sistema de gestão Espaço Equilibre</h1>
+            <h1 className="mt-1 whitespace-nowrap text-3xl font-semibold tracking-tight sm:text-4xl">Sistema de gestão Espaço Equilibre</h1>
             <p className="mt-2 text-sm leading-6 text-black/55">Acesse os módulos</p>
           </div>
 
