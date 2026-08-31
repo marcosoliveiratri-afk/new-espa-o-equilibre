@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
+import { AuthGuard } from "@/components/AuthGuard";
 
 export const Route = createFileRoute("/pilates")({ component: Pilates });
 
 function Pilates() {
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
+    <AuthGuard>
+      <div className="min-h-screen bg-[#f7f7f5]">
       <TopBar />
       <AppShell>
         <div className="mx-auto max-w-7xl">
@@ -26,6 +28,7 @@ function Pilates() {
           </div>
         </div>
       </AppShell>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }
