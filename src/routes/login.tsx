@@ -18,17 +18,18 @@ function Login() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/", replace: true });
+      if (data.session) window.location.replace("/");
     });
   }, [navigate]);
 
   async function signIn(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(""); setMessage(""); setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (error) { setError(error.message); return; }
-    navigate({ to: "/", replace: true });
+    if (!data.session) { setError("Login realizado, mas a sessão não foi criada. Tente novamente."); return; }
+    window.location.assign("/");
   }
 
   async function signUp() {
@@ -40,7 +41,7 @@ function Login() {
     });
     setLoading(false);
     if (error) { setError(error.message); return; }
-    if (data.session) { navigate({ to: "/", replace: true }); return; }
+    if (data.session) { window.location.assign("/"); return; }
     setMessage("Conta criada. Verifique seu e-mail para confirmar o cadastro e depois entre no sistema.");
     setIsRegistering(false);
   }
