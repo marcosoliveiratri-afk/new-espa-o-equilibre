@@ -1,12 +1,11 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, Dumbbell } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/")({ component: Index });
 
 function Index() {
   return (
-    <AppShell>
+    <main className="min-h-screen bg-[#f7f7f5] p-4 text-[#1b1b1b] sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
           <p className="text-sm font-medium text-black/45">Painel de gestão</p>
@@ -28,6 +27,6 @@ function Index() {
           <p className="mt-2 text-sm leading-6 text-black/55">Tenha a operação do estúdio de Pilates em um só lugar.</p>
         </Link>
       </div>
-    </AppShell>
+    </main>
   );
 }
