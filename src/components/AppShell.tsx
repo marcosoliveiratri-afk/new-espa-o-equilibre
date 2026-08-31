@@ -1,14 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { CalendarDays, Dumbbell, Home, LogOut, Menu, Settings, Users, X } from "lucide-react";
+import { Dumbbell, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const items = [
-  { label: "Início", to: "/", icon: Home },
-  { label: "Alunos", to: "/", icon: Users },
   { label: "Pilates", to: "/", icon: Dumbbell },
-  { label: "Agenda", to: "/", icon: CalendarDays },
-  { label: "Configurações", to: "/", icon: Settings },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
