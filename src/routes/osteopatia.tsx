@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
+import { AuthGuard } from "@/components/AuthGuard";
 
 export const Route = createFileRoute("/osteopatia")({ component: Osteopatia });
 
 function Osteopatia() {
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
+    <AuthGuard>
+      <div className="min-h-screen bg-[#f7f7f5]">
       <TopBar />
       <AppShell>
         <div className="mx-auto max-w-7xl">
@@ -26,6 +28,7 @@ function Osteopatia() {
           </div>
         </div>
       </AppShell>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }
