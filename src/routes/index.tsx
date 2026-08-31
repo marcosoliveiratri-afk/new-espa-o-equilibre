@@ -12,8 +12,8 @@ function Index() {
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
             <p className="text-sm font-medium text-black/45">Painel de gestão</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">Módulos</h1>
-            <p className="mt-2 text-sm leading-6 text-black/55">Acesse a gestão do seu estúdio.</p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">Sistema de gestão Espaço Equilibre</h1>
+            <p className="mt-2 text-sm leading-6 text-black/55">Acesse os módulos</p>
           </div>
 
           <Link
