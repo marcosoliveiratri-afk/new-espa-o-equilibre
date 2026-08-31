@@ -27,7 +27,14 @@ function Login() {
     setError(""); setMessage(""); setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
-    if (error) { setError(error.message); return; }
+    if (error) {
+      if (error.message.toLowerCase().includes("invalid login credentials")) {
+        setError("E-mail ou senha incorretos. Se você acabou de confirmar o cadastro, tente redefinir sua senha ou criar a conta novamente neste mesmo ambiente.");
+      } else {
+        setError(error.message);
+      }
+      return;
+    }
     if (!data.session) { setError("Login realizado, mas a sessão não foi criada. Tente novamente."); return; }
     window.location.assign("/");
   }
