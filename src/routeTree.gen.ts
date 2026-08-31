@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
+import { Route as PilatesRouteImport } from './routes/pilates'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OsteopatiaRoute = OsteopatiaRouteImport.update({
+  id: '/osteopatia',
+  path: '/osteopatia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PilatesRoute = PilatesRouteImport.update({
+  id: '/pilates',
+  path: '/pilates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/osteopatia': typeof OsteopatiaRoute
+  '/pilates': typeof PilatesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/osteopatia': typeof OsteopatiaRoute
+  '/pilates': typeof PilatesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/osteopatia': typeof OsteopatiaRoute
+  '/pilates': typeof PilatesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths: '/' | '/login' | '/osteopatia' | '/pilates'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to: '/' | '/login' | '/osteopatia' | '/pilates'
+  id: '__root__' | '/' | '/login' | '/osteopatia' | '/pilates'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  OsteopatiaRoute: typeof OsteopatiaRoute
+  PilatesRoute: typeof PilatesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/osteopatia': {
+      id: '/osteopatia'
+      path: '/osteopatia'
+      fullPath: '/osteopatia'
+      preLoaderRoute: typeof OsteopatiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pilates': {
+      id: '/pilates'
+      path: '/pilates'
+      fullPath: '/pilates'
+      preLoaderRoute: typeof PilatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  OsteopatiaRoute: OsteopatiaRoute,
+  PilatesRoute: PilatesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
