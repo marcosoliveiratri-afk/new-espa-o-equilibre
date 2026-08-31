@@ -16,7 +16,7 @@ function Index() {
 
         <Link
           to="/pilates"
-          className="group block max-w-md rounded-2xl border border-black/10 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          className="group block max-w-md rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-black/5">
