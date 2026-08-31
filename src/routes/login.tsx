@@ -12,6 +12,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -28,6 +29,20 @@ function Login() {
     setLoading(false);
     if (error) { setError(error.message); return; }
     navigate({ to: "/", replace: true });
+  }
+
+  async function signUp() {
+    setError(""); setMessage(""); setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: { emailRedirectTo: window.location.origin + "/login" },
+    });
+    setLoading(false);
+    if (error) { setError(error.message); return; }
+    if (data.session) { navigate({ to: "/", replace: true }); return; }
+    setMessage("Conta criada. Verifique seu e-mail para confirmar o cadastro e depois entre no sistema.");
+    setIsRegistering(false);
   }
 
   async function resetPassword() {
@@ -60,14 +75,19 @@ function Login() {
         <div className="w-full max-w-[390px]">
           <div className="mb-10 lg:hidden"><p className="text-sm font-semibold tracking-wide">Espaço Equilibre</p><p className="mt-1 text-xs text-black/45">Sistema de gestão</p></div>
           <div className="mb-8"><p className="text-sm font-medium text-black/45">Área administrativa</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Bem-vindo de volta</h2><p className="mt-2 text-sm leading-6 text-black/50">Entre com seus dados para acessar o sistema.</p></div>
-          <form className="space-y-5" onSubmit={signIn}>
+          <form className="space-y-5" onSubmit={isRegistering ? signUp : signIn}>
             <label className="block"><span className="mb-2 block text-sm font-medium">E-mail</span><div className="relative"><Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35" size={18}/><input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" autoComplete="email" placeholder="seu@email.com" className="h-12 w-full rounded-xl border border-black/10 bg-white pl-11 pr-4 text-sm outline-none transition focus:border-black/30 focus:ring-2 focus:ring-black/5" /></div></label>
-            <label className="block"><span className="mb-2 block text-sm font-medium">Senha</span><div className="relative"><LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35" size={18}/><input value={password} onChange={(e) => setPassword(e.target.value)} required type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="Digite sua senha" className="h-12 w-full rounded-xl border border-black/10 bg-white pl-11 pr-12 text-sm outline-none transition focus:border-black/30 focus:ring-2 focus:ring-black/5" /><button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-black/35 hover:text-black" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}>{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}</button></div></label>
+            <label className="block"><span className="mb-2 block text-sm font-medium">Senha</span><div className="relative"><LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35" size={18}/><input value={password} onChange={(e) => setPassword(e.target.value)} required type={showPassword ? "text" : "password"} autoComplete={isRegistering ? "new-password" : "current-password"} placeholder="Digite sua senha" className="h-12 w-full rounded-xl border border-black/10 bg-white pl-11 pr-12 text-sm outline-none transition focus:border-black/30 focus:ring-2 focus:ring-black/5" /><button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-black/35 hover:text-black" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}>{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}</button></div></label>
             {error && <p className="rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2 text-sm text-red-700">{error}</p>}
             {message && <p className="rounded-xl border border-green-500/20 bg-green-500/5 px-3 py-2 text-sm text-green-700">{message}</p>}
             <div className="flex items-center justify-end"><button disabled={resetLoading} type="button" onClick={resetPassword} className="text-xs font-medium text-black/55 hover:text-black disabled:opacity-50">{resetLoading ? "Enviando..." : "Esqueci minha senha"}</button></div>
-            <button disabled={loading} type="submit" className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#111] text-sm font-medium text-white transition hover:bg-black/85 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Entrando..." : "Entrar"} <ArrowRight size={17}/></button>
+            <button disabled={loading} type="submit" className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#111] text-sm font-medium text-white transition hover:bg-black/85 disabled:cursor-not-allowed disabled:opacity-60">{loading ? (isRegistering ? "Criando conta..." : "Entrando...") : (isRegistering ? "Criar conta" : "Entrar")} <ArrowRight size={17}/></button>
           </form>
+          <div className="mt-5 text-center">
+            <button type="button" onClick={() => { setIsRegistering((v) => !v); setError(""); setMessage(""); }} className="text-sm font-medium text-black/60 hover:text-black">
+              {isRegistering ? "Já possui uma conta? Entrar" : "Ainda não possui uma conta? Criar conta"}
+            </button>
+          </div>
           <p className="mt-8 text-center text-xs text-black/35">Acesso seguro e exclusivo para usuários autorizados.</p>
         </div>
       </section>
