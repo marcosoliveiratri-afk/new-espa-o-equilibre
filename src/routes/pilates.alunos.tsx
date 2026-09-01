@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Student={id:string;full_name:string;phone:string|null;active:boolean;plan:string;teacher:string;due:string|null;planStatus:string;contract:string;assessment:string;financial:string};
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T00:00:00")):"—";
-const formatPhone=(value:string)=>{const d=value.replace(/\\D/g,"").slice(0,11);return d.length<=2?d: d.length<=3?`(${d.slice(0,2)}) ${d.slice(2)}`:d.length<=7?`(${d.slice(0,2)}) ${d.slice(2,3)} ${d.slice(3)}`:`(${d.slice(0,2)}) ${d.slice(2,3)} ${d.slice(3,7)}-${d.slice(7)}`};
+const formatPhone=(value:string)=>{const digits=value.replace(/[^0-9]/g,"").slice(0,11);if(digits.length===0)return "";if(digits.length<=2)return `(${digits}`;if(digits.length<=3)return `(${digits.slice(0,2)}) ${digits.slice(2)}`;if(digits.length<=7)return `(${digits.slice(0,2)}) ${digits.slice(2,3)} ${digits.slice(3)}`;return `(${digits.slice(0,2)}) ${digits.slice(2,3)} ${digits.slice(3,7)}-${digits.slice(7)}`};
 const formatMoneyInput=(value:string)=>{const d=value.replace(/\\D/g,"");return d?`${(Number(d)/100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}`:"";};
 const moneyToNumber=(value:string)=>Number(value.replace(/\\./g,"").replace(",","."))||0;
 const statusClass=(v:string)=>["Vencida","Vencendo","Pendente","Vencido"].includes(v)?"bg-red-50 text-red-700":v.includes("Próxima")?"bg-amber-50 text-amber-700":"bg-emerald-50 text-emerald-700";
