@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
 import { AuthGuard } from "@/components/AuthGuard";
-import { Filter, Plus, Search } from "lucide-react";
+import { Filter, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type Student = {
@@ -41,8 +41,10 @@ function Alunos() {
   const [teacher, setTeacher] = useState("Todos");
   const [plan, setPlan] = useState("Todos");
   const [showForm, setShowForm] = useState(false);
+  const [studentList, setStudentList] = useState<Student[]>(students);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
 
-  const filtered = useMemo(() => students.filter((student) => {
+  const filtered = useMemo(() => studentList.filter((student) => {
     const term = search.toLowerCase();
     const matchesSearch = !term || student.name.toLowerCase().includes(term) || student.phone.includes(term);
     const matchesActivity = activity === "Todos" || (activity === "Ativos" ? student.active : !student.active);
@@ -54,7 +56,7 @@ function Alunos() {
       || (alertFilter === "Contrato vencendo" && student.contract === "Vencendo")
       || (alertFilter === "Avaliação vencida" && student.assessment === "Vencida");
     return matchesSearch && matchesActivity && matchesTeacher && matchesPlan && matchesAlert;
-  }), [search, activity, alertFilter, teacher, plan]);
+  }), [studentList, search, activity, alertFilter, teacher, plan]);
 
   return (
     <AuthGuard>
@@ -94,7 +96,7 @@ function Alunos() {
               <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[1400px] text-left text-sm">
                   <thead className="bg-black/[0.025] text-xs uppercase tracking-wide text-black/45">
-                    <tr>{["Foto","Nome","Telefone","Plano atual","Professor responsável","Vencimento do plano","Status do plano","Status do contrato","Status da avaliação física","Status financeiro"].map((heading) => <th key={heading} className="whitespace-nowrap px-4 py-3 font-medium">{heading}</th>)}</tr>
+                    <tr>{["Foto","Nome","Telefone","Plano atual","Professor responsável","Vencimento do plano","Status do plano","Status do contrato","Status da avaliação física","Status financeiro","Ações"].map((heading) => <th key={heading} className="whitespace-nowrap px-4 py-3 font-medium">{heading}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-black/5">
                     {filtered.map((student) => (
@@ -109,13 +111,27 @@ function Alunos() {
                         <td className="px-4 py-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${statusClass(student.contract)}`}>{student.contract}</span></td>
                         <td className="px-4 py-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${statusClass(student.assessment)}`}>{student.assessment}</span></td>
                         <td className="px-4 py-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${statusClass(student.financial === "Regular" ? "Em dia" : student.financial)}`}>{student.financial}</span></td>
+                        <td className="px-4 py-4"><button onClick={() => setStudentToDelete(student)} className="inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-red-600 hover:bg-red-50" title={`Excluir ${student.name}`}><Trash2 size={17} /> Excluir</button></td>
                       </tr>
                     ))}
-                    {!filtered.length && <tr><td colSpan={10} className="px-4 py-12 text-center text-black/45">Nenhum aluno encontrado para os filtros selecionados.</td></tr>}
+                    {!filtered.length && <tr><td colSpan={11} className="px-4 py-12 text-center text-black/45">Nenhum aluno encontrado para os filtros selecionados.</td></tr>}
                   </tbody>
                 </table>
               </div>
             </div>
+
+            {studentToDelete && (
+              <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4">
+                <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                  <h2 className="text-xl font-semibold">Excluir aluno?</h2>
+                  <p className="mt-2 text-sm leading-6 text-black/60">Você está prestes a excluir <strong>{studentToDelete.name}</strong> da listagem. Esta ação remove o aluno da visualização atual.</p>
+                  <div className="mt-6 flex justify-end gap-3">
+                    <button onClick={() => setStudentToDelete(null)} className="rounded-xl border border-black/10 px-4 py-2.5 text-sm">Cancelar</button>
+                    <button onClick={() => { setStudentList((current) => current.filter((student) => student.name !== studentToDelete.name)); setStudentToDelete(null); }} className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700">Excluir aluno</button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {showForm && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
