@@ -92,19 +92,13 @@ function Login() {
       {/* Lado esquerdo — marca */}
       <section className="hidden flex-1 flex-col items-center justify-center bg-[#f3f3f1] px-10 lg:flex">
         <div className="flex max-w-md flex-col items-center text-center">
-          <div
-            className="flex h-40 w-40 items-center justify-center rounded-full"
-            style={{ backgroundColor: TERRACOTTA }}
-          >
-            <img
-              src={logo}
-              alt="Espaço Equilibre"
-              width={112}
-              height={112}
-              className="h-28 w-28 object-contain"
-              style={{ filter: "brightness(0) invert(1)" }}
-            />
-          </div>
+          <img
+            src={logoAsset.url}
+            alt="Espaço Equilibre"
+            width={160}
+            height={160}
+            className="h-40 w-40 object-contain"
+          />
           <h1
             className="mt-10 text-5xl leading-tight text-[#1a1a1a]"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: "italic", fontWeight: 500 }}
