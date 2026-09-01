@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
 import { Route as PilatesRouteImport } from './routes/pilates'
 import { Route as PilatesAlunosRouteImport } from './routes/pilates.alunos'
+import { Route as PilatesAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 
@@ -42,6 +43,11 @@ const PilatesAlunosRoute = PilatesAlunosRouteImport.update({
   path: '/alunos',
   getParentRoute: () => PilatesRoute,
 } as any)
+const PilatesAlunoIdRoute = PilatesAlunoIdRouteImport.update({
+  id: '/$alunoId',
+  path: '/$alunoId',
+  getParentRoute: () => PilatesAlunosRoute,
+} as any)
 const VisualizacaoRoute = VisualizacaoRouteImport.update({
   id: '/visualizacao',
   path: '/visualizacao',
@@ -58,7 +64,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRouteWithChildren
-  '/pilates/alunos': typeof PilatesAlunosRoute
+  '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
+  '/pilates/alunos/$alunoId': typeof PilatesAlunoIdRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -89,6 +96,7 @@ export interface FileRouteTypes {
     | '/osteopatia'
     | '/pilates'
     | '/pilates/alunos'
+    | '/pilates/alunos/$alunoId'
     | '/visualizacao'
     | '/visualizacao/pilates'
   fileRoutesByTo: FileRoutesByTo
@@ -156,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilatesAlunosRouteImport
       parentRoute: typeof PilatesRoute
     }
+    '/pilates/alunos/$alunoId': {
+      id: '/pilates/alunos/$alunoId'
+      path: '/$alunoId'
+      fullPath: '/pilates/alunos/$alunoId'
+      preLoaderRoute: typeof PilatesAlunoIdRouteImport
+      parentRoute: typeof PilatesAlunosRoute
+    }
     '/visualizacao': {
       id: '/visualizacao'
       path: '/visualizacao'
@@ -173,12 +188,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PilatesAlunosRouteChildren {
+  PilatesAlunoIdRoute: typeof PilatesAlunoIdRoute
+}
+
+const PilatesAlunosRouteChildren: PilatesAlunosRouteChildren = {
+  PilatesAlunoIdRoute: PilatesAlunoIdRoute,
+}
+
+const PilatesAlunosRouteWithChildren = PilatesAlunosRoute._addFileChildren(
+  PilatesAlunosRouteChildren,
+)
+
 interface PilatesRouteChildren {
   PilatesAlunosRoute: typeof PilatesAlunosRoute
 }
 
 const PilatesRouteChildren: PilatesRouteChildren = {
-  PilatesAlunosRoute: PilatesAlunosRoute,
+  PilatesAlunosRoute: PilatesAlunosRouteWithChildren,
 }
 
 const PilatesRouteWithChildren = PilatesRoute._addFileChildren(
