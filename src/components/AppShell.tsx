@@ -1,10 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, LayoutDashboard, Menu, Settings, Users, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard, Menu, Settings, Users, FlaskConical, X } from "lucide-react";
 import { useState } from "react";
 
 const pilatesItems = [
   { label: "Dashboard", to: "/pilates", icon: LayoutDashboard },
   { label: "Alunos", to: "/pilates/alunos", icon: Users },
+  { label: "Aulas experimentais", to: "/pilates/aulas-experimentais", icon: FlaskConical },
   { label: "Configurações", to: "/pilates/configuracoes", icon: Settings },
 ] as const;
 
