@@ -1,10 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Dumbbell, LayoutDashboard, Menu, Users, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard, Menu, Users, X } from "lucide-react";
 import { useState } from "react";
 
 const pilatesItems = [
   { label: "Dashboard", to: "/pilates", icon: LayoutDashboard },
-  { label: "Visão geral", to: "/pilates", icon: Dumbbell },
   { label: "Alunos", to: "/pilates/alunos", icon: Users },
 ] as const;
 
