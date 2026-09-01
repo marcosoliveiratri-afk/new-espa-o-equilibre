@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo-equilibre.png";
+import logoAsset from "@/assets/logo-equilibre.png.asset.json";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -92,19 +92,13 @@ function Login() {
       {/* Lado esquerdo — marca */}
       <section className="hidden flex-1 flex-col items-center justify-center bg-[#f3f3f1] px-10 lg:flex">
         <div className="flex max-w-md flex-col items-center text-center">
-          <div
-            className="flex h-40 w-40 items-center justify-center rounded-full"
-            style={{ backgroundColor: TERRACOTTA }}
-          >
-            <img
-              src={logo}
-              alt="Espaço Equilibre"
-              width={112}
-              height={112}
-              className="h-28 w-28 object-contain"
-              style={{ filter: "brightness(0) invert(1)" }}
-            />
-          </div>
+          <img
+            src={logoAsset.url}
+            alt="Espaço Equilibre"
+            width={160}
+            height={160}
+            className="h-40 w-40 object-contain"
+          />
           <h1
             className="mt-10 text-5xl leading-tight text-[#1a1a1a]"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: "italic", fontWeight: 500 }}
@@ -124,9 +118,7 @@ function Login() {
       <section className="flex w-full items-center justify-center px-6 py-12 lg:max-w-[52%]">
         <div className="w-full max-w-[420px]">
           <div className="mb-10 flex flex-col items-center lg:hidden">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full" style={{ backgroundColor: TERRACOTTA }}>
-              <img src={logo} alt="Espaço Equilibre" width={64} height={64} className="h-16 w-16 object-contain" style={{ filter: "brightness(0) invert(1)" }} />
-            </div>
+            <img src={logoAsset.url} alt="Espaço Equilibre" width={96} height={96} className="h-24 w-24 object-contain" />
             <p className="mt-4 text-2xl" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: "italic" }}>
               Espaço Equilibre
             </p>
