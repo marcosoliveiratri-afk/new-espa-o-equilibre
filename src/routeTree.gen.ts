@@ -106,6 +106,10 @@ export interface FileRoutesById {
   '/pilates': typeof PilatesRouteWithChildren
   '/pilates/alunos': typeof PilatesAlunosRoute
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
+  '/pilates/fechamentos': typeof PilatesFechamentosRoute
+  '/pilates/alertas': typeof PilatesAlertasRoute
+  '/pilates/aulas-experimentais': typeof PilatesAulasExperimentaisRoute
+  '/pilates/alunos/$alunoId': typeof PilatesAlunoIdRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -122,8 +126,6 @@ export interface FileRouteTypes {
     | '/pilates/alertas'
     | '/pilates/aulas-experimentais'
     | '/pilates/alunos/$alunoId'
-    | '/pilates/fechamentos'
-    | '/pilates/alertas'
     | '/visualizacao'
     | '/visualizacao/pilates'
   fileRoutesByTo: FileRoutesByTo
@@ -134,6 +136,10 @@ export interface FileRouteTypes {
     | '/pilates'
     | '/pilates/alunos'
     | '/pilates/configuracoes'
+    | '/pilates/fechamentos'
+    | '/pilates/alertas'
+    | '/pilates/aulas-experimentais'
+    | '/pilates/alunos/$alunoId'
     | '/visualizacao'
     | '/visualizacao/pilates'
   id:
@@ -195,6 +201,7 @@ declare module '@tanstack/react-router' {
     }
     '/pilates/aulas-experimentais': { id: '/pilates/aulas-experimentais', path: '/aulas-experimentais', fullPath: '/pilates/aulas-experimentais', preLoaderRoute: typeof PilatesAulasExperimentaisRouteImport, parentRoute: typeof PilatesRoute }
     '/pilates/fechamentos': { id: '/pilates/fechamentos', path: '/fechamentos', fullPath: '/pilates/fechamentos', preLoaderRoute: typeof PilatesFechamentosRouteImport, parentRoute: typeof PilatesRoute }
+    '/pilates/alertas': { id: '/pilates/alertas', path: '/alertas', fullPath: '/pilates/alertas', preLoaderRoute: typeof PilatesAlertasRouteImport, parentRoute: typeof PilatesRoute }
     '/pilates/configuracoes': {
       id: '/pilates/configuracoes'
       path: '/configuracoes'
