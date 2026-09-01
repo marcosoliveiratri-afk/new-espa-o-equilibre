@@ -118,9 +118,7 @@ function Login() {
       <section className="flex w-full items-center justify-center px-6 py-12 lg:max-w-[52%]">
         <div className="w-full max-w-[420px]">
           <div className="mb-10 flex flex-col items-center lg:hidden">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full" style={{ backgroundColor: TERRACOTTA }}>
-              <img src={logo} alt="Espaço Equilibre" width={64} height={64} className="h-16 w-16 object-contain" style={{ filter: "brightness(0) invert(1)" }} />
-            </div>
+            <img src={logoAsset.url} alt="Espaço Equilibre" width={96} height={96} className="h-24 w-24 object-contain" />
             <p className="mt-4 text-2xl" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: "italic" }}>
               Espaço Equilibre
             </p>
