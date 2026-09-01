@@ -17,6 +17,7 @@ import { Route as PilatesAlunosRouteImport } from './routes/pilates.alunos'
 import { Route as PilatesConfiguracoesRouteImport } from './routes/pilates.configuracoes'
 import { Route as PilatesAulasExperimentaisRouteImport } from './routes/pilates.aulas-experimentais'
 import { Route as PilatesAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
+import { Route as PilatesFechamentosRouteImport } from './routes/pilates.fechamentos'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 
@@ -51,6 +52,7 @@ const PilatesAlunosRoute = PilatesAlunosRouteImport.update({
   path: '/alunos',
   getParentRoute: () => PilatesRoute,
 } as any)
+const PilatesFechamentosRoute = PilatesFechamentosRouteImport.update({ id: '/fechamentos', path: '/fechamentos', getParentRoute: () => PilatesRoute } as any)
 const PilatesAlunoIdRoute = PilatesAlunoIdRouteImport.update({
   id: '/$alunoId',
   path: '/$alunoId',
@@ -76,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/aulas-experimentais': typeof PilatesAulasExperimentaisRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunoIdRoute
+  '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -85,6 +88,7 @@ export interface FileRoutesByTo {
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRouteWithChildren
   '/pilates/alunos': typeof PilatesAlunosRoute
+  '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/aulas-experimentais': typeof PilatesAulasExperimentaisRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
@@ -110,8 +114,10 @@ export interface FileRouteTypes {
     | '/pilates'
     | '/pilates/alunos'
     | '/pilates/configuracoes'
+    | '/pilates/fechamentos'
     | '/pilates/aulas-experimentais'
     | '/pilates/alunos/$alunoId'
+    | '/pilates/fechamentos'
     | '/visualizacao'
     | '/visualizacao/pilates'
   fileRoutesByTo: FileRoutesByTo
@@ -182,6 +188,7 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof PilatesRoute
     }
     '/pilates/aulas-experimentais': { id: '/pilates/aulas-experimentais', path: '/aulas-experimentais', fullPath: '/pilates/aulas-experimentais', preLoaderRoute: typeof PilatesAulasExperimentaisRouteImport, parentRoute: typeof PilatesRoute }
+    '/pilates/fechamentos': { id: '/pilates/fechamentos', path: '/fechamentos', fullPath: '/pilates/fechamentos', preLoaderRoute: typeof PilatesFechamentosRouteImport, parentRoute: typeof PilatesRoute }
     '/pilates/configuracoes': {
       id: '/pilates/configuracoes'
       path: '/configuracoes'
@@ -228,12 +235,14 @@ const PilatesAlunosRouteWithChildren = PilatesAlunosRoute._addFileChildren(
 interface PilatesRouteChildren {
   PilatesAlunosRoute: typeof PilatesAlunosRoute
   PilatesConfiguracoesRoute: typeof PilatesConfiguracoesRoute
+  PilatesFechamentosRoute: typeof PilatesFechamentosRoute
   PilatesAulasExperimentaisRoute: typeof PilatesAulasExperimentaisRoute
 }
 
 const PilatesRouteChildren: PilatesRouteChildren = {
   PilatesAlunosRoute: PilatesAlunosRouteWithChildren,
   PilatesConfiguracoesRoute: PilatesConfiguracoesRoute,
+  PilatesFechamentosRoute: PilatesFechamentosRoute,
   PilatesAulasExperimentaisRoute: PilatesAulasExperimentaisRoute,
 }
 
