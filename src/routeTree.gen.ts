@@ -19,6 +19,7 @@ import { Route as PilatesAulasExperimentaisRouteImport } from './routes/pilates.
 import { Route as PilatesAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
 import { Route as PilatesFechamentosRouteImport } from './routes/pilates.fechamentos'
 import { Route as PilatesAlertasRouteImport } from './routes/pilates.alertas'
+import { Route as PilatesFluxoCaixaRouteImport } from './routes/pilates.fluxo-caixa'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 
@@ -55,6 +56,7 @@ const PilatesAlunosRoute = PilatesAlunosRouteImport.update({
 } as any)
 const PilatesFechamentosRoute = PilatesFechamentosRouteImport.update({ id: '/fechamentos', path: '/fechamentos', getParentRoute: () => PilatesRoute } as any)
 const PilatesAlertasRoute = PilatesAlertasRouteImport.update({ id: '/alertas', path: '/alertas', getParentRoute: () => PilatesRoute } as any)
+const PilatesFluxoCaixaRoute = PilatesFluxoCaixaRouteImport.update({ id: '/fluxo-caixa', path: '/fluxo-caixa', getParentRoute: () => PilatesRoute } as any)
 const PilatesAlunoIdRoute = PilatesAlunoIdRouteImport.update({
   id: '/$alunoId',
   path: '/$alunoId',
@@ -82,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/pilates/alunos/$alunoId': typeof PilatesAlunoIdRoute
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
+  '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -124,6 +127,7 @@ export interface FileRouteTypes {
     | '/pilates/configuracoes'
     | '/pilates/fechamentos'
     | '/pilates/alertas'
+    | '/pilates/fluxo-caixa'
     | '/pilates/aulas-experimentais'
     | '/pilates/alunos/$alunoId'
     | '/visualizacao'
@@ -202,6 +206,7 @@ declare module '@tanstack/react-router' {
     '/pilates/aulas-experimentais': { id: '/pilates/aulas-experimentais', path: '/aulas-experimentais', fullPath: '/pilates/aulas-experimentais', preLoaderRoute: typeof PilatesAulasExperimentaisRouteImport, parentRoute: typeof PilatesRoute }
     '/pilates/fechamentos': { id: '/pilates/fechamentos', path: '/fechamentos', fullPath: '/pilates/fechamentos', preLoaderRoute: typeof PilatesFechamentosRouteImport, parentRoute: typeof PilatesRoute }
     '/pilates/alertas': { id: '/pilates/alertas', path: '/alertas', fullPath: '/pilates/alertas', preLoaderRoute: typeof PilatesAlertasRouteImport, parentRoute: typeof PilatesRoute }
+    '/pilates/fluxo-caixa': { id: '/pilates/fluxo-caixa', path: '/fluxo-caixa', fullPath: '/pilates/fluxo-caixa', preLoaderRoute: typeof PilatesFluxoCaixaRouteImport, parentRoute: typeof PilatesRoute }
     '/pilates/configuracoes': {
       id: '/pilates/configuracoes'
       path: '/configuracoes'
@@ -250,6 +255,7 @@ interface PilatesRouteChildren {
   PilatesConfiguracoesRoute: typeof PilatesConfiguracoesRoute
   PilatesFechamentosRoute: typeof PilatesFechamentosRoute
   PilatesAlertasRoute: typeof PilatesAlertasRoute
+  PilatesFluxoCaixaRoute: typeof PilatesFluxoCaixaRoute
   PilatesAulasExperimentaisRoute: typeof PilatesAulasExperimentaisRoute
 }
 
@@ -258,6 +264,7 @@ const PilatesRouteChildren: PilatesRouteChildren = {
   PilatesConfiguracoesRoute: PilatesConfiguracoesRoute,
   PilatesFechamentosRoute: PilatesFechamentosRoute,
   PilatesAlertasRoute: PilatesAlertasRoute,
+  PilatesFluxoCaixaRoute: PilatesFluxoCaixaRoute,
   PilatesAulasExperimentaisRoute: PilatesAulasExperimentaisRoute,
 }
 
