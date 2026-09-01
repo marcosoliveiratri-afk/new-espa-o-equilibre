@@ -61,7 +61,7 @@ function Alunos() {
       <div className="min-h-screen bg-[#f7f7f5]">
         <TopBar />
         <AppShell>
-          <div className="mx-auto max-w-[1600px]">
+          <div className="w-full max-w-none">
             <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
                 <p className="text-sm font-medium text-black/45">Pilates</p>
@@ -73,8 +73,8 @@ function Alunos() {
               </button>
             </div>
 
-            <div className="rounded-2xl border border-black/10 bg-white shadow-sm">
-              <div className="border-b border-black/10 p-4">
+            <div className="w-full">
+              <div className="border-y border-black/10 py-4">
                 <div className="flex flex-col gap-3 lg:flex-row">
                   <label className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40" size={18} />
@@ -91,8 +91,8 @@ function Alunos() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[1500px] text-left text-sm">
+              <div className="w-full overflow-x-auto">
+                <table className="w-full min-w-[1400px] text-left text-sm">
                   <thead className="bg-black/[0.025] text-xs uppercase tracking-wide text-black/45">
                     <tr>{["Foto","Nome","Telefone","Plano atual","Professor responsável","Vencimento do plano","Status do plano","Status do contrato","Status da avaliação física","Status financeiro"].map((heading) => <th key={heading} className="whitespace-nowrap px-4 py-3 font-medium">{heading}</th>)}</tr>
                   </thead>
