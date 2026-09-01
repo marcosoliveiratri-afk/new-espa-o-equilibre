@@ -6,8 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 type Student={id:string;full_name:string;phone:string|null;active:boolean;plan:string;teacher:string;due:string|null;planStatus:string;contract:string;assessment:string;financial:string};
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T00:00:00")):"—";
 const formatPhone=(value:string)=>{const digits=value.replace(/[^0-9]/g,"").slice(0,11);if(digits.length===0)return "";if(digits.length<=2)return `(${digits}`;if(digits.length<=3)return `(${digits.slice(0,2)}) ${digits.slice(2)}`;if(digits.length<=7)return `(${digits.slice(0,2)}) ${digits.slice(2,3)} ${digits.slice(3)}`;return `(${digits.slice(0,2)}) ${digits.slice(2,3)} ${digits.slice(3,7)}-${digits.slice(7)}`};
-const formatMoneyInput=(value:string)=>{const cleaned=value.replace(/[^0-9,\.]/g,"").replace(".",",");const parts=cleaned.split(",");const integer=(parts[0]||"").replace(/^0+(?=\d)/,"");const decimal=(parts[1]||"").slice(0,2);return parts.length>1?`${integer||"0"},${decimal}`:integer};
-const moneyToNumber=(value:string)=>{const normalized=value.trim().replace(/\./g,"").replace(",",".");const n=Number(normalized);return Number.isFinite(n)?n:0;};
+const formatMoneyInput=(value:string)=>{const digits=String(value??"").replace(/[^0-9]/g,"");if(!digits)return "";const cents=Number(digits);if(!Number.isFinite(cents))return "";return (cents/100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});};
+const moneyToNumber=(value:string)=>{const digits=String(value??"").replace(/[^0-9]/g,"");if(!digits)return 0;const cents=Number(digits);return Number.isFinite(cents)?cents/100:0;};
 const statusClass=(v:string)=>["Vencida","Vencendo","Pendente","Vencido"].includes(v)?"bg-red-50 text-red-700":v.includes("Próxima")?"bg-amber-50 text-amber-700":"bg-emerald-50 text-emerald-700";
 
 export const Route=createFileRoute("/pilates/alunos")({component:Alunos});
