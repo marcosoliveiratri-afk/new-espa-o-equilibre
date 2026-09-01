@@ -18,6 +18,7 @@ import { Route as PilatesConfiguracoesRouteImport } from './routes/pilates.confi
 import { Route as PilatesAulasExperimentaisRouteImport } from './routes/pilates.aulas-experimentais'
 import { Route as PilatesAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
 import { Route as PilatesFechamentosRouteImport } from './routes/pilates.fechamentos'
+import { Route as PilatesAlertasRouteImport } from './routes/pilates.alertas'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 
@@ -53,6 +54,7 @@ const PilatesAlunosRoute = PilatesAlunosRouteImport.update({
   getParentRoute: () => PilatesRoute,
 } as any)
 const PilatesFechamentosRoute = PilatesFechamentosRouteImport.update({ id: '/fechamentos', path: '/fechamentos', getParentRoute: () => PilatesRoute } as any)
+const PilatesAlertasRoute = PilatesAlertasRouteImport.update({ id: '/alertas', path: '/alertas', getParentRoute: () => PilatesRoute } as any)
 const PilatesAlunoIdRoute = PilatesAlunoIdRouteImport.update({
   id: '/$alunoId',
   path: '/$alunoId',
@@ -78,7 +80,9 @@ export interface FileRoutesByFullPath {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/aulas-experimentais': typeof PilatesAulasExperimentaisRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunoIdRoute
-  '/pilates/fechamentos': typeof PilatesFechamentosRoute
+  '/pilates/fechamentos'
+    | '/pilates/alertas': typeof PilatesFechamentosRoute
+  '/pilates/alertas': typeof PilatesAlertasRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -88,7 +92,9 @@ export interface FileRoutesByTo {
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRouteWithChildren
   '/pilates/alunos': typeof PilatesAlunosRoute
-  '/pilates/fechamentos': typeof PilatesFechamentosRoute
+  '/pilates/fechamentos'
+    | '/pilates/alertas': typeof PilatesFechamentosRoute
+  '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/aulas-experimentais': typeof PilatesAulasExperimentaisRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
@@ -115,9 +121,11 @@ export interface FileRouteTypes {
     | '/pilates/alunos'
     | '/pilates/configuracoes'
     | '/pilates/fechamentos'
+    | '/pilates/alertas'
     | '/pilates/aulas-experimentais'
     | '/pilates/alunos/$alunoId'
     | '/pilates/fechamentos'
+    | '/pilates/alertas'
     | '/visualizacao'
     | '/visualizacao/pilates'
   fileRoutesByTo: FileRoutesByTo
@@ -188,7 +196,10 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof PilatesRoute
     }
     '/pilates/aulas-experimentais': { id: '/pilates/aulas-experimentais', path: '/aulas-experimentais', fullPath: '/pilates/aulas-experimentais', preLoaderRoute: typeof PilatesAulasExperimentaisRouteImport, parentRoute: typeof PilatesRoute }
-    '/pilates/fechamentos': { id: '/pilates/fechamentos', path: '/fechamentos', fullPath: '/pilates/fechamentos', preLoaderRoute: typeof PilatesFechamentosRouteImport, parentRoute: typeof PilatesRoute }
+    '/pilates/fechamentos'
+    | '/pilates/alertas': { id: '/pilates/fechamentos'
+    | '/pilates/alertas', path: '/fechamentos', fullPath: '/pilates/fechamentos'
+    | '/pilates/alertas', preLoaderRoute: typeof PilatesFechamentosRouteImport, parentRoute: typeof PilatesRoute }
     '/pilates/configuracoes': {
       id: '/pilates/configuracoes'
       path: '/configuracoes'
@@ -236,6 +247,7 @@ interface PilatesRouteChildren {
   PilatesAlunosRoute: typeof PilatesAlunosRoute
   PilatesConfiguracoesRoute: typeof PilatesConfiguracoesRoute
   PilatesFechamentosRoute: typeof PilatesFechamentosRoute
+  PilatesAlertasRoute: typeof PilatesAlertasRoute
   PilatesAulasExperimentaisRoute: typeof PilatesAulasExperimentaisRoute
 }
 
@@ -243,6 +255,7 @@ const PilatesRouteChildren: PilatesRouteChildren = {
   PilatesAlunosRoute: PilatesAlunosRouteWithChildren,
   PilatesConfiguracoesRoute: PilatesConfiguracoesRoute,
   PilatesFechamentosRoute: PilatesFechamentosRoute,
+  PilatesAlertasRoute: PilatesAlertasRoute,
   PilatesAulasExperimentaisRoute: PilatesAulasExperimentaisRoute,
 }
 
