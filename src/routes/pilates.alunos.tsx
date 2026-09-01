@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -100,7 +100,7 @@ function Alunos() {
                     {filtered.map((student) => (
                       <tr key={student.name} className="hover:bg-black/[0.015]">
                         <td className="px-4 py-4"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/10 text-xs font-semibold">{student.initials}</div></td>
-                        <td className="px-4 py-4 font-medium">{student.name}</td>
+                        <td className="px-4 py-4 font-medium"><Link to="/pilates/alunos/$alunoId" params={{ alunoId: student.name.toLowerCase().replace(/ /g, "-") }} className="hover:underline">{student.name}</Link></td>
                         <td className="px-4 py-4 text-black/60">{student.phone}</td>
                         <td className="px-4 py-4">{student.plan}</td>
                         <td className="px-4 py-4">{student.teacher}</td>
