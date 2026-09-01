@@ -20,10 +20,10 @@ type Student = {
 };
 
 const students: Student[] = [
-  { initials: "AM", name: "Ana Martins", phone: "(11) 99999-1201", plan: "Pilates 2x semana", teacher: "Carla Souza", due: "12/09/2026", active: true, tuition: "Em dia", contract: "Regular", assessment: "Em dia", financial: "Regular" },
-  { initials: "BC", name: "Bruno Costa", phone: "(11) 98888-3421", plan: "Pilates 3x semana", teacher: "Mariana Lima", due: "04/09/2026", active: true, tuition: "Próxima do vencimento", contract: "Vencendo", assessment: "Em dia", financial: "Regular" },
-  { initials: "CF", name: "Camila Ferreira", phone: "(11) 97777-5632", plan: "Pilates 2x semana", teacher: "Carla Souza", due: "28/08/2026", active: true, tuition: "Vencida", contract: "Regular", assessment: "Vencida", financial: "Pendente" },
-  { initials: "DP", name: "Diego Pereira", phone: "(11) 96666-7810", plan: "Pilates 1x semana", teacher: "Rafael Alves", due: "18/09/2026", active: false, tuition: "Em dia", contract: "Regular", assessment: "Em dia", financial: "Regular" },
+  { initials: "AM", name: "Ana Martins", phone: "(11) 99999-1201", plan: "Mensal", teacher: "Carla Souza", due: "12/09/2026", active: true, tuition: "Em dia", contract: "Regular", assessment: "Em dia", financial: "Regular" },
+  { initials: "BC", name: "Bruno Costa", phone: "(11) 98888-3421", plan: "Trimestral", teacher: "Mariana Lima", due: "04/09/2026", active: true, tuition: "Próxima do vencimento", contract: "Vencendo", assessment: "Em dia", financial: "Regular" },
+  { initials: "CF", name: "Camila Ferreira", phone: "(11) 97777-5632", plan: "Mensal", teacher: "Carla Souza", due: "28/08/2026", active: true, tuition: "Vencida", contract: "Regular", assessment: "Vencida", financial: "Pendente" },
+  { initials: "DP", name: "Diego Pereira", phone: "(11) 96666-7810", plan: "Semestral", teacher: "Rafael Alves", due: "18/09/2026", active: false, tuition: "Em dia", contract: "Regular", assessment: "Em dia", financial: "Regular" },
 ];
 
 const statusClass = (value: string) => {
@@ -86,7 +86,7 @@ function Alunos() {
                   <select value={activity} onChange={(e) => setActivity(e.target.value)} className="rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm"><option>Todos</option><option>Ativos</option><option>Inativos</option></select>
                   <select value={alertFilter} onChange={(e) => setAlertFilter(e.target.value)} className="rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm"><option>Todos</option><option>Mensalidade vencida</option><option>Próxima do vencimento</option><option>Contrato vencendo</option><option>Avaliação vencida</option></select>
                   <select value={teacher} onChange={(e) => setTeacher(e.target.value)} className="rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm"><option>Todos</option><option>Carla Souza</option><option>Mariana Lima</option><option>Rafael Alves</option></select>
-                  <select value={plan} onChange={(e) => setPlan(e.target.value)} className="rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm"><option>Todos</option><option>Pilates 1x semana</option><option>Pilates 2x semana</option><option>Pilates 3x semana</option></select>
+                  <select value={plan} onChange={(e) => setPlan(e.target.value)} className="rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm"><option>Todos</option><option>Semestral</option><option>Mensal</option><option>Trimestral</option></select>
                   <div className="flex items-center px-2 text-sm text-black/45">{filtered.length} aluno(s) encontrado(s)</div>
                 </div>
               </div>
@@ -124,7 +124,7 @@ function Alunos() {
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     <input placeholder="Nome completo" className="rounded-xl border border-black/10 px-3 py-3 text-sm" />
                     <input placeholder="Telefone" className="rounded-xl border border-black/10 px-3 py-3 text-sm" />
-                    <select className="rounded-xl border border-black/10 px-3 py-3 text-sm"><option>Selecione o plano</option><option>Pilates 1x semana</option><option>Pilates 2x semana</option><option>Pilates 3x semana</option></select>
+                    <select className="rounded-xl border border-black/10 px-3 py-3 text-sm"><option>Selecione o plano</option><option>Semestral</option><option>Mensal</option><option>Trimestral</option></select>
                     <select className="rounded-xl border border-black/10 px-3 py-3 text-sm"><option>Selecione o professor</option><option>Carla Souza</option><option>Mariana Lima</option><option>Rafael Alves</option></select>
                   </div>
                   <div className="mt-6 flex justify-end gap-3"><button onClick={() => setShowForm(false)} className="rounded-xl border border-black/10 px-4 py-2.5 text-sm">Cancelar</button><button className="rounded-xl bg-[#1b1b1b] px-4 py-2.5 text-sm font-medium text-white">Salvar aluno</button></div>
