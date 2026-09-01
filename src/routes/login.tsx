@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo-equilibre.png";
+import logoAsset from "@/assets/logo-equilibre.png.asset.json";
 
 export const Route = createFileRoute("/login")({
   component: Login,
