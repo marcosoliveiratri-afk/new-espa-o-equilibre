@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
 import { Route as PilatesRouteImport } from './routes/pilates'
+import { Route as PilatesAlunosRouteImport } from './routes/pilates.alunos'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 
@@ -36,6 +37,11 @@ const PilatesRoute = PilatesRouteImport.update({
   path: '/pilates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PilatesAlunosRoute = PilatesAlunosRouteImport.update({
+  id: '/alunos',
+  path: '/alunos',
+  getParentRoute: () => PilatesRoute,
+} as any)
 const VisualizacaoRoute = VisualizacaoRouteImport.update({
   id: '/visualizacao',
   path: '/visualizacao',
@@ -51,7 +57,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
-  '/pilates': typeof PilatesRoute
+  '/pilates': typeof PilatesRouteWithChildren
+  '/pilates/alunos': typeof PilatesAlunosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -59,7 +66,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
-  '/pilates': typeof PilatesRoute
+  '/pilates': typeof PilatesRouteWithChildren
+  '/pilates/alunos': typeof PilatesAlunosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -68,7 +76,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
-  '/pilates': typeof PilatesRoute
+  '/pilates': typeof PilatesRouteWithChildren
+  '/pilates/alunos': typeof PilatesAlunosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/osteopatia'
     | '/pilates'
+    | '/pilates/alunos'
     | '/visualizacao'
     | '/visualizacao/pilates'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/osteopatia'
     | '/pilates'
+    | '/pilates/alunos'
     | '/visualizacao'
     | '/visualizacao/pilates'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/osteopatia'
     | '/pilates'
+    | '/pilates/alunos'
     | '/visualizacao'
     | '/visualizacao/pilates'
   fileRoutesById: FileRoutesById
@@ -103,7 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   OsteopatiaRoute: typeof OsteopatiaRoute
-  PilatesRoute: typeof PilatesRoute
+  PilatesRoute: typeof PilatesRouteWithChildren
   VisualizacaoRoute: typeof VisualizacaoRouteWithChildren
 }
 
@@ -137,6 +149,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pilates/alunos': {
+      id: '/pilates/alunos'
+      path: '/alunos'
+      fullPath: '/pilates/alunos'
+      preLoaderRoute: typeof PilatesAlunosRouteImport
+      parentRoute: typeof PilatesRoute
+    }
     '/visualizacao': {
       id: '/visualizacao'
       path: '/visualizacao'
@@ -154,6 +173,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PilatesRouteChildren {
+  PilatesAlunosRoute: typeof PilatesAlunosRoute
+}
+
+const PilatesRouteChildren: PilatesRouteChildren = {
+  PilatesAlunosRoute: PilatesAlunosRoute,
+}
+
+const PilatesRouteWithChildren = PilatesRoute._addFileChildren(
+  PilatesRouteChildren,
+)
+
 interface VisualizacaoRouteChildren {
   VisualizacaoPilatesRoute: typeof VisualizacaoPilatesRoute
 }
@@ -170,7 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   OsteopatiaRoute: OsteopatiaRoute,
-  PilatesRoute: PilatesRoute,
+  PilatesRoute: PilatesRouteWithChildren,
   VisualizacaoRoute: VisualizacaoRouteWithChildren,
 }
 export const routeTree = rootRouteImport
