@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
 import { Route as PilatesRouteImport } from './routes/pilates'
+import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
+import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +36,32 @@ const PilatesRoute = PilatesRouteImport.update({
   path: '/pilates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VisualizacaoRoute = VisualizacaoRouteImport.update({
+  id: '/visualizacao',
+  path: '/visualizacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisualizacaoPilatesRoute = VisualizacaoPilatesRouteImport.update({
+  id: '/pilates',
+  path: '/pilates',
+  getParentRoute: () => VisualizacaoRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRoute
+  '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRoute
+  '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +69,34 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRoute
+  '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/osteopatia' | '/pilates'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/osteopatia'
+    | '/pilates'
+    | '/visualizacao'
+    | '/visualizacao/pilates'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/osteopatia' | '/pilates'
-  id: '__root__' | '/' | '/login' | '/osteopatia' | '/pilates'
+  to:
+    | '/'
+    | '/login'
+    | '/osteopatia'
+    | '/pilates'
+    | '/visualizacao'
+    | '/visualizacao/pilates'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/osteopatia'
+    | '/pilates'
+    | '/visualizacao'
+    | '/visualizacao/pilates'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +104,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OsteopatiaRoute: typeof OsteopatiaRoute
   PilatesRoute: typeof PilatesRoute
+  VisualizacaoRoute: typeof VisualizacaoRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -99,14 +137,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/visualizacao': {
+      id: '/visualizacao'
+      path: '/visualizacao'
+      fullPath: '/visualizacao'
+      preLoaderRoute: typeof VisualizacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visualizacao/pilates': {
+      id: '/visualizacao/pilates'
+      path: '/pilates'
+      fullPath: '/visualizacao/pilates'
+      preLoaderRoute: typeof VisualizacaoPilatesRouteImport
+      parentRoute: typeof VisualizacaoRoute
+    }
   }
 }
+
+interface VisualizacaoRouteChildren {
+  VisualizacaoPilatesRoute: typeof VisualizacaoPilatesRoute
+}
+
+const VisualizacaoRouteChildren: VisualizacaoRouteChildren = {
+  VisualizacaoPilatesRoute: VisualizacaoPilatesRoute,
+}
+
+const VisualizacaoRouteWithChildren = VisualizacaoRoute._addFileChildren(
+  VisualizacaoRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   OsteopatiaRoute: OsteopatiaRoute,
   PilatesRoute: PilatesRoute,
+  VisualizacaoRoute: VisualizacaoRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
