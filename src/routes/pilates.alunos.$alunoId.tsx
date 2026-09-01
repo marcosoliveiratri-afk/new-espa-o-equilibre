@@ -1,8 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/AppShell";
-import { TopBar } from "@/components/TopBar";
-import { AuthGuard } from "@/components/AuthGuard";
-import { ArrowLeft, Download, ExternalLink, FileText, RotateCcw } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 const tabs = ["Informações pessoais", "Plano", "Contrato", "Avaliação física", "Financeiro", "Histórico"] as const;
@@ -22,11 +19,7 @@ function PerfilAluno() {
   const student = { name: alunoId === "bruno-costa" ? "Bruno Costa" : alunoId === "camila-ferreira" ? "Camila Ferreira" : "Ana Martins", initials: alunoId === "bruno-costa" ? "BC" : alunoId === "camila-ferreira" ? "CF" : "AM" };
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-[#f7f7f5]">
-        <TopBar />
-        <AppShell>
-          <div className="mx-auto max-w-7xl">
+    <div className="mx-auto max-w-7xl">
             <Link to="/pilates/alunos" className="mb-5 inline-flex items-center gap-2 text-sm text-black/55 hover:text-black"><ArrowLeft size={17} /> Voltar para alunos</Link>
 
             <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm sm:p-6">
@@ -47,10 +40,7 @@ function PerfilAluno() {
               {tab === "Financeiro" && <Financial />}
               {tab === "Histórico" && <History />}
             </div>
-          </div>
-        </AppShell>
-      </div>
-    </AuthGuard>
+    </div>
   );
 }
 
