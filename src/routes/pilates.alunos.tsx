@@ -45,8 +45,6 @@ function Alunos() {
   const [studentList, setStudentList] = useState<Student[]>(students);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
 
-  if (pathname !== "/pilates/alunos") return <Outlet />;
-
   const filtered = useMemo(() => studentList.filter((student) => {
     const term = search.toLowerCase();
     const matchesSearch = !term || student.name.toLowerCase().includes(term) || student.phone.includes(term);
@@ -60,6 +58,8 @@ function Alunos() {
       || (alertFilter === "Avaliação vencida" && student.assessment === "Vencida");
     return matchesSearch && matchesActivity && matchesTeacher && matchesPlan && matchesAlert;
   }), [studentList, search, activity, alertFilter, teacher, plan]);
+
+  if (pathname !== "/pilates/alunos") return <Outlet />;
 
   return (
     <AuthGuard>
