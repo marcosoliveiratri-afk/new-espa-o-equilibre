@@ -13,8 +13,8 @@ function Pilates() {
     <AuthGuard>
       <div className="min-h-screen bg-[#f7f7f5]">
         <TopBar />
-        {isDashboard ? (
-          <AppShell>
+        <AppShell>
+          {isDashboard ? (
             <div className="mx-auto max-w-7xl">
               <div className="mb-8">
                 <p className="text-sm font-medium text-black/45">Módulo</p>
@@ -30,10 +30,10 @@ function Pilates() {
                 </p>
               </div>
             </div>
-          </AppShell>
-        ) : (
-          <Outlet />
-        )}
+          ) : (
+            <Outlet />
+          )}
+        </AppShell>
       </div>
     </AuthGuard>
   );
