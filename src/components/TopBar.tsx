@@ -11,8 +11,8 @@ export function TopBar() {
     supabase.auth.getUser().then(({ data }) => {
       if (!mounted || !data.user) return;
       const name =
-        data.user.user_metadata?.full_name ||
-        data.user.user_metadata?.name ||
+        data.user.user_metadata?.['full_name'] ||
+        data.user.user_metadata?.['name'] ||
         data.user.email?.split("@")[0] ||
         "Usuário";
       setUser({ name, email: data.user.email || "" });
@@ -26,8 +26,8 @@ export function TopBar() {
         return;
       }
       const name =
-        currentUser.user_metadata?.full_name ||
-        currentUser.user_metadata?.name ||
+        currentUser.user_metadata?.['full_name'] ||
+        currentUser.user_metadata?.['name'] ||
         currentUser.email?.split("@")[0] ||
         "Usuário";
       setUser({ name, email: currentUser.email || "" });
