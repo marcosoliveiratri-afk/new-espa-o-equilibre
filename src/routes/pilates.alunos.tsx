@@ -1,7 +1,4 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { AppShell } from "@/components/AppShell";
-import { TopBar } from "@/components/TopBar";
-import { AuthGuard } from "@/components/AuthGuard";
 import { Filter, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -62,11 +59,7 @@ function Alunos() {
   if (pathname !== "/pilates/alunos") return <Outlet />;
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-[#f7f7f5]">
-        <TopBar />
-        <AppShell>
-          <div className="w-full max-w-none">
+    <div className="w-full max-w-none">
             <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
                 <p className="text-sm font-medium text-black/45">Pilates</p>
@@ -150,9 +143,6 @@ function Alunos() {
                 </div>
               </div>
             )}
-          </div>
-        </AppShell>
-      </div>
-    </AuthGuard>
+    </div>
   );
 }
