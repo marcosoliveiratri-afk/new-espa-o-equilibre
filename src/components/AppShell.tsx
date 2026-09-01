@@ -3,11 +3,11 @@ import { ChevronLeft, ChevronRight, LayoutDashboard, Menu, Settings, Users, Flas
 import { useState } from "react";
 
 const pilatesItems = [
-  { label: "Dashboard", to: "/pilates", icon: LayoutDashboard },
   { label: "Alunos", to: "/pilates/alunos", icon: Users },
   { label: "Aulas experimentais", to: "/pilates/aulas-experimentais", icon: FlaskConical },
   { label: "Central de alertas", to: "/pilates/alertas", icon: BellRing },
   { label: "Fechamentos", to: "/pilates/fechamentos", icon: ReceiptText },
+  { label: "Dashboard", to: "/pilates", icon: LayoutDashboard },
   { label: "Configurações", to: "/pilates/configuracoes", icon: Settings },
 ] as const;
 
