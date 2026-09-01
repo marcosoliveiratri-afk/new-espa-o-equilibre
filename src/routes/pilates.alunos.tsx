@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -35,6 +35,7 @@ const statusClass = (value: string) => {
 export const Route = createFileRoute("/pilates/alunos")({ component: Alunos });
 
 function Alunos() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [search, setSearch] = useState("");
   const [activity, setActivity] = useState("Todos");
   const [alertFilter, setAlertFilter] = useState("Todos");
@@ -43,6 +44,8 @@ function Alunos() {
   const [showForm, setShowForm] = useState(false);
   const [studentList, setStudentList] = useState<Student[]>(students);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+
+  if (pathname !== "/pilates/alunos") return <Outlet />;
 
   const filtered = useMemo(() => studentList.filter((student) => {
     const term = search.toLowerCase();
