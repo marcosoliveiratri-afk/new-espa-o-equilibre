@@ -21,6 +21,7 @@ import { Route as PilatesAulasExperimentaisRouteImport } from './routes/pilates.
 import { Route as PilatesConfiguracoesRouteImport } from './routes/pilates.configuracoes'
 import { Route as PilatesFechamentosRouteImport } from './routes/pilates.fechamentos'
 import { Route as PilatesFluxoCaixaRouteImport } from './routes/pilates.fluxo-caixa'
+import { Route as VisualizacaoOsteopatiaRouteImport } from './routes/visualizacao.osteopatia'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 import { Route as PilatesAlunosAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
 
@@ -85,6 +86,11 @@ const PilatesFluxoCaixaRoute = PilatesFluxoCaixaRouteImport.update({
   path: '/fluxo-caixa',
   getParentRoute: () => PilatesRoute,
 } as any)
+const VisualizacaoOsteopatiaRoute = VisualizacaoOsteopatiaRouteImport.update({
+  id: '/osteopatia',
+  path: '/osteopatia',
+  getParentRoute: () => VisualizacaoRoute,
+} as any)
 const VisualizacaoPilatesRoute = VisualizacaoPilatesRouteImport.update({
   id: '/pilates',
   path: '/pilates',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
+  '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
 }
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
+  '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
 }
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
+  '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
 }
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/pilates/configuracoes'
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
+    | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/pilates/alunos/$alunoId'
   fileRoutesByTo: FileRoutesByTo
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/pilates/configuracoes'
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
+    | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/pilates/alunos/$alunoId'
   id:
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/pilates/configuracoes'
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
+    | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/pilates/alunos/$alunoId'
   fileRoutesById: FileRoutesById
@@ -290,6 +302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilatesFluxoCaixaRouteImport
       parentRoute: typeof PilatesRoute
     }
+    '/visualizacao/osteopatia': {
+      id: '/visualizacao/osteopatia'
+      path: '/osteopatia'
+      fullPath: '/visualizacao/osteopatia'
+      preLoaderRoute: typeof VisualizacaoOsteopatiaRouteImport
+      parentRoute: typeof VisualizacaoRoute
+    }
     '/visualizacao/pilates': {
       id: '/visualizacao/pilates'
       path: '/pilates'
@@ -343,10 +362,12 @@ const PilatesRouteWithChildren =
   PilatesRoute._addFileChildren(PilatesRouteChildren)
 
 interface VisualizacaoRouteChildren {
+  VisualizacaoOsteopatiaRoute: typeof VisualizacaoOsteopatiaRoute
   VisualizacaoPilatesRoute: typeof VisualizacaoPilatesRoute
 }
 
 const VisualizacaoRouteChildren: VisualizacaoRouteChildren = {
+  VisualizacaoOsteopatiaRoute: VisualizacaoOsteopatiaRoute,
   VisualizacaoPilatesRoute: VisualizacaoPilatesRoute,
 }
 
