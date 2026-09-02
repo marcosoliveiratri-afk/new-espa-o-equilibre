@@ -327,7 +327,7 @@ export type Database = {
       student_plans: {
         Row: {
           created_at: string
-          due_date: string
+          due_date: string | null
           id: string
           monthly_value: number
           plan_id: string
@@ -338,7 +338,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          due_date: string
+          due_date?: string | null
           id?: string
           monthly_value: number
           plan_id: string
@@ -349,7 +349,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          due_date?: string
+          due_date?: string | null
           id?: string
           monthly_value?: number
           plan_id?: string
