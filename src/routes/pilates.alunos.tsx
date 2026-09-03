@@ -23,7 +23,20 @@ function Alunos(){
   setPlans(p.data||[]);setTeachers(t.data||[]);
   setRows((s.data||[]).map((x:any)=>{const sp=(x.student_plans||[])[0]||{};const c=(x.student_contracts||[])[0]||{};const a=(x.physical_assessments||[])[0]||{};const pay=(x.student_payments||[])[0]||{};return {id:x.id,full_name:x.full_name,phone:x.phone,active:x.active,plan:sp.plans?.name||"—",teacher:sp.teachers?.name||"—",due:sp.due_date||null,planStatus:sp.status||"—",contract:c.status||"—",assessment:a.status||"—",financial:pay.status==="Pago"?"Regular":pay.status||"—",destination:pay.destination||"—"};}));setLoading(false);
  }
- useEffect(()=>{load();},[]);
+ useEffect(()=>{load();},[pathname]);
+ useEffect(()=>{
+  const db=supabase as any;
+  const channel=db.channel("alunos-sync")
+   .on("postgres_changes",{event:"*",schema:"public",table:"students"},()=>load())
+   .on("postgres_changes",{event:"*",schema:"public",table:"student_plans"},()=>load())
+   .on("postgres_changes",{event:"*",schema:"public",table:"student_contracts"},()=>load())
+   .on("postgres_changes",{event:"*",schema:"public",table:"physical_assessments"},()=>load())
+   .on("postgres_changes",{event:"*",schema:"public",table:"student_payments"},()=>load())
+   .subscribe();
+  const onFocus=()=>load();
+  window.addEventListener("focus",onFocus);
+  return ()=>{db.removeChannel(channel);window.removeEventListener("focus",onFocus);};
+ },[]);
  const filtered=useMemo(()=>rows.filter(x=>(!search||x.full_name.toLowerCase().includes(search.toLowerCase())||(x.phone||"").includes(search))&&(activity==="Todos"||(activity==="Ativos"?x.active:!x.active))&&(teacher==="Todos"||x.teacher===teacher)&&(plan==="Todos"||x.plan===plan)&&(destination==="Todos"||x.destination===destination)),[rows,search,activity,teacher,plan,destination]);
  
  async function save(){if(!form.full_name||!form.plan_id||!form.start_date||!form.due_date){setError("Preencha nome, plano, início e a data de vencimento (dia da cobrança).");return;}const db=supabase as any;const {data:st,error:e}=await db.from("students").insert({full_name:form.full_name,phone:form.phone||null}).select().single();if(e){setError(e.message);return;}const {error:pe}=await db.from("student_plans").insert({student_id:st.id,plan_id:form.plan_id,teacher_id:form.teacher_id||null,monthly_value:moneyToNumber(form.monthly_value),start_date:form.start_date,due_date:form.due_date});if(pe){setError(pe.message);return;}await db.from("student_audit_log").insert({student_id:st.id,action:"Cadastro criado",details:{source:"interface"}});setShowForm(false);setForm({full_name:"",phone:"",plan_id:"",teacher_id:"",monthly_value:"",start_date:new Date().toISOString().slice(0,10),due_date:""});load();}
