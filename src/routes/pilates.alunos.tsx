@@ -13,7 +13,7 @@ const statusClass=(v:string)=>["Vencida","Vencendo","Pendente","Vencido"].includ
 export const Route=createFileRoute("/pilates/alunos")({component:Alunos});
 function Alunos(){
  const pathname=useRouterState({select:s=>s.location.pathname}); const [rows,setRows]=useState<Student[]>([]); const [plans,setPlans]=useState<any[]>([]); const [teachers,setTeachers]=useState<any[]>([]);
- const [loading,setLoading]=useState(true),[error,setError]=useState(""); const [search,setSearch]=useState(""),[activity,setActivity]=useState("Todos"),[teacher,setTeacher]=useState("Todos"),[plan,setPlan]=useState("Todos"),[showForm,setShowForm]=useState(false),[deleting,setDeleting]=useState<Student|null>(null);
+ const [loading,setLoading]=useState(true),[error,setError]=useState(""); const [search,setSearch]=useState(""),[activity,setActivity]=useState("Todos"),[teacher,setTeacher]=useState("Todos"),[plan,setPlan]=useState("Todos"),[destination,setDestination]=useState("Todos"),[showForm,setShowForm]=useState(false),[deleting,setDeleting]=useState<Student|null>(null);
  const [form,setForm]=useState({full_name:"",phone:"",plan_id:"",teacher_id:"",monthly_value:"",start_date:new Date().toISOString().slice(0,10),due_date:""});
  async function load(){
   setLoading(true);setError("");
