@@ -18,7 +18,7 @@ function Alunos(){
  async function load(){
   setLoading(true);setError("");
   const db=supabase as any;
-  const [s,p,t]=await Promise.all([db.from("students").select("*,student_plans(plan_id,teacher_id,due_date,status,plans(name),teachers(name)),student_contracts(status,end_date),physical_assessments(status,next_assessment_date),student_payments(status,due_date)").order("full_name"),db.from("plans").select("*").order("duration_months"),db.from("teachers").select("*").eq("active",true).order("name")]);
+  const [s,p,t]=await Promise.all([db.from("students").select("*,student_plans(plan_id,teacher_id,due_date,status,plans(name),teachers(name)),student_contracts(status,end_date),physical_assessments(status,next_assessment_date),student_payments(status,due_date,destination)").order("full_name"),db.from("plans").select("*").order("duration_months"),db.from("teachers").select("*").eq("active",true).order("name")]);
   if(s.error){setError(s.error.message);setLoading(false);return;} if(p.error||t.error){setError(p.error?.message||t.error?.message||"Erro ao carregar dados");}
   setPlans(p.data||[]);setTeachers(t.data||[]);
   setRows((s.data||[]).map((x:any)=>{const sp=(x.student_plans||[])[0]||{};const c=(x.student_contracts||[])[0]||{};const a=(x.physical_assessments||[])[0]||{};const pay=(x.student_payments||[])[0]||{};return {id:x.id,full_name:x.full_name,phone:x.phone,active:x.active,plan:sp.plans?.name||"—",teacher:sp.teachers?.name||"—",due:sp.due_date||null,planStatus:sp.status||"—",contract:c.status||"—",assessment:a.status||"—",financial:pay.status==="Pago"?"Regular":pay.status||"—"};}));setLoading(false);
