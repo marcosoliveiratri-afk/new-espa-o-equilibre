@@ -3,7 +3,7 @@ import { Filter, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type Student={id:string;full_name:string;phone:string|null;active:boolean;plan:string;teacher:string;due:string|null;planStatus:string;contract:string;assessment:string;financial:string};
+type Student={id:string;full_name:string;phone:string|null;active:boolean;plan:string;teacher:string;due:string|null;planStatus:string;contract:string;assessment:string;financial:string;destination:string};
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T00:00:00")):"—";
 const formatPhone=(value:string)=>{const digits=value.replace(/[^0-9]/g,"").slice(0,11);if(digits.length===0)return "";if(digits.length<=2)return `(${digits}`;if(digits.length<=3)return `(${digits.slice(0,2)}) ${digits.slice(2)}`;if(digits.length<=7)return `(${digits.slice(0,2)}) ${digits.slice(2,3)} ${digits.slice(3)}`;return `(${digits.slice(0,2)}) ${digits.slice(2,3)} ${digits.slice(3,7)}-${digits.slice(7)}`};
 const formatMoneyInput=(value:string)=>{const digits=String(value??"").replace(/[^0-9]/g,"");if(!digits)return "";const cents=Number(digits);if(!Number.isFinite(cents))return "";return (cents/100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});};
