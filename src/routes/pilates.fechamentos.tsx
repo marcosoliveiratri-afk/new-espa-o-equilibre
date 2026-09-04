@@ -8,11 +8,9 @@ import {
   Wallet,
   FileDown,
   Save,
-  CalendarDays,
-  Filter,
-  Users,
-  CreditCard,
-  TrendingUp,
+  Scale,
+  ArrowLeftRight,
+  CheckCircle2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/pilates/fechamentos")({
@@ -20,9 +18,33 @@ export const Route = createFileRoute("/pilates/fechamentos")({
 });
 
 const brl = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  Number(v || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 
-const ACCENTS: any = {
+const fmtDate = (d?: string | null) =>
+  d ? new Intl.DateTimeFormat("pt-BR").format(new Date(d + "T00:00:00")) : "—";
+
+const MONTHS = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+const ACCENTS: Record<
+  string,
+  { ring: string; bg: string; chip: string; bar: string }
+> = {
   sky: {
     ring: "border-sky-200/70",
     bg: "bg-gradient-to-br from-sky-50 to-white",
@@ -108,15 +130,7 @@ function Card({
   );
 }
 
-function SectionTitle({
-  title,
-  count,
-}: {
-  icon?: any;
-  title: string;
-  tone?: string;
-  count?: number;
-}) {
+function SectionTitle({ title, count }: { title: string; count?: number }) {
   return (
     <div className="mb-4 flex items-center gap-2">
       <h2 className="text-lg font-bold tracking-tight text-black/80">
@@ -129,71 +143,85 @@ function SectionTitle({
   );
 }
 
+type Row = {
+  key: string;
+  date: string | null;
+  student: string;
+  type: string;
+  amount: number;
+  destination: string;
+  method: string | null;
+  teacher_id: string | null;
+};
+
 function Fechamentos() {
+  const now = new Date();
+  const [year, setYear] = useState(String(now.getFullYear()));
+  const [monthNum, setMonthNum] = useState(
+    String(now.getMonth() + 1).padStart(2, "0")
+  );
+  const [teacher, setTeacher] = useState("all");
+  const [teachers, setTeachers] = useState<any[]>([]);
+  const [plans, setPlans] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [entries, setEntries] = useState<any[]>([]);
   const [split, setSplit] = useState({
     professor_percentage: 50,
     clinic_percentage: 50,
   });
-  const [teacher, setTeacher] = useState("all"),
-    [teachers, setTeachers] = useState<any[]>([]),
-    [plans, setPlans] = useState<any[]>([]),
-    [payments, setPayments] = useState<any[]>([]),
-    [entries, setEntries] = useState<any[]>([]),
-    [month, setMonth] = useState(new Date().toISOString().slice(0, 7)),
-    [form, setForm] = useState({
-      description: "Aula avulsa",
-      amount: "",
-      entry_date: new Date().toISOString().slice(0, 10),
-    });
   const [error, setError] = useState("");
-  const [savingReport, setSavingReport] = useState(false);
-  const [basis, setBasis] = useState<"paid_at" | "due_date">("paid_at");
   const [loading, setLoading] = useState(true);
+  const [savingReport, setSavingReport] = useState(false);
+
+  const month = `${year}-${monthNum}`;
 
   const load = async () => {
-    setLoading(true);
     const db = supabase as any;
-    const [t, sp, p, e, fs] = await Promise.all([
-      db.from("teachers").select("*").eq("active", true).order("name"),
+    const [t, sp, p, st, pl, e, fs] = await Promise.all([
+      db.from("teachers").select("*").order("name"),
       db.from("student_plans").select("*"),
       db.from("student_payments").select("*"),
+      db.from("students").select("id,full_name"),
+      db.from("private_lesson_students").select("*"),
       db.from("teacher_financial_entries").select("*"),
       db.from("financial_split_settings").select("*").limit(1).maybeSingle(),
     ]);
-    if ([t, sp, p, e, fs].find((x: any) => x.error))
-      setError([t, sp, p, e, fs].find((x: any) => x.error)?.error.message);
+    const err = [t, sp, p, st, pl, e, fs].find((x: any) => x?.error);
+    setError(err ? err.error.message : "");
     setTeachers(t.data || []);
     setPlans(sp.data || []);
     setPayments(p.data || []);
+    setStudents(st.data || []);
+    setLessons(pl.data || []);
     setEntries(e.data || []);
     if (fs.data)
       setSplit({
-        professor_percentage: Number(fs.data.professor_percentage),
-        clinic_percentage: Number(fs.data.clinic_percentage),
+        professor_percentage: Number(fs.data.professor_percentage) || 50,
+        clinic_percentage: Number(fs.data.clinic_percentage) || 50,
       });
     setLoading(false);
   };
 
   useEffect(() => {
     load();
-    const ch = supabase
-      .channel("fechamentos-payments")
-      .on(
+    const ch = supabase.channel("fechamentos-realtime");
+    [
+      "student_payments",
+      "student_plans",
+      "private_lesson_students",
+      "teacher_financial_entries",
+      "financial_split_settings",
+    ].forEach((table) =>
+      ch.on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "student_payments" },
-        () => {
-          load();
-        }
+        { event: "*", schema: "public", table },
+        () => void load()
       )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "teacher_financial_entries" },
-        () => {
-          load();
-        }
-      )
-      .subscribe();
-    const onFocus = () => load();
+    );
+    ch.subscribe();
+    const onFocus = () => void load();
     window.addEventListener("focus", onFocus);
     return () => {
       supabase.removeChannel(ch);
@@ -202,259 +230,292 @@ function Fechamentos() {
   }, []);
 
   const m = useMemo(() => {
-    const paid = payments.filter(
-      (x: any) =>
-        x.status === "Pago" && String(x[basis] || "").slice(0, 7) === month
-    );
-    const details = paid
-      .map((x: any) => ({
-        ...x,
-        plan: plans.find(
-          (p: any) => p.id === x.plan_id || p.plan_id === x.plan_id
-        ),
-      }))
-      .filter((x: any) =>
-        teacher === "all" ? true : teacher ? x.plan?.teacher_id === teacher : true
+    const studentName = (id: string) =>
+      students.find((s: any) => s.id === id)?.full_name || "Aluno";
+    const inMonth = (d?: string | null) => !!d && d.slice(0, 7) === month;
+    const norm = (d?: string | null) =>
+      d === "Professor" ? "Professor" : "Clínica";
+    const isPaid = (s?: string | null) =>
+      ["pago", "recebido", "pago parcial"].includes(
+        String(s || "").toLowerCase()
       );
-    const planRevenue = details.reduce(
-      (a: number, x: any) => a + Number(x.amount || 0),
-      0
+
+    const rows: Row[] = [];
+
+    // 1. Mensalidades / planos / parcelas efetivamente pagas
+    payments.forEach((x: any) => {
+      if (!isPaid(x.status)) return;
+      const date = x.paid_at || x.due_date;
+      if (!inMonth(date)) return;
+      const plan = plans.find((p: any) => p.id === x.plan_id);
+      rows.push({
+        key: "sp-" + x.id,
+        date,
+        student: studentName(x.student_id),
+        type: String(x.status).toLowerCase().includes("parcial")
+          ? "Parcela"
+          : "Mensalidade",
+        amount: Number(x.amount || 0),
+        destination: norm(x.destination),
+        method: x.payment_method || null,
+        teacher_id: plan?.teacher_id || null,
+      });
+    });
+
+    // 2. Aulas avulsas pagas
+    lessons.forEach((x: any) => {
+      if (!x.paid) return;
+      const date = x.paid_at || x.lesson_date;
+      if (!inMonth(date)) return;
+      rows.push({
+        key: "pl-" + x.id,
+        date,
+        student: x.full_name,
+        type: "Aula avulsa",
+        amount: Number(x.lesson_value || 0),
+        destination: norm(x.destination),
+        method: x.payment_method || null,
+        teacher_id: x.teacher_id || null,
+      });
+    });
+
+    // 3. Outros recebimentos lançados manualmente
+    entries.forEach((x: any) => {
+      if (!isPaid(x.status)) return;
+      if (!inMonth(x.entry_date)) return;
+      rows.push({
+        key: "fe-" + x.id,
+        date: x.entry_date,
+        student: x.description || "Lançamento",
+        type: /avuls/i.test(x.description || "") ? "Aula avulsa" : "Outros",
+        amount: Number(x.amount || 0),
+        destination: norm(x.destination),
+        method: null,
+        teacher_id: x.teacher_id || null,
+      });
+    });
+
+    const filtered = (
+      teacher === "all" ? rows : rows.filter((r) => r.teacher_id === teacher)
+    ).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+    const sum = (list: Row[]) => list.reduce((a, x) => a + x.amount, 0);
+    const total = sum(filtered);
+    const receivedProfessor = sum(
+      filtered.filter((r) => r.destination === "Professor")
     );
-    const extraRows = entries.filter((x: any) =>
-      x.status === "Pago" &&
-      x.entry_date?.slice(0, 7) === month &&
-      (teacher === "all" ? true : teacher ? x.teacher_id === teacher : false)
+    const receivedClinic = sum(
+      filtered.filter((r) => r.destination === "Clínica")
     );
-    const extra = extraRows.reduce(
-      (a: number, x: any) => a + Number(x.amount || 0),
-      0
-    );
-    const total = planRevenue + extra;
-    const paymentMethods = details.reduce((acc: any, x: any) => {
-      const key = x.payment_method || "Não informado";
-      acc[key] = (acc[key] || 0) + Number(x.amount || 0);
+    const shareProfessor = total * (split.professor_percentage / 100);
+    const shareClinic = total * (split.clinic_percentage / 100);
+    const balanceProfessor = receivedProfessor - shareProfessor;
+    const balanceClinic = receivedClinic - shareClinic;
+    const adjustment = Math.abs(balanceProfessor);
+    const status: "equal" | "professor" | "clinic" =
+      Math.round(adjustment * 100) === 0
+        ? "equal"
+        : balanceProfessor > 0
+        ? "professor"
+        : "clinic";
+
+    const byType = filtered.reduce<Record<string, number>>((acc, x) => {
+      acc[x.type] = (acc[x.type] || 0) + x.amount;
       return acc;
     }, {});
-    const byTeacher = teachers
-      .map((t) => ({
-        teacher: t,
-        rows: details.filter((x: any) => x.plan?.teacher_id === t.id),
-        total: details
-          .filter((x: any) => x.plan?.teacher_id === t.id)
-          .reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
-      }))
-      .filter((x: any) => x.rows.length || teacher === "all");
-    const destProfessor = details
-      .filter((x: any) => x.destination === "Professor")
-      .reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
-    const destClinica = details
-      .filter((x: any) => x.destination === "Clínica")
-      .reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
-    return {
-      details,
-      extraRows,
-      planRevenue,
-      extra,
-      total,
-      destProfessor,
-      destClinica,
-      teacherShare: total * (split.professor_percentage / 100),
-      clinicShare: total * (split.clinic_percentage / 100),
-      paymentMethods,
-      byTeacher,
-    };
-  }, [payments, plans, entries, teacher, month, teachers, split, basis]);
 
-  const reportSnapshot = () => ({
-    month,
-    teacher,
-    teacher_name:
-      teacher === "all"
-        ? "Todos os professores"
-        : teachers.find((t: any) => t.id === teacher)?.name ||
-          "Todos os professores",
-    total: m.total,
-    planRevenue: m.planRevenue,
-    extra: m.extra,
-    teacherShare: m.teacherShare,
-    clinicShare: m.clinicShare,
-    paymentMethods: m.paymentMethods,
-    details: m.details.map((x: any) => ({
-      amount: x.amount,
-      destination: x.destination,
-      payment_method: x.payment_method,
-      paid_at: x.paid_at,
-      teacher_id: x.plan?.teacher_id,
-    })),
-  });
+    return {
+      rows: filtered,
+      total,
+      receivedProfessor,
+      receivedClinic,
+      shareProfessor,
+      shareClinic,
+      balanceProfessor,
+      balanceClinic,
+      adjustment,
+      status,
+      byType,
+    };
+  }, [payments, lessons, entries, plans, students, month, teacher, split]);
+
+  const teacherName =
+    teacher === "all"
+      ? "Todos os professores"
+      : teachers.find((t: any) => t.id === teacher)?.name || "Professor";
+
+  const statusUi =
+    m.status === "equal"
+      ? {
+          label: "Fechamento equilibrado",
+          detail: "Nenhum valor a repassar neste período.",
+          box: "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
+          bar: "bg-emerald-500",
+          text: "text-emerald-700",
+          icon: CheckCircle2,
+        }
+      : m.status === "professor"
+      ? {
+          label: `Professor deve repassar ${brl(m.adjustment)} para a Clínica`,
+          detail: "O professor recebeu acima da cota de 50%.",
+          box: "border-amber-200 bg-gradient-to-br from-amber-50 to-white",
+          bar: "bg-amber-500",
+          text: "text-amber-700",
+          icon: ArrowLeftRight,
+        }
+      : {
+          label: `Clínica deve repassar ${brl(m.adjustment)} para o Professor`,
+          detail: "A clínica recebeu acima da cota de 50%.",
+          box: "border-sky-200 bg-gradient-to-br from-sky-50 to-white",
+          bar: "bg-sky-500",
+          text: "text-sky-700",
+          icon: ArrowLeftRight,
+        };
 
   const saveReport = async () => {
     setSavingReport(true);
     setError("");
-    const snap = reportSnapshot();
     const { error } = await (supabase as any)
       .from("teacher_financial_reports")
       .insert({
         month,
-        teacher_id: teacher === "all" || !teacher ? null : teacher,
-        teacher_name: snap.teacher_name,
+        teacher_id: teacher === "all" ? null : teacher,
+        teacher_name: teacherName,
         total: m.total,
-        snapshot: snap,
+        snapshot: {
+          month,
+          teacher_name: teacherName,
+          total: m.total,
+          receivedProfessor: m.receivedProfessor,
+          receivedClinic: m.receivedClinic,
+          shareProfessor: m.shareProfessor,
+          shareClinic: m.shareClinic,
+          adjustment: m.adjustment,
+          status: statusUi.label,
+          rows: m.rows,
+        },
       });
     if (error) setError(error.message);
-    else alert("Relatório salvo no histórico.");
+    else alert("Fechamento salvo no histórico.");
     setSavingReport(false);
   };
 
   const printReport = () => {
-    const title =
-      teacher === "all"
-        ? "Todos os professores"
-        : teachers.find((t: any) => t.id === teacher)?.name || "Professor";
-    const rows = m.details
+    const rows = m.rows
       .map(
-        (x: any) =>
-          `<tr><td>${
-            teachers.find((t: any) => t.id === x.plan?.teacher_id)?.name ||
-            "Não informado"
-          }</td><td>${x.destination || "—"}</td><td>${
-            x.payment_method || "—"
-          }</td><td>${x.paid_at || "—"}</td><td>${brl(
-            Number(x.amount || 0)
-          )}</td></tr>`
-      )
-      .join("");
-    const methods = Object.entries(m.paymentMethods)
-      .map(([k, v]: any) => `<tr><td>${k}</td><td>${brl(Number(v))}</td></tr>`)
-      .join("");
-    const teacherRows = m.byTeacher
-      .map(
-        (x: any) =>
-          `<tr><td>${x.teacher.name}</td><td>${x.rows.length}</td><td>${brl(
-            x.total
-          )}</td><td>${brl(
-            x.total * (split.professor_percentage / 100)
-          )}</td></tr>`
+        (x) =>
+          `<tr><td>${fmtDate(x.date)}</td><td>${x.student}</td><td>${
+            x.type
+          }</td><td>${brl(x.amount)}</td><td>${x.destination}</td></tr>`
       )
       .join("");
     const w = window.open("", "_blank");
     if (!w) return;
     w.document.write(
-      `<!doctype html><html><head><meta charset="utf-8"><title>Relatório de Fechamento</title><style>body{font-family:Arial,sans-serif;color:#222;padding:32px}h1{margin-bottom:4px}h2{margin-top:28px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #ddd;padding:8px;text-align:left}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.card{border:1px solid #ddd;padding:14px;border-radius:8px}.value{font-size:22px;font-weight:bold}.muted{color:#666}@media print{body{padding:0}}</style></head><body><h1>Relatório Completo de Fechamento</h1><p class="muted">Período: ${month} · Responsável: ${title}</p><h2>Resumo financeiro</h2><div class="grid"><div class="card">Mensalidades<div class="value">${brl(
-        m.planRevenue
-      )}</div></div><div class="card">Aulas avulsas<div class="value">${brl(
-        m.extra
-      )}</div></div><div class="card">Total recebido<div class="value">${brl(
-        m.total
-      )}</div></div><div class="card">Parte do professor (${
-        split.professor_percentage
-      }%)<div class="value">${brl(
-        m.teacherShare
-      )}</div></div><div class="card">Parte da clínica (${
-        split.clinic_percentage
-      }%)<div class="value">${brl(m.clinicShare)}</div></div></div><h2>Recebimentos por meio de pagamento</h2><table><thead><tr><th>Meio</th><th>Total</th></tr></thead><tbody>${
-        methods || "<tr><td colspan=2>Nenhum recebimento</td></tr>"
-      }</tbody></table><h2>Detalhamento de todas as mensalidades recebidas</h2><table><thead><tr><th>Professor</th><th>Destino</th><th>Forma de pagamento</th><th>Data</th><th>Valor</th></tr></thead><tbody>${
-        rows || "<tr><td colspan=5>Nenhum recebimento</td></tr>"
-      }</tbody></table>${
-        teacher === "all"
-          ? `<h2>Consolidado por professor</h2><table><thead><tr><th>Professor</th><th>Recebimentos</th><th>Total</th><th>50% do professor</th></tr></thead><tbody>${teacherRows}</tbody></table>`
-          : ""
-      }<h2>Informações do relatório</h2><p>Este documento consolida exclusivamente os pagamentos marcados como pagos no sistema para o período selecionado, incluindo destino e forma de recebimento.</p><script>window.onload=()=>window.print()</script></body></html>`
+      `<!doctype html><html><head><meta charset="utf-8"><title>Fechamento ${month}</title><style>body{font-family:Arial,sans-serif;color:#222;padding:32px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #ddd;padding:8px;text-align:left}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.card{border:1px solid #ddd;padding:14px;border-radius:8px}.value{font-size:20px;font-weight:bold}</style></head><body>` +
+        `<h1>Fechamento — ${MONTHS[Number(monthNum) - 1]}/${year}</h1><p>${teacherName}</p>` +
+        `<div class="grid"><div class="card">Total recebido<div class="value">${brl(
+          m.total
+        )}</div></div><div class="card">Professor recebeu<div class="value">${brl(
+          m.receivedProfessor
+        )}</div></div><div class="card">Clínica recebeu<div class="value">${brl(
+          m.receivedClinic
+        )}</div></div><div class="card">Cota do professor (50%)<div class="value">${brl(
+          m.shareProfessor
+        )}</div></div><div class="card">Cota da clínica (50%)<div class="value">${brl(
+          m.shareClinic
+        )}</div></div><div class="card">Ajuste<div class="value">${brl(
+          m.adjustment
+        )}</div></div></div>` +
+        `<h2>${statusUi.label}</h2>` +
+        `<h2>Detalhamento</h2><table><thead><tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Valor</th><th>Recebido por</th></tr></thead><tbody>${
+          rows || "<tr><td colspan=5>Nenhum recebimento no período</td></tr>"
+        }</tbody></table>` +
+        `<script>window.onload=()=>window.print()</script></body></html>`
     );
     w.document.close();
   };
 
-  const add = async () => {
-    if (!teacher || !Number(form.amount)) {
-      setError("Selecione o professor e informe o valor.");
-      return;
-    }
-    const { error } = await (supabase as any)
-      .from("teacher_financial_entries")
-      .insert({
-        teacher_id: teacher,
-        description: form.description,
-        amount: Number(form.amount),
-        entry_date: form.entry_date,
-        status: "Pago",
-      });
-    if (error) setError(error.message);
-    else {
-      setForm({ ...form, amount: "" });
-      load();
-    }
-  };
-
   if (loading)
     return (
-      <div className="py-12 text-center text-sm text-black/45">
+      <div className="w-full max-w-none p-2 text-sm text-black/50">
         Carregando fechamento...
       </div>
     );
 
+  const years = Array.from(
+    new Set([
+      String(now.getFullYear() - 1),
+      String(now.getFullYear()),
+      String(now.getFullYear() + 1),
+      year,
+    ])
+  ).sort();
+
   return (
-    <div className="mx-auto max-w-7xl">
-      <div className="mb-8 overflow-hidden rounded-3xl border border-black/5 bg-gradient-to-r from-[#0f766e] via-[#115e59] to-[#1f2937] p-7 text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,.7)]">
+    <div className="w-full max-w-none">
+      <div className="mb-7 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 p-7 text-white shadow-[0_18px_40px_-24px_rgba(6,78,59,.9)]">
         <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/60">
-          Área financeira
+          Pilates
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-          Fechamentos dos Professores
-        </h1>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight">Fechamento</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/70">
-          Divisão automática de {split.professor_percentage}% para a clínica e{" "}
-          {split.clinic_percentage}% para o professor, baseada nas receitas
-          recebidas.
+          Divisão automática 50% / 50% sobre tudo que foi efetivamente recebido
+          no período — mensalidades, parcelas, planos e aulas avulsas pagas.
         </p>
       </div>
 
       {error && (
-        <div className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4 rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-        <div className="flex flex-wrap items-end gap-4">
-          <div>
-            <label className="text-xs font-medium text-black/50">Professor</label>
-            <select
-              value={teacher}
-              onChange={(e) => setTeacher(e.target.value)}
-              className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
-            >
-              <option value="all">Todos os professores</option>
-              <option value="">Selecione o professor</option>
-              {teachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-medium text-black/50">Mês de referência</label>
-            <input
-              type="month"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-              className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-black/50">Base do cálculo</label>
-            <select
-              value={basis}
-              onChange={(e) => setBasis(e.target.value as any)}
-              className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
-            >
-              <option value="paid_at">Data do pagamento</option>
-              <option value="due_date">Vencimento (competência)</option>
-            </select>
-          </div>
+      <div className="mb-7 flex flex-wrap items-end gap-4 rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+        <div>
+          <label className="text-xs font-medium text-black/50">Mês</label>
+          <select
+            value={monthNum}
+            onChange={(e) => setMonthNum(e.target.value)}
+            className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
+          >
+            {MONTHS.map((name, i) => (
+              <option key={name} value={String(i + 1).padStart(2, "0")}>
+                {name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div>
+          <label className="text-xs font-medium text-black/50">Ano</label>
+          <select
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
+          >
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-black/50">Professor</label>
+          <select
+            value={teacher}
+            onChange={(e) => setTeacher(e.target.value)}
+            className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
+          >
+            <option value="all">Todos os professores</option>
+            {teachers.map((t: any) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="ml-auto flex flex-wrap gap-3">
           <button
             onClick={saveReport}
             disabled={savingReport}
@@ -468,264 +529,194 @@ function Fechamentos() {
             className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-black/80"
           >
             <FileDown size={16} />
-            Gerar relatório completo
+            Gerar relatório
           </button>
         </div>
       </div>
 
-      <section className="mb-9">
-        <SectionTitle
-          icon={TrendingUp}
-          tone="emerald"
-          title="Resumo por destino de pagamento"
-        />
-        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+      <section className="mb-8">
+        <SectionTitle title="Indicadores do período" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Card
-            title="Destino: Professor"
-            value={brl(m.destProfessor)}
-            icon={UserRoundCheck}
-            detail="Total recebido com destino Professor no período"
-            accent="sky"
-          />
-          <Card
-            title="Destino: Clínica"
-            value={brl(m.destClinica)}
-            icon={Landmark}
-            detail="Total recebido com destino Clínica no período"
-            accent="emerald"
-          />
-        </div>
-      </section>
-
-      <section className="mb-9">
-        <SectionTitle
-          icon={CircleDollarSign}
-          tone="violet"
-          title="Receitas do fechamento"
-        />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card
-            title="Mensalidades recebidas"
-            value={brl(m.planRevenue)}
-            icon={CreditCard}
-            detail="Pagamentos de planos marcados como pagos"
+            title="Total recebido"
+            value={brl(m.total)}
+            icon={CircleDollarSign}
+            detail="Somente pagamentos efetivamente recebidos"
             accent="violet"
           />
           <Card
-            title="Aulas avulsas recebidas"
-            value={brl(m.extra)}
-            icon={Wallet}
-            detail="Entradas extras de aulas avulsas pagas"
-            accent="amber"
-          />
-          <Card
-            title={`${split.professor_percentage}% Professor`}
-            value={brl(m.teacherShare)}
+            title="Professor recebeu"
+            value={brl(m.receivedProfessor)}
             icon={UserRoundCheck}
-            detail="Parte do professor sobre o total"
+            detail="Recebimentos com destino Professor"
             accent="sky"
           />
           <Card
-            title={`${split.clinic_percentage}% Clínica`}
-            value={brl(m.clinicShare)}
+            title="Clínica recebeu"
+            value={brl(m.receivedClinic)}
             icon={Landmark}
-            detail="Parte da clínica sobre o total"
+            detail="Recebimentos com destino Clínica"
             accent="emerald"
+          />
+          <Card
+            title={`Cota do professor — ${split.professor_percentage}%`}
+            value={brl(m.shareProfessor)}
+            icon={Scale}
+            detail="Valor que o professor deve ficar"
+            accent="sky"
+          />
+          <Card
+            title={`Cota da clínica — ${split.clinic_percentage}%`}
+            value={brl(m.shareClinic)}
+            icon={Scale}
+            detail="Valor que a clínica deve ficar"
+            accent="emerald"
+          />
+          <Card
+            title="Ajuste"
+            value={brl(m.adjustment)}
+            icon={ArrowLeftRight}
+            detail="Diferença necessária para equalizar"
+            accent={m.status === "equal" ? "slate" : "amber"}
           />
         </div>
       </section>
 
-      <section className="mb-9">
-        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-500/10 text-slate-600">
-              <CalendarDays size={18} />
+      <section className="mb-8">
+        <div
+          className={
+            "relative overflow-hidden rounded-2xl border p-6 shadow-sm " +
+            statusUi.box
+          }
+        >
+          <span className={"absolute inset-x-0 top-0 h-1 " + statusUi.bar} />
+          <div className="flex items-center gap-4">
+            <span
+              className={
+                "flex h-11 w-11 items-center justify-center rounded-2xl bg-white/70 " +
+                statusUi.text
+              }
+            >
+              <statusUi.icon size={22} />
             </span>
             <div>
-              <h2 className="text-lg font-bold tracking-tight text-black/80">
-                Receita total do fechamento
+              <p className="text-xs font-semibold uppercase tracking-wide text-black/45">
+                Status do fechamento
+              </p>
+              <h2
+                className={
+                  "mt-1 text-xl font-bold tracking-tight " + statusUi.text
+                }
+              >
+                {statusUi.label}
               </h2>
-              <p className="text-sm text-black/50">
-                O cálculo considera somente receitas marcadas como pagas no
-                período selecionado.
+              <p className="mt-1 text-sm text-black/55">{statusUi.detail}</p>
+            </div>
+            <div className="ml-auto hidden text-right sm:block">
+              <p className="text-xs font-semibold uppercase tracking-wide text-black/45">
+                Saldo professor
+              </p>
+              <p className="text-lg font-bold text-black/80">
+                {brl(m.balanceProfessor)}
+              </p>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-black/45">
+                Saldo clínica
+              </p>
+              <p className="text-lg font-bold text-black/80">
+                {brl(m.balanceClinic)}
               </p>
             </div>
-            <p className="ml-auto text-3xl font-bold tracking-tight text-black/85">
-              {brl(m.total)}
-            </p>
           </div>
         </div>
       </section>
 
-      <section className="mb-9">
-        <SectionTitle
-          icon={Filter}
-          tone="amber"
-          title="Recebimentos por meio de pagamento"
-          count={Object.keys(m.paymentMethods).length}
-        />
-        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-          <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(m.paymentMethods).map(([method, value]: any) => (
-              <div
-                key={method}
-                className="relative overflow-hidden rounded-xl border border-amber-200/70 bg-gradient-to-br from-amber-50 to-white p-4 transition-transform hover:-translate-y-0.5"
-              >
-                <span className="absolute inset-x-0 top-0 h-1 bg-amber-500" />
-                <div className="text-sm font-medium text-amber-800">{method}</div>
-                <strong className="mt-2 block text-xl font-bold tracking-tight text-black/85">
-                  {brl(Number(value))}
-                </strong>
-              </div>
-            ))}
-            {!Object.keys(m.paymentMethods).length && (
-              <div className="col-span-full rounded-xl border border-dashed border-black/15 p-4 text-sm text-black/45">
-                Nenhum pagamento recebido no período.
-              </div>
-            )}
-          </div>
+      <section className="mb-8">
+        <SectionTitle title="Composição por tipo de recebimento" />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {Object.entries(m.byType).map(([type, value]) => (
+            <div
+              key={type}
+              className="relative overflow-hidden rounded-xl border border-amber-200/70 bg-gradient-to-br from-amber-50 to-white p-4"
+            >
+              <span className="absolute inset-x-0 top-0 h-1 bg-amber-500" />
+              <div className="text-sm font-medium text-amber-800">{type}</div>
+              <strong className="mt-2 block text-xl font-bold tracking-tight text-black/85">
+                {brl(value)}
+              </strong>
+            </div>
+          ))}
+          {!Object.keys(m.byType).length && (
+            <div className="col-span-full rounded-xl border border-dashed border-black/15 p-4 text-sm text-black/45">
+              Nenhum pagamento recebido no período.
+            </div>
+          )}
         </div>
       </section>
 
-      <section className="mb-9">
-        <SectionTitle
-          icon={Users}
-          tone="sky"
-          title="Detalhamento dos recebimentos"
-          count={m.details.length}
-        />
+      <section className="mb-10">
+        <SectionTitle title="Detalhamento do fechamento" count={m.rows.length} />
         <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white shadow-sm">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="border-b border-black/10 bg-black/[.04] text-xs font-semibold uppercase tracking-wide text-black/55">
               <tr>
-                <th className="p-4">Professor</th>
-                <th>Mensalidade</th>
-                <th>Destino</th>
-                <th>Forma</th>
-                <th>Data</th>
-                <th>Valor</th>
+                <th className="p-4">Data</th>
+                <th className="p-4">Aluno</th>
+                <th className="p-4">Tipo</th>
+                <th className="p-4">Forma</th>
+                <th className="p-4">Valor</th>
+                <th className="p-4">Recebido por</th>
               </tr>
             </thead>
             <tbody>
-              {m.details.map((x: any) => (
+              {m.rows.map((x) => (
                 <tr
-                  key={x.id}
+                  key={x.key}
                   className="border-b border-black/5 transition-colors hover:bg-black/[.02]"
                 >
-                  <td className="p-4 font-medium">
-                    {teachers.find((t) => t.id === x.plan?.teacher_id)?.name ||
-                      "Não informado"}
-                  </td>
-                  <td>{x.description || "Mensalidade"}</td>
-                  <td>
+                  <td className="p-4">{fmtDate(x.date)}</td>
+                  <td className="p-4 font-medium">{x.student}</td>
+                  <td className="p-4">{x.type}</td>
+                  <td className="p-4">{x.method || "—"}</td>
+                  <td className="p-4 font-semibold">{brl(x.amount)}</td>
+                  <td className="p-4">
                     <span
                       className={
                         "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold " +
                         (x.destination === "Professor"
                           ? "bg-sky-100 text-sky-700 ring-1 ring-sky-200"
-                          : x.destination === "Clínica"
-                          ? "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200"
-                          : "bg-slate-100 text-slate-600 ring-1 ring-slate-200")
+                          : "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200")
                       }
                     >
-                      {x.destination || "—"}
+                      {x.destination}
                     </span>
-                  </td>
-                  <td>{x.payment_method || "—"}</td>
-                  <td>{x.paid_at || "—"}</td>
-                  <td className="font-medium">
-                    {brl(Number(x.amount || 0))}
                   </td>
                 </tr>
               ))}
-              {!m.details.length && (
+              {!m.rows.length && (
                 <tr>
                   <td
                     colSpan={6}
                     className="p-8 text-center text-sm text-black/45"
                   >
-                    Nenhuma mensalidade recebida no período.
+                    Nenhum recebimento no período selecionado.
                   </td>
                 </tr>
               )}
             </tbody>
-          </table>
-        </div>
-      </section>
-
-      {teacher === "all" && (
-        <section className="mb-9">
-          <SectionTitle
-            icon={Users}
-            tone="violet"
-            title="Consolidado por professor"
-            count={m.byTeacher.length}
-          />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {m.byTeacher.map((x: any) => (
-              <div
-                key={x.teacher.id}
-                className="relative overflow-hidden rounded-2xl border border-violet-200/70 bg-gradient-to-br from-violet-50 to-white p-5 transition-transform hover:-translate-y-0.5"
-              >
-                <span className="absolute inset-x-0 top-0 h-1 bg-violet-500" />
-                <div className="text-sm font-medium text-violet-800">
-                  {x.teacher.name}
-                </div>
-                <strong className="mt-3 block text-2xl font-bold tracking-tight text-black/85">
-                  {brl(x.total)}
-                </strong>
-                <span className="text-xs text-black/45">
-                  {x.rows.length} recebimento(s)
-                </span>
-              </div>
-            ))}
-            {!m.byTeacher.length && (
-              <div className="col-span-full rounded-xl border border-dashed border-black/15 p-4 text-sm text-black/45">
-                Nenhum professor com recebimentos no período.
-              </div>
+            {!!m.rows.length && (
+              <tfoot>
+                <tr className="bg-black/[.03] font-semibold">
+                  <td className="p-4" colSpan={4}>
+                    Total recebido
+                  </td>
+                  <td className="p-4">{brl(m.total)}</td>
+                  <td className="p-4">
+                    <Wallet size={16} className="text-black/40" />
+                  </td>
+                </tr>
+              </tfoot>
             )}
-          </div>
-        </section>
-      )}
-
-      <section className="mb-9">
-        <SectionTitle
-          icon={Wallet}
-          tone="slate"
-          title="Adicionar aula avulsa paga"
-        />
-        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <input
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-              placeholder="Descrição"
-              className="rounded-xl border border-black/10 px-3 py-2.5 text-sm"
-            />
-            <input
-              value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: e.target.value })}
-              placeholder="Valor recebido"
-              inputMode="decimal"
-              className="rounded-xl border border-black/10 px-3 py-2.5 text-sm"
-            />
-            <input
-              type="date"
-              value={form.entry_date}
-              onChange={(e) =>
-                setForm({ ...form, entry_date: e.target.value })
-              }
-              className="rounded-xl border border-black/10 px-3 py-2.5 text-sm"
-            />
-          </div>
-          <button
-            onClick={add}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-black/80"
-          >
-            Adicionar ao fechamento
-          </button>
+          </table>
         </div>
       </section>
     </div>
