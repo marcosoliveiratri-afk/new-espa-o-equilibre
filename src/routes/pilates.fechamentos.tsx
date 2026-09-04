@@ -109,44 +109,22 @@ function Card({
 }
 
 function SectionTitle({
-  icon: Icon,
   title,
-  tone,
   count,
 }: {
-  icon: any;
+  icon?: any;
   title: string;
-  tone: string;
+  tone?: string;
   count?: number;
 }) {
-  const t: any = {
-    rose: "bg-rose-500/10 text-rose-600",
-    amber: "bg-amber-500/10 text-amber-600",
-    sky: "bg-sky-500/10 text-sky-600",
-    orange: "bg-orange-500/10 text-orange-600",
-    violet: "bg-violet-500/10 text-violet-600",
-    emerald: "bg-emerald-500/10 text-emerald-600",
-    slate: "bg-slate-500/10 text-slate-600",
-  };
   return (
-    <div className="mb-4 flex items-center gap-3">
-      <span
-        className={
-          "flex h-9 w-9 items-center justify-center rounded-xl " +
-          (t[tone] || t.sky)
-        }
-      >
-        <Icon size={18} />
-      </span>
+    <div className="mb-4 flex items-center gap-2">
       <h2 className="text-lg font-bold tracking-tight text-black/80">
         {title}
       </h2>
       {typeof count === "number" && (
-        <span className="rounded-full bg-black/[.06] px-2.5 py-0.5 text-xs font-semibold text-black/60">
-          {count}
-        </span>
+        <span className="text-sm font-semibold text-black/45">{count}</span>
       )}
-      <span className="h-px flex-1 bg-black/10" />
     </div>
   );
 }
