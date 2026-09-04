@@ -134,11 +134,15 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          destination: string
           full_name: string
           id: string
           lesson_date: string | null
           lesson_value: number
           notes: string | null
+          paid: boolean
+          paid_at: string | null
+          payment_method: string | null
           phone: string | null
           plan_id: string | null
           teacher_id: string | null
@@ -147,11 +151,15 @@ export type Database = {
         Insert: {
           active?: boolean
           created_at?: string
+          destination?: string
           full_name: string
           id?: string
           lesson_date?: string | null
           lesson_value?: number
           notes?: string | null
+          paid?: boolean
+          paid_at?: string | null
+          payment_method?: string | null
           phone?: string | null
           plan_id?: string | null
           teacher_id?: string | null
@@ -160,11 +168,15 @@ export type Database = {
         Update: {
           active?: boolean
           created_at?: string
+          destination?: string
           full_name?: string
           id?: string
           lesson_date?: string | null
           lesson_value?: number
           notes?: string | null
+          paid?: boolean
+          paid_at?: string | null
+          payment_method?: string | null
           phone?: string | null
           plan_id?: string | null
           teacher_id?: string | null
@@ -435,6 +447,7 @@ export type Database = {
           amount: number
           created_at: string
           description: string
+          destination: string
           entry_date: string
           id: string
           status: string
@@ -444,6 +457,7 @@ export type Database = {
           amount: number
           created_at?: string
           description: string
+          destination?: string
           entry_date?: string
           id?: string
           status?: string
@@ -453,6 +467,7 @@ export type Database = {
           amount?: number
           created_at?: string
           description?: string
+          destination?: string
           entry_date?: string
           id?: string
           status?: string
