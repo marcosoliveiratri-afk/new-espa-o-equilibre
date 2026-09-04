@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 const tabs=["Informações pessoais","Plano","Contrato","Avaliação física","Financeiro","Histórico"] as const; type Tab=typeof tabs[number];
 const fmt=(d:any)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T00:00:00")):"—"; const money=(v:any)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const badge=(x:string)=> <span className="inline-flex rounded-full bg-black/5 px-2.5 py-1 text-xs font-medium">{x}</span>;
+const phoneDigits=(v:any)=>String(v||"").replace(/\D/g,"");
+const formatPhone=(v:any)=>{const d=phoneDigits(v);if(d.length<=2)return d.length?`(${d}`:"";if(d.length<=3)return`(${d.slice(0,2)}) ${d.slice(2)}`;if(d.length<=7)return`(${d.slice(0,2)}) ${d.slice(2,3)} ${d.slice(3)}`;return`(${d.slice(0,2)}) ${d.slice(2,3)} ${d.slice(3,7)}-${d.slice(7,11)}`;};
 export const Route=createFileRoute("/pilates/alunos/$alunoId")({component:PerfilAluno});
 function PerfilAluno(){const [tab,setTab]=useState<Tab>("Informações pessoais"),[data,setData]=useState<any>(null),[error,setError]=useState(""),[uploading,setUploading]=useState(false),[editing,setEditing]=useState(false),[saving,setSaving]=useState(false),[receipt,setReceipt]=useState<any>(null),[refs,setRefs]=useState<any>({plans:[],teachers:[]});const {alunoId}=Route.useParams();
 useEffect(()=>{setEditing(false);},[tab]);
