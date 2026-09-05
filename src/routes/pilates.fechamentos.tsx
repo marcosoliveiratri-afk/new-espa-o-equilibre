@@ -96,7 +96,7 @@ function Card({
   detail?: string;
   accent?: string;
 }) {
-  const a = ACCENTS[accent] || ACCENTS.sky;
+  const a = ACCENTS[accent] ?? ACCENTS["sky"]!;
   return (
     <div
       className={
