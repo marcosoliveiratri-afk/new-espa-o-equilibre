@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"; import { useEffect,useMemo,useState } from "react"; import { supabase } from "@/integrations/supabase/client"; import { AlertTriangle, CalendarClock, FileWarning, FlaskConical, CheckCircle2, CreditCard } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router"; import { useEffect,useMemo,useState } from "react"; import { supabase } from "@/integrations/supabase/client"; import { CreditCard, FlaskConical } from "lucide-react";
 export const Route=createFileRoute("/pilates/alertas")({component:Alertas});
 const fmt=(d:string)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T00:00:00")):"—";
 const days=(d:string)=>Math.ceil((new Date(d+"T00:00:00").getTime()-new Date(new Date().toISOString().slice(0,10)+"T00:00:00").getTime())/86400000);
