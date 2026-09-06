@@ -259,21 +259,21 @@ function Dashboard() {
 
       <section className="mb-9">
         <SectionTitle title="Alunos e planos" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
             <p className="text-xs text-black/45">Alunos ativos</p>
             <p className="mt-1 text-2xl font-bold">{m.activeStudents}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Alunos desativados</p>
             <p className="mt-1 text-2xl font-bold">{m.inactive}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Planos ativos</p>
             <p className="mt-1 text-2xl font-bold">{m.activePlans}</p>
             <p className="text-xs text-black/40">{m.closed} encerrados/inativos</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Planos cadastrados</p>
             <p className="mt-1 text-2xl font-bold">{d.pl?.length || 0}</p>
           </div>
@@ -282,32 +282,32 @@ function Dashboard() {
 
       <section className="mb-9">
         <SectionTitle title="Receitas" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
             <p className="text-xs text-black/45">Destino: Professor</p>
             <p className="mt-1 text-2xl font-bold">{brl(m.professorReceived)}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Destino: Clínica</p>
             <p className="mt-1 text-2xl font-bold">{brl(m.clinicReceived)}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Receita recorrente</p>
             <p className="mt-1 text-2xl font-bold">{brl(m.recurring)}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Caixa Pilates</p>
             <p className="mt-1 text-2xl font-bold">{brl(m.cashBalance)}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Receita atual</p>
             <p className="mt-1 text-2xl font-bold">{brl(m.current)}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Receita prevista</p>
             <p className="mt-1 text-2xl font-bold">{brl(m.expected)}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Mensalidades vencidas</p>
             <p className="mt-1 text-2xl font-bold">{brl(m.overdue)}</p>
           </div>
@@ -316,24 +316,24 @@ function Dashboard() {
 
       <section className="mb-9">
         <SectionTitle title="Aulas experimentais" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+          <div>
             <p className="text-xs text-black/45">Total</p>
             <p className="mt-1 text-2xl font-bold">{m.trials}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Agendadas</p>
             <p className="mt-1 text-2xl font-bold">{m.scheduled}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Realizadas</p>
             <p className="mt-1 text-2xl font-bold">{m.done}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Convertidas</p>
             <p className="mt-1 text-2xl font-bold">{m.converted}</p>
           </div>
-          <div className="rounded-xl border border-black/10 bg-white p-4">
+          <div>
             <p className="text-xs text-black/45">Canceladas</p>
             <p className="mt-1 text-2xl font-bold">{m.cancelled}</p>
           </div>
