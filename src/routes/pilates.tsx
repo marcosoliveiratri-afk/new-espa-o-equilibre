@@ -1,7 +1,393 @@
-import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"; import { AppShell } from "@/components/AppShell"; import { TopBar } from "@/components/TopBar"; import { AuthGuard } from "@/components/AuthGuard"; import { useEffect,useMemo,useState } from "react"; import { supabase } from "@/integrations/supabase/client"; import { Activity,CalendarClock,CheckCircle2,CircleDollarSign,Landmark,Users,UserRoundCheck,UserX,Wallet } from "lucide-react";
-export const Route=createFileRoute("/pilates")({component:Pilates}); const brl=(v:number)=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const ACCENTS:any={sky:{ring:"border-sky-200/70",bg:"bg-gradient-to-br from-sky-50 to-white",chip:"bg-sky-500/10 text-sky-700",bar:"bg-sky-500"},emerald:{ring:"border-emerald-200/70",bg:"bg-gradient-to-br from-emerald-50 to-white",chip:"bg-emerald-500/10 text-emerald-700",bar:"bg-emerald-500"},violet:{ring:"border-violet-200/70",bg:"bg-gradient-to-br from-violet-50 to-white",chip:"bg-violet-500/10 text-violet-700",bar:"bg-violet-500"}};
-function Card({title,value,icon:Icon,detail,accent="sky"}:{title:string;value:string;icon:any;detail?:string;accent?:string}){const a=ACCENTS[accent]||ACCENTS.sky;return <div className={"group relative overflow-hidden rounded-2xl border p-5 shadow-[0_1px_2px_rgba(16,24,40,.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-12px_rgba(16,24,40,.25)] "+a.ring+" "+a.bg}><span className={"absolute inset-x-0 top-0 h-1 "+a.bar}/><div className="flex items-start justify-between gap-3"><p className="text-[13px] font-semibold uppercase tracking-wide text-black/50">{title}</p><span className={"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl "+a.chip}><Icon size={18}/></span></div><p className="mt-4 text-[28px] font-bold leading-none tracking-tight text-black/85">{value}</p>{detail&&<p className="mt-2 text-xs leading-snug text-black/45">{detail}</p>}</div>}
+import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
+import { AppShell } from "@/components/AppShell";
+import { TopBar } from "@/components/TopBar";
+import { AuthGuard } from "@/components/AuthGuard";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-function Dashboard(){const now=new Date();const [month,setMonth]=useState(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`),[teacherFilter,setTeacherFilter]=useState("all"),[d,setD]=useState<any>({}),[loading,setLoading]=useState(true),[error,setError]=useState("");const load=async()=>{const db=supabase as any;const [s,sp,p,t,pl,te,ce]=await Promise.all([db.from("students").select("*"),db.from("student_plans").select("*"),db.from("student_payments").select("*"),db.from("trial_classes").select("*"),db.from("plans").select("*"),db.from("teachers").select("*"),db.from("clinic_cash_expenses").select("*")]);const e=[s,sp,p,t,pl,te,ce].find((x:any)=>x.error)?.error;if(e)setError(e.message);setD({s:s.data||[],sp:sp.data||[],p:p.data||[],t:t.data||[],pl:pl.data||[],te:te.data||[],ce:ce.data||[]});setLoading(false)};useEffect(()=>{load();const ch=supabase.channel("dashboard-payments").on("postgres_changes",{event:"*",schema:"public",table:"student_payments"},()=>{load()}).on("postgres_changes",{event:"*",schema:"public",table:"student_plans"},()=>{load()}).subscribe();const onFocus=()=>load();window.addEventListener("focus",onFocus);return()=>{supabase.removeChannel(ch);window.removeEventListener("focus",onFocus)}},[]);const m=useMemo(()=>{const {s=[],sp=[],p=[],t=[],pl=[],te=[],ce=[]}=d,monthStart=`${month}-01`,monthEnd=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).toISOString().slice(0,10),today=new Date().toISOString().slice(0,10),planById=new Map<string,any>(sp.map((x:any)=>[x.id,x])),matchTeacher=(planId:any)=>teacherFilter==="all"||planById.get(planId)?.teacher_id===teacherFilter,active=sp.filter((x:any)=>x.status==="Ativo"&&(x.start_date||"0000-00-00")<=monthEnd&&(!x.end_date||x.end_date>=monthStart)&&(teacherFilter==="all"||x.teacher_id===teacherFilter)),activeStudents=s.filter((x:any)=>x.active),inactiveStudents=s.filter((x:any)=>!x.active),activeIds=new Set(activeStudents.map((x:any)=>x.id)),financialPayments=p.filter((x:any)=>activeIds.has(x.student_id)&&matchTeacher(x.plan_id)&&x.status!=="Cancelado"&&x.due_date>=monthStart&&x.due_date<=monthEnd),clinicReceived=financialPayments.filter((x:any)=>x.status==="Pago"&&x.destination==="Clínica").reduce((a:number,x:any)=>a+Number(x.amount||0),0),professorReceived=financialPayments.filter((x:any)=>x.status==="Pago"&&x.destination==="Professor").reduce((a:number,x:any)=>a+Number(x.amount||0),0),cashExpenses=ce.filter((x:any)=>String(x.expense_date||"").slice(0,7)===month&&x.status!=="Cancelado").reduce((a:number,x:any)=>a+Number(x.amount||0),0),cashBalance=clinicReceived-cashExpenses;return {total:activeStudents.length,activeStudents:activeStudents.length,inactive:inactiveStudents.length,activePlans:active.length,closed:sp.filter((x:any)=>x.status!=="Ativo").length,recurring:active.reduce((a:number,x:any)=>a+Number(x.monthly_value||0),0),current:financialPayments.filter((x:any)=>x.status==="Pago").reduce((a:number,x:any)=>a+Number(x.amount||0),0),expected:active.filter((x:any)=>activeIds.has(x.student_id)).reduce((a:number,x:any)=>a+Number(x.monthly_value||0),0),overdue:financialPayments.filter((x:any)=>x.status!=="Pago"&&x.due_date&&x.due_date<today).reduce((a:number,x:any)=>a+Number(x.amount||0),0),clinicReceived,professorReceived,cashExpenses,cashBalance,trials:t.filter((x:any)=>!x.scheduled_date||(x.scheduled_date>=monthStart&&x.scheduled_date<=monthEnd)).length,scheduled:t.filter((x:any)=>x.status==="Agendada"&&(!x.scheduled_date||(x.scheduled_date>=monthStart&&x.scheduled_date<=monthEnd))).length,done:t.filter((x:any)=>x.status==="Realizada"&&(!x.scheduled_date||(x.scheduled_date>=monthStart&&x.scheduled_date<=monthEnd))).length,converted:t.filter((x:any)=>x.status==="Convertida"&&(!x.scheduled_date||(x.scheduled_date>=monthStart&&x.scheduled_date<=monthEnd))).length,cancelled:t.filter((x:any)=>x.status==="Cancelada"&&(!x.scheduled_date||(x.scheduled_date>=monthStart&&x.scheduled_date<=monthEnd))).length,byPlan:pl.map((x:any)=>[x.name,active.filter((y:any)=>y.plan_id===x.id).length]),byTeacher:te.map((x:any)=>[x.name,active.filter((y:any)=>y.teacher_id===x.id).length]).filter((x:any)=>x[1])}},[d,month,teacherFilter]);if(loading)return <div className="py-12 text-center text-sm text-black/45">Carregando indicadores...</div>;const groups=[["Alunos e planos","sky",[[ "Alunos ativos",String(m.activeStudents),Users,"Em acompanhamento"],[ "Alunos desativados",String(m.inactive),UserX,"Alunos perdidos/desativados"] ,[ "Planos ativos",String(m.activePlans),CheckCircle2,`${m.closed} encerrados/inativos`],[ "Planos cadastrados",String(d.pl?.length||0),Activity]]],["Receitas","emerald",[[ "Destino: Professor",brl(m.professorReceived),UserRoundCheck,"Total recebido com destino Professor"],[ "Destino: Clínica",brl(m.clinicReceived),Landmark,"Total recebido com destino Clínica"],[ "Receita recorrente",brl(m.recurring),CircleDollarSign,"Soma mensal dos planos ativos"],[ "Caixa Pilates",brl(m.cashBalance),Wallet,"Receita da clínica menos gastos do período"],[ "Receita atual",brl(m.current),Wallet,"Pagamentos marcados como pagos"],[ "Receita prevista",brl(m.expected),CalendarClock,"Pagamentos futuros/pendentes"],[ "Mensalidades vencidas",brl(m.overdue),Activity,"Valores pendentes em atraso"]]],["Aulas experimentais","violet",[[ "Total",String(m.trials),Users],[ "Agendadas",String(m.scheduled),CalendarClock],[ "Realizadas",String(m.done),CheckCircle2],[ "Convertidas",String(m.converted),UserRoundCheck],[ "Canceladas",String(m.cancelled),Activity]]]];return <div className="mx-auto max-w-7xl"><div className="mb-8 overflow-hidden rounded-3xl border border-black/5 bg-gradient-to-r from-[#1f2937] via-[#334155] to-[#0f766e] p-7 text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,.7)]"><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/60">Módulo Pilates</p><h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Dashboard Pilates</h1><p className="mt-2 max-w-2xl text-sm text-white/70">Todos os indicadores são calculados a partir dos dados reais do módulo.</p></div><div className="mb-8 flex flex-wrap items-end gap-4 rounded-2xl border border-black/10 bg-white p-5 shadow-sm"><div><label className="text-xs font-medium text-black/50">Período do Dashboard</label><input type="month" value={month} onChange={e=>setMonth(e.target.value)} className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"/></div><div><label className="text-xs font-medium text-black/50">Professor</label><select value={teacherFilter} onChange={e=>setTeacherFilter(e.target.value)} className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"><option value="all">Todos os professores</option>{(d.te||[]).map((t:any)=><option key={t.id} value={t.id}>{t.name}</option>)}</select></div><p className="pb-2 text-sm text-black/45">Os indicadores respeitam o período e o professor selecionados.</p></div>{error&&<div className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</div>}{groups.map(([title,accent,cards]:any)=><section key={title} className="mb-9"><div className="mb-4"><h2 className="text-lg font-bold tracking-tight text-black/80">{title}</h2></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{cards.map((x:any)=><Card key={x[0]} title={x[0]} value={x[1]} icon={x[2]} detail={x[3]} accent={accent}/>)}</div></section>)}<div className="grid gap-5 lg:grid-cols-2"><div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm"><h2 className="text-lg font-bold tracking-tight text-black/80">Alunos ativos por plano</h2><div className="mt-5 space-y-3">{m.byPlan?.map((x:any)=><div key={x[0]} className="flex items-center justify-between rounded-lg bg-black/[.02] px-3 py-2.5 text-sm"><span>{x[0]}</span><strong>{x[1]}</strong></div>)}</div></div><div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm"><h2 className="text-lg font-bold tracking-tight text-black/80">Alunos ativos por professor</h2><div className="mt-5 space-y-3">{m.byTeacher?.length?m.byTeacher.map((x:any)=><div key={x[0]} className="flex items-center justify-between rounded-lg bg-black/[.02] px-3 py-2.5 text-sm"><span>{x[0]}</span><strong>{x[1]}</strong></div>):<p className="text-sm text-black/45">Nenhum aluno vinculado.</p>}</div></div></div></div>}
-function Pilates(){const pathname=useRouterState({select:s=>s.location.pathname});return <AuthGuard><div className="min-h-screen bg-[#f7f7f5]"><TopBar/><AppShell>{pathname==="/pilates"?<Dashboard/>:<Outlet/>}</AppShell></div></AuthGuard>}
+export const Route = createFileRoute("/pilates")({ component: Pilates });
+const brl = (v: number) =>
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function SectionTitle({ title, count }: { title: string; count?: number }) {
+  return (
+    <div className="mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-bold tracking-tight text-black/80">
+        {title}
+      </h2>
+      {typeof count === "number" && (
+        <span className="text-sm font-semibold text-black/45">{count}</span>
+      )}
+    </div>
+  );
+}
+
+function Dashboard() {
+  const now = new Date();
+  const [month, setMonth] = useState(
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+  );
+  const [teacherFilter, setTeacherFilter] = useState("all");
+  const [d, setD] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const load = async () => {
+    const db = supabase as any;
+    const [s, sp, p, t, pl, te, ce] = await Promise.all([
+      db.from("students").select("*"),
+      db.from("student_plans").select("*"),
+      db.from("student_payments").select("*"),
+      db.from("trial_classes").select("*"),
+      db.from("plans").select("*"),
+      db.from("teachers").select("*"),
+      db.from("clinic_cash_expenses").select("*"),
+    ]);
+    const e = [s, sp, p, t, pl, te, ce].find((x: any) => x.error)?.error;
+    if (e) setError(e.message);
+    setD({
+      s: s.data || [],
+      sp: sp.data || [],
+      p: p.data || [],
+      t: t.data || [],
+      pl: pl.data || [],
+      te: te.data || [],
+      ce: ce.data || [],
+    });
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel("dashboard-payments")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "student_payments" },
+        () => load()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "student_plans" },
+        () => load()
+      )
+      .subscribe();
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      supabase.removeChannel(ch);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, []);
+
+  const m = useMemo(() => {
+    const {
+      s = [],
+      sp = [],
+      p = [],
+      t = [],
+      pl = [],
+      te = [],
+      ce = [],
+    } = d;
+    const monthStart = `${month}-01`;
+    const monthEnd = new Date(
+      Number(month.slice(0, 4)),
+      Number(month.slice(5, 7)),
+      0
+    )
+      .toISOString()
+      .slice(0, 10);
+    const today = new Date().toISOString().slice(0, 10);
+    const planById = new Map<string, any>(sp.map((x: any) => [x.id, x]));
+    const matchTeacher = (planId: any) =>
+      teacherFilter === "all" ||
+      planById.get(planId)?.teacher_id === teacherFilter;
+    const active = sp.filter(
+      (x: any) =>
+        x.status === "Ativo" &&
+        (x.start_date || "0000-00-00") <= monthEnd &&
+        (!x.end_date || x.end_date >= monthStart) &&
+        (teacherFilter === "all" || x.teacher_id === teacherFilter)
+    );
+    const activeStudents = s.filter((x: any) => x.active);
+    const inactiveStudents = s.filter((x: any) => !x.active);
+    const activeIds = new Set(activeStudents.map((x: any) => x.id));
+    const financialPayments = p.filter(
+      (x: any) =>
+        activeIds.has(x.student_id) &&
+        matchTeacher(x.plan_id) &&
+        x.status !== "Cancelado" &&
+        x.due_date >= monthStart &&
+        x.due_date <= monthEnd
+    );
+    const clinicReceived = financialPayments
+      .filter((x: any) => x.status === "Pago" && x.destination === "Clínica")
+      .reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
+    const professorReceived = financialPayments
+      .filter((x: any) => x.status === "Pago" && x.destination === "Professor")
+      .reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
+    const cashExpenses = ce
+      .filter(
+        (x: any) =>
+          String(x.expense_date || "").slice(0, 7) === month &&
+          x.status !== "Cancelado"
+      )
+      .reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
+    const cashBalance = clinicReceived - cashExpenses;
+
+    return {
+      activeStudents: activeStudents.length,
+      inactive: inactiveStudents.length,
+      activePlans: active.length,
+      closed: sp.filter((x: any) => x.status !== "Ativo").length,
+      recurring: active.reduce(
+        (a: number, x: any) => a + Number(x.monthly_value || 0),
+        0
+      ),
+      current: financialPayments
+        .filter((x: any) => x.status === "Pago")
+        .reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
+      expected: active
+        .filter((x: any) => activeIds.has(x.student_id))
+        .reduce((a: number, x: any) => a + Number(x.monthly_value || 0), 0),
+      overdue: financialPayments
+        .filter(
+          (x: any) => x.status !== "Pago" && x.due_date && x.due_date < today
+        )
+        .reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
+      clinicReceived,
+      professorReceived,
+      cashExpenses,
+      cashBalance,
+      trials: t.filter(
+        (x: any) =>
+          !x.scheduled_date ||
+          (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd)
+      ).length,
+      scheduled: t.filter(
+        (x: any) =>
+          x.status === "Agendada" &&
+          (!x.scheduled_date ||
+            (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))
+      ).length,
+      done: t.filter(
+        (x: any) =>
+          x.status === "Realizada" &&
+          (!x.scheduled_date ||
+            (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))
+      ).length,
+      converted: t.filter(
+        (x: any) =>
+          x.status === "Convertida" &&
+          (!x.scheduled_date ||
+            (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))
+      ).length,
+      cancelled: t.filter(
+        (x: any) =>
+          x.status === "Cancelada" &&
+          (!x.scheduled_date ||
+            (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))
+      ).length,
+      byPlan: pl.map((x: any) => [
+        x.name,
+        active.filter((y: any) => y.plan_id === x.id).length,
+      ]),
+      byTeacher: te
+        .map((x: any) => [
+          x.name,
+          active.filter((y: any) => y.teacher_id === x.id).length,
+        ])
+        .filter((x: any) => x[1]),
+    };
+  }, [d, month, teacherFilter]);
+
+  if (loading)
+    return (
+      <div className="py-12 text-center text-sm text-black/45">
+        Carregando indicadores...
+      </div>
+    );
+
+  return (
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8">
+        <p className="text-sm font-medium text-black/45">Pilates</p>
+        <h1 className="mt-1 text-3xl font-semibold">Dashboard Pilates</h1>
+        <p className="mt-2 text-sm text-black/55">
+          Todos os indicadores são calculados a partir dos dados reais do módulo.
+        </p>
+      </div>
+
+      <div className="mb-8 flex flex-wrap items-end gap-4 rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+        <div>
+          <label className="text-xs font-medium text-black/50">
+            Período do Dashboard
+          </label>
+          <input
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-black/50">Professor</label>
+          <select
+            value={teacherFilter}
+            onChange={(e) => setTeacherFilter(e.target.value)}
+            className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm"
+          >
+            <option value="all">Todos os professores</option>
+            {(d.te || []).map((t: any) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <p className="pb-2 text-sm text-black/45">
+          Os indicadores respeitam o período e o professor selecionados.
+        </p>
+      </div>
+
+      {error && (
+        <div className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <section className="mb-9">
+        <SectionTitle title="Alunos e planos" />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className="text-xs text-black/45">Alunos ativos</p>
+            <p className="mt-1 text-2xl font-bold">{m.activeStudents}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Alunos desativados</p>
+            <p className="mt-1 text-2xl font-bold">{m.inactive}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Planos ativos</p>
+            <p className="mt-1 text-2xl font-bold">{m.activePlans}</p>
+            <p className="text-xs text-black/40">{m.closed} encerrados/inativos</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Planos cadastrados</p>
+            <p className="mt-1 text-2xl font-bold">{d.pl?.length || 0}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-9">
+        <SectionTitle title="Receitas" />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className="text-xs text-black/45">Destino: Professor</p>
+            <p className="mt-1 text-2xl font-bold">{brl(m.professorReceived)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Destino: Clínica</p>
+            <p className="mt-1 text-2xl font-bold">{brl(m.clinicReceived)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Receita recorrente</p>
+            <p className="mt-1 text-2xl font-bold">{brl(m.recurring)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Caixa Pilates</p>
+            <p className="mt-1 text-2xl font-bold">{brl(m.cashBalance)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Receita atual</p>
+            <p className="mt-1 text-2xl font-bold">{brl(m.current)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Receita prevista</p>
+            <p className="mt-1 text-2xl font-bold">{brl(m.expected)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Mensalidades vencidas</p>
+            <p className="mt-1 text-2xl font-bold">{brl(m.overdue)}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-9">
+        <SectionTitle title="Aulas experimentais" />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+          <div>
+            <p className="text-xs text-black/45">Total</p>
+            <p className="mt-1 text-2xl font-bold">{m.trials}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Agendadas</p>
+            <p className="mt-1 text-2xl font-bold">{m.scheduled}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Realizadas</p>
+            <p className="mt-1 text-2xl font-bold">{m.done}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Convertidas</p>
+            <p className="mt-1 text-2xl font-bold">{m.converted}</p>
+          </div>
+          <div>
+            <p className="text-xs text-black/45">Canceladas</p>
+            <p className="mt-1 text-2xl font-bold">{m.cancelled}</p>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+          <SectionTitle title="Alunos ativos por plano" />
+          <div className="mt-5 space-y-3">
+            {m.byPlan?.map((x: any) => (
+              <div
+                key={x[0]}
+                className="flex items-center justify-between rounded-lg bg-black/[.02] px-3 py-2.5 text-sm"
+              >
+                <span>{x[0]}</span>
+                <strong>{x[1]}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+          <SectionTitle title="Alunos ativos por professor" />
+          <div className="mt-5 space-y-3">
+            {m.byTeacher?.length ? (
+              m.byTeacher.map((x: any) => (
+                <div
+                  key={x[0]}
+                  className="flex items-center justify-between rounded-lg bg-black/[.02] px-3 py-2.5 text-sm"
+                >
+                  <span>{x[0]}</span>
+                  <strong>{x[1]}</strong>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-black/45">Nenhum aluno vinculado.</p>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function Pilates() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <AuthGuard>
+      <div className="min-h-screen bg-[#f7f7f5]">
+        <TopBar />
+        <AppShell>
+          {pathname === "/pilates" ? <Dashboard /> : <Outlet />}
+        </AppShell>
+      </div>
+    </AuthGuard>
+  );
+}
