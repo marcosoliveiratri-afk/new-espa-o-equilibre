@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FileDown, Save, CheckCircle2, ArrowLeftRight } from "lucide-react";
+import {
+  CircleDollarSign,
+  Landmark,
+  UserRoundCheck,
+  Wallet,
+  FileDown,
+  Save,
+  Scale,
+  ArrowLeftRight,
+  CheckCircle2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/pilates/fechamentos")({
   component: Fechamentos,
@@ -30,6 +40,95 @@ const MONTHS = [
   "Novembro",
   "Dezembro",
 ];
+
+const ACCENTS: Record<
+  string,
+  { ring: string; bg: string; chip: string; bar: string }
+> = {
+  sky: {
+    ring: "border-sky-200/70",
+    bg: "bg-gradient-to-br from-sky-50 to-white",
+    chip: "bg-sky-500/10 text-sky-700",
+    bar: "bg-sky-500",
+  },
+  emerald: {
+    ring: "border-emerald-200/70",
+    bg: "bg-gradient-to-br from-emerald-50 to-white",
+    chip: "bg-emerald-500/10 text-emerald-700",
+    bar: "bg-emerald-500",
+  },
+  violet: {
+    ring: "border-violet-200/70",
+    bg: "bg-gradient-to-br from-violet-50 to-white",
+    chip: "bg-violet-500/10 text-violet-700",
+    bar: "bg-violet-500",
+  },
+  amber: {
+    ring: "border-amber-200/70",
+    bg: "bg-gradient-to-br from-amber-50 to-white",
+    chip: "bg-amber-500/10 text-amber-700",
+    bar: "bg-amber-500",
+  },
+  rose: {
+    ring: "border-rose-200/70",
+    bg: "bg-gradient-to-br from-rose-50 to-white",
+    chip: "bg-rose-500/10 text-rose-700",
+    bar: "bg-rose-500",
+  },
+  slate: {
+    ring: "border-slate-200/70",
+    bg: "bg-gradient-to-br from-slate-50 to-white",
+    chip: "bg-slate-500/10 text-slate-700",
+    bar: "bg-slate-500",
+  },
+};
+
+function Card({
+  title,
+  value,
+  icon: Icon,
+  detail,
+  accent = "sky",
+}: {
+  title: string;
+  value: string;
+  icon: any;
+  detail?: string;
+  accent?: string;
+}) {
+  const a = ACCENTS[accent] ?? ACCENTS["sky"]!;
+  return (
+    <div
+      className={
+        "group relative overflow-hidden rounded-2xl border p-5 shadow-[0_1px_2px_rgba(16,24,40,.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-12px_rgba(16,24,40,.25)] " +
+        a.ring +
+        " " +
+        a.bg
+      }
+    >
+      <span className={"absolute inset-x-0 top-0 h-1 " + a.bar} />
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[13px] font-semibold uppercase tracking-wide text-black/50">
+          {title}
+        </p>
+        <span
+          className={
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl " +
+            a.chip
+          }
+        >
+          <Icon size={18} />
+        </span>
+      </div>
+      <p className="mt-4 text-[28px] font-bold leading-none tracking-tight text-black/85">
+        {value}
+      </p>
+      {detail && (
+        <p className="mt-2 text-xs leading-snug text-black/45">{detail}</p>
+      )}
+    </div>
+  );
+}
 
 function SectionTitle({ title, count }: { title: string; count?: number }) {
   return (
@@ -143,6 +242,7 @@ function Fechamentos() {
 
     const rows: Row[] = [];
 
+    // 1. Mensalidades / planos / parcelas efetivamente pagas
     payments.forEach((x: any) => {
       if (!isPaid(x.status)) return;
       const date = x.paid_at || x.due_date;
@@ -162,6 +262,7 @@ function Fechamentos() {
       });
     });
 
+    // 2. Aulas avulsas pagas
     lessons.forEach((x: any) => {
       if (!x.paid) return;
       const date = x.paid_at || x.lesson_date;
@@ -178,6 +279,7 @@ function Fechamentos() {
       });
     });
 
+    // 3. Outros recebimentos lançados manualmente
     entries.forEach((x: any) => {
       if (!isPaid(x.status)) return;
       if (!inMonth(x.entry_date)) return;
@@ -247,6 +349,8 @@ function Fechamentos() {
       ? {
           label: "Fechamento equilibrado",
           detail: "Nenhum valor a repassar neste período.",
+          box: "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
+          bar: "bg-emerald-500",
           text: "text-emerald-700",
           icon: CheckCircle2,
         }
@@ -254,12 +358,16 @@ function Fechamentos() {
       ? {
           label: `Professor deve repassar ${brl(m.adjustment)} para a Clínica`,
           detail: "O professor recebeu acima da cota de 50%.",
+          box: "border-amber-200 bg-gradient-to-br from-amber-50 to-white",
+          bar: "bg-amber-500",
           text: "text-amber-700",
           icon: ArrowLeftRight,
         }
       : {
           label: `Clínica deve repassar ${brl(m.adjustment)} para o Professor`,
           detail: "A clínica recebeu acima da cota de 50%.",
+          box: "border-sky-200 bg-gradient-to-br from-sky-50 to-white",
+          bar: "bg-sky-500",
           text: "text-sky-700",
           icon: ArrowLeftRight,
         };
@@ -346,10 +454,12 @@ function Fechamentos() {
 
   return (
     <div className="w-full max-w-none">
-      <div className="mb-8">
-        <p className="text-sm font-medium text-black/45">Pilates</p>
-        <h1 className="mt-1 text-3xl font-semibold">Fechamento</h1>
-        <p className="mt-2 text-sm text-black/55">
+      <div className="mb-7 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 p-7 text-white shadow-[0_18px_40px_-24px_rgba(6,78,59,.9)]">
+        <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/60">
+          Pilates
+        </p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight">Fechamento</h1>
+        <p className="mt-2 max-w-2xl text-sm text-white/70">
           Divisão automática 50% / 50% sobre tudo que foi efetivamente recebido
           no período — mensalidades, parcelas, planos e aulas avulsas pagas.
         </p>
@@ -426,80 +536,95 @@ function Fechamentos() {
 
       <section className="mb-8">
         <SectionTitle title="Indicadores do período" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <p className="text-xs text-black/45">Total recebido</p>
-            <p className="mt-1 text-2xl font-bold">{brl(m.total)}</p>
-            <p className="text-xs text-black/40">
-              Somente pagamentos efetivamente recebidos
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-black/45">Professor recebeu</p>
-            <p className="mt-1 text-2xl font-bold">{brl(m.receivedProfessor)}</p>
-            <p className="text-xs text-black/40">
-              Recebimentos com destino Professor
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-black/45">Clínica recebeu</p>
-            <p className="mt-1 text-2xl font-bold">{brl(m.receivedClinic)}</p>
-            <p className="text-xs text-black/40">
-              Recebimentos com destino Clínica
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-black/45">
-              Cota do professor — {split.professor_percentage}%
-            </p>
-            <p className="mt-1 text-2xl font-bold">{brl(m.shareProfessor)}</p>
-            <p className="text-xs text-black/40">
-              Valor que o professor deve ficar
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-black/45">
-              Cota da clínica — {split.clinic_percentage}%
-            </p>
-            <p className="mt-1 text-2xl font-bold">{brl(m.shareClinic)}</p>
-            <p className="text-xs text-black/40">
-              Valor que a clínica deve ficar
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-black/45">Ajuste</p>
-            <p className="mt-1 text-2xl font-bold">{brl(m.adjustment)}</p>
-            <p className="text-xs text-black/40">
-              Diferença necessária para equalizar
-            </p>
-          </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Card
+            title="Total recebido"
+            value={brl(m.total)}
+            icon={CircleDollarSign}
+            detail="Somente pagamentos efetivamente recebidos"
+            accent="violet"
+          />
+          <Card
+            title="Professor recebeu"
+            value={brl(m.receivedProfessor)}
+            icon={UserRoundCheck}
+            detail="Recebimentos com destino Professor"
+            accent="sky"
+          />
+          <Card
+            title="Clínica recebeu"
+            value={brl(m.receivedClinic)}
+            icon={Landmark}
+            detail="Recebimentos com destino Clínica"
+            accent="emerald"
+          />
+          <Card
+            title={`Cota do professor — ${split.professor_percentage}%`}
+            value={brl(m.shareProfessor)}
+            icon={Scale}
+            detail="Valor que o professor deve ficar"
+            accent="sky"
+          />
+          <Card
+            title={`Cota da clínica — ${split.clinic_percentage}%`}
+            value={brl(m.shareClinic)}
+            icon={Scale}
+            detail="Valor que a clínica deve ficar"
+            accent="emerald"
+          />
+          <Card
+            title="Ajuste"
+            value={brl(m.adjustment)}
+            icon={ArrowLeftRight}
+            detail="Diferença necessária para equalizar"
+            accent={m.status === "equal" ? "slate" : "amber"}
+          />
         </div>
       </section>
 
       <section className="mb-8">
-        <SectionTitle title="Status do fechamento" />
-        <div className="flex items-start gap-4">
-          <span className={"flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-black/[.04] " + statusUi.text}>
-            <statusUi.icon size={22} />
-          </span>
-          <div>
-            <h2 className={"text-xl font-bold tracking-tight " + statusUi.text}>
-              {statusUi.label}
-            </h2>
-            <p className="mt-1 text-sm text-black/55">{statusUi.detail}</p>
-            <div className="mt-4 flex flex-wrap gap-6">
-              <div>
-                <p className="text-xs text-black/45">Saldo professor</p>
-                <p className="text-lg font-bold text-black/80">
-                  {brl(m.balanceProfessor)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-black/45">Saldo clínica</p>
-                <p className="text-lg font-bold text-black/80">
-                  {brl(m.balanceClinic)}
-                </p>
-              </div>
+        <div
+          className={
+            "relative overflow-hidden rounded-2xl border p-6 shadow-sm " +
+            statusUi.box
+          }
+        >
+          <span className={"absolute inset-x-0 top-0 h-1 " + statusUi.bar} />
+          <div className="flex items-center gap-4">
+            <span
+              className={
+                "flex h-11 w-11 items-center justify-center rounded-2xl bg-white/70 " +
+                statusUi.text
+              }
+            >
+              <statusUi.icon size={22} />
+            </span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-black/45">
+                Status do fechamento
+              </p>
+              <h2
+                className={
+                  "mt-1 text-xl font-bold tracking-tight " + statusUi.text
+                }
+              >
+                {statusUi.label}
+              </h2>
+              <p className="mt-1 text-sm text-black/55">{statusUi.detail}</p>
+            </div>
+            <div className="ml-auto hidden text-right sm:block">
+              <p className="text-xs font-semibold uppercase tracking-wide text-black/45">
+                Saldo professor
+              </p>
+              <p className="text-lg font-bold text-black/80">
+                {brl(m.balanceProfessor)}
+              </p>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-black/45">
+                Saldo clínica
+              </p>
+              <p className="text-lg font-bold text-black/80">
+                {brl(m.balanceClinic)}
+              </p>
             </div>
           </div>
         </div>
@@ -509,15 +634,21 @@ function Fechamentos() {
         <SectionTitle title="Composição por tipo de recebimento" />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {Object.entries(m.byType).map(([type, value]) => (
-            <div key={type}>
-              <p className="text-xs text-black/45">{type}</p>
-              <p className="mt-1 text-2xl font-bold">{brl(value)}</p>
+            <div
+              key={type}
+              className="relative overflow-hidden rounded-xl border border-amber-200/70 bg-gradient-to-br from-amber-50 to-white p-4"
+            >
+              <span className="absolute inset-x-0 top-0 h-1 bg-amber-500" />
+              <div className="text-sm font-medium text-amber-800">{type}</div>
+              <strong className="mt-2 block text-xl font-bold tracking-tight text-black/85">
+                {brl(value)}
+              </strong>
             </div>
           ))}
           {!Object.keys(m.byType).length && (
-            <p className="text-sm text-black/45">
+            <div className="col-span-full rounded-xl border border-dashed border-black/15 p-4 text-sm text-black/45">
               Nenhum pagamento recebido no período.
-            </p>
+            </div>
           )}
         </div>
       </section>
@@ -579,7 +710,9 @@ function Fechamentos() {
                     Total recebido
                   </td>
                   <td className="p-4">{brl(m.total)}</td>
-                  <td className="p-4" />
+                  <td className="p-4">
+                    <Wallet size={16} className="text-black/40" />
+                  </td>
                 </tr>
               </tfoot>
             )}
