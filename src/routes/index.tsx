@@ -18,28 +18,39 @@ function Index() {
             <p className="mt-2 text-sm leading-6 text-black/55">Acesse os módulos</p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-          <Link
-            to="/pilates"
-            className="group block rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5"
-          >
-            <div className="flex justify-end">
-              <ArrowRight className="text-black/35 transition group-hover:translate-x-1 group-hover:text-black/70" size={20} />
-            </div>
-            <h2 className="mt-2 font-semibold">Pilates</h2>
-            <p className="mt-2 text-sm leading-6 text-black/55">Tenha a operação do estúdio de Pilates em um só lugar.</p>
-          </Link>
+                    <div className="grid gap-4 sm:grid-cols-2">
+            <Link
+              to="/pilates"
+              className="group block rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5"
+            >
+              <div className="flex justify-end">
+                <ArrowRight className="text-black/35 transition group-hover:translate-x-1 group-hover:text-black/70" size={20} />
+              </div>
+              <h2 className="mt-2 font-semibold">Pilates</h2>
+              <p className="mt-2 text-sm leading-6 text-black/55">Tenha a operação do estúdio de Pilates em um só lugar.</p>
+            </Link>
 
-          <Link
-            to="/osteopatia"
-            className="group block rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5"
-          >
-            <div className="flex justify-end">
-              <ArrowRight className="text-black/35 transition group-hover:translate-x-1 group-hover:text-black/70" size={20} />
-            </div>
-            <h2 className="mt-2 font-semibold">Osteopatia</h2>
-            <p className="mt-2 text-sm leading-6 text-black/55">Gerencie a operação do atendimento de Osteopatia em um só lugar.</p>
-          </Link>
+            <Link
+              to="/osteopatia"
+              className="group block rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5"
+            >
+              <div className="flex justify-end">
+                <ArrowRight className="text-black/35 transition group-hover:translate-x-1 group-hover:text-black/70" size={20} />
+              </div>
+              <h2 className="mt-2 font-semibold">Osteopatia</h2>
+              <p className="mt-2 text-sm leading-6 text-black/55">Gerencie a operação do atendimento de Osteopatia em um só lugar.</p>
+            </Link>
+
+            <Link
+              to="/projeto-oficina"
+              className="group block rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5"
+            >
+              <div className="flex justify-end">
+                <ArrowRight className="text-black/35 transition group-hover:translate-x-1 group-hover:text-black/70" size={20} />
+              </div>
+              <h2 className="mt-2 font-semibold">Projeto Oficina</h2>
+              <p className="mt-2 text-sm leading-6 text-black/55">Gerencie projetos e ordens de serviço da oficina.</p>
+            </Link>
           </div>
         </div>
       </main>
