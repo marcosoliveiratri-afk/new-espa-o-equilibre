@@ -43,11 +43,7 @@ function Alunos(){
  return (
   <div style={{background:"#F5F6FA",minHeight:"100vh",padding:"24px 24px 40px"}}>
    {/* Header */}
-   <div style={{background:"linear-gradient(to right,#1f2937,#334155,#0f766e)",borderRadius:20,padding:"28px 32px",marginBottom:24,boxShadow:"0 18px 40px -24px rgba(15,23,42,.7)"}}>
-    <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",color:"rgba(255,255,255,0.6)",textTransform:"uppercase"}}>Pilates</p>
-    <h1 style={{fontSize:30,fontWeight:700,color:"white",marginTop:8,letterSpacing:"-0.02em"}}>Cadastro de Alunos</h1>
-    <p style={{fontSize:14,color:"rgba(255,255,255,0.7)",marginTop:8,maxWidth:500}}>Dados sincronizados com o Supabase em tempo real.</p>
-   </div>
+   <h1 style={{fontSize:30,fontWeight:700,color:"#111827",marginBottom:24,letterSpacing:"-0.02em"}}>Cadastro de Alunos</h1>
 
    {/* Botão novo */}
    <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
