@@ -379,33 +379,34 @@ function Fechamentos() {
   };
 
   const printReport = () => {
+    const e = escapeHtml;
     const rows = m.rows
       .map(
         (x) =>
-          `<tr><td>${fmtDate(x.date)}</td><td>${x.student}</td><td>${
+          `<tr><td>${e(fmtDate(x.date))}</td><td>${e(x.student)}</td><td>${e(
             x.type
-          }</td><td>${brl(x.amount)}</td><td>${x.destination}</td></tr>`
+          )}</td><td>${e(brl(x.amount))}</td><td>${e(x.destination)}</td></tr>`
       )
       .join("");
     const w = window.open("", "_blank");
     if (!w) return;
     w.document.write(
-      `<!doctype html><html><head><meta charset="utf-8"><title>Fechamento ${month}</title><style>body{font-family:Arial,sans-serif;color:#222;padding:32px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #ddd;padding:8px;text-align:left}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.card{border:1px solid #ddd;padding:14px;border-radius:8px}.value{font-size:20px;font-weight:bold}</style></head><body>` +
-        `<h1>Fechamento — ${MONTHS[Number(monthNum) - 1]}/${year}</h1><p>${teacherName}</p>` +
-        `<div class="grid"><div class="card">Total recebido<div class="value">${brl(
+      `<!doctype html><html><head><meta charset="utf-8"><title>Fechamento ${e(month)}</title><style>body{font-family:Arial,sans-serif;color:#222;padding:32px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #ddd;padding:8px;text-align:left}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.card{border:1px solid #ddd;padding:14px;border-radius:8px}.value{font-size:20px;font-weight:bold}</style></head><body>` +
+        `<h1>Fechamento — ${e(MONTHS[Number(monthNum) - 1])}/${e(year)}</h1><p>${e(teacherName)}</p>` +
+        `<div class="grid"><div class="card">Total recebido<div class="value">${e(brl(
           m.total
-        )}</div></div><div class="card">Professor recebeu<div class="value">${brl(
+        ))}</div></div><div class="card">Professor recebeu<div class="value">${e(brl(
           m.receivedProfessor
-        )}</div></div><div class="card">Clínica recebeu<div class="value">${brl(
+        ))}</div></div><div class="card">Clínica recebeu<div class="value">${e(brl(
           m.receivedClinic
-        )}</div></div><div class="card">Cota do professor (50%)<div class="value">${brl(
+        ))}</div></div><div class="card">Cota do professor (50%)<div class="value">${e(brl(
           m.shareProfessor
-        )}</div></div><div class="card">Cota da clínica (50%)<div class="value">${brl(
+        ))}</div></div><div class="card">Cota da clínica (50%)<div class="value">${e(brl(
           m.shareClinic
-        )}</div></div><div class="card">Ajuste<div class="value">${brl(
+        ))}</div></div><div class="card">Ajuste<div class="value">${e(brl(
           m.adjustment
-        )}</div></div></div>` +
-        `<h2>${statusUi.label}</h2>` +
+        ))}</div></div></div>` +
+        `<h2>${e(statusUi.label)}</h2>` +
         `<h2>Detalhamento</h2><table><thead><tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Valor</th><th>Recebido por</th></tr></thead><tbody>${
           rows || "<tr><td colspan=5>Nenhum recebimento no período</td></tr>"
         }</tbody></table>` +
