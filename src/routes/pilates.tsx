@@ -65,17 +65,7 @@ function Dashboard() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-    const ch = supabase
-      .channel("dashboard-payments")
-      .on("postgres_changes", { event: "*", schema: "public", table: "student_payments" }, () => { load(); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "student_plans" }, () => { load(); })
-      .subscribe();
-    const onFocus = () => load();
-    window.addEventListener("focus", onFocus);
-    return () => { supabase.removeChannel(ch); window.removeEventListener("focus", onFocus); };
-  }, []);
+  useDataSync(load);
 
   const m = useMemo(() => {
     const { s = [], sp = [], p = [], t = [], pl = [], te = [], ce = [] } = d;
