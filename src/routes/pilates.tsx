@@ -18,19 +18,20 @@ const ACCENT_COLORS = {
 } as const;
 
 function Card({
-  title, value, icon, detail, accent = "info",
+  title, value, icon: Icon, detail, accent = "info",
 }: {
   title: string; value: string; icon: any; detail?: string;
   accent?: "info" | "receiving" | "overdue";
 }) {
   const c = ACCENT_COLORS[accent] || ACCENT_COLORS.info;
+  const IconComponent = Icon && typeof Icon === "function" ? Icon : null;
   return (
     <div
       className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5"
       style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(16, 24, 40, 0.05)", display: "flex", flexDirection: "column", gap: 16 }}
     >
       <div style={{ width: 36, height: 36, borderRadius: 10, background: c.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        {icon({ size: 18, color: c.icon })}
+        {IconComponent ? <IconComponent size={18} color={c.icon} /> : null}
       </div>
       <div>
         <p style={{ fontSize: 13, fontWeight: 400, color: "#64748B", marginBottom: 4 }}>{title}</p>
