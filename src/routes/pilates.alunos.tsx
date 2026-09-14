@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { Filter, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useDataSync } from "@/hooks/useDataSync";
 
 type Student={id:string;full_name:string;phone:string|null;active:boolean;plan:string;teacher:string;due:string|null;planStatus:string;contract:string;assessment:string;financial:string;destination:string};
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T00:00:00")):"—";
@@ -32,7 +33,7 @@ function Alunos(){
   setPlans(p.data||[]);setTeachers(t.data||[]);
   setRows((s.data||[]).map((x:any)=>{const sp=(x.student_plans||[])[0]||{};const c=(x.student_contracts||[])[0]||{};const a=(x.physical_assessments||[])[0]||{};const pay=(x.student_payments||[])[0]||{};return {id:x.id,full_name:x.full_name,phone:x.phone,active:x.active,plan:sp.plans?.name||"—",teacher:sp.teachers?.name||"—",due:sp.due_date||null,planStatus:sp.status||"—",contract:c.status||"—",assessment:a.status||"—",financial:pay.status==="Pago"?"Regular":pay.status||"—",destination:pay.destination||"—"};}));setLoading(false);
  }
- useEffect(()=>{load();},[pathname]);
+ useDataSync(load,[pathname]);
  useEffect(()=>{
   const db=supabase as any;
   const channel=db.channel("alunos-sync")
