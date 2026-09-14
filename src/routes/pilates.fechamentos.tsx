@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { escapeHtml } from "@/lib/escape-html";
 import { useDataSync } from "@/hooks/useDataSync";
 import {
   CircleDollarSign,
