@@ -2,8 +2,9 @@ import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { AppShell } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
 import { AuthGuard } from "@/components/AuthGuard";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useDataSync } from "@/hooks/useDataSync";
 import { Activity, CalendarClock, CheckCircle2, CircleDollarSign, Landmark, Users, UserRoundCheck, UserX, Wallet } from "lucide-react";
 
 export const Route = createFileRoute("/pilates")({ component: Pilates });
