@@ -41,14 +41,14 @@ const OsteopatiaRoute = OsteopatiaRouteImport.update({
   path: '/osteopatia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProjetoOficinaRoute = ProjetoOficinaRouteImport.update({
-  id: '/projeto-oficina',
-  path: '/projeto-oficina',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PilatesRoute = PilatesRouteImport.update({
   id: '/pilates',
   path: '/pilates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjetoOficinaRoute = ProjetoOficinaRouteImport.update({
+  id: '/projeto-oficina',
+  path: '/projeto-oficina',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VisualizacaoRoute = VisualizacaoRouteImport.update({
@@ -112,8 +112,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
-  '/projeto-oficina': typeof ProjetoOficinaRoute
   '/pilates': typeof PilatesRouteWithChildren
+  '/projeto-oficina': typeof ProjetoOficinaRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
@@ -130,8 +130,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
-  '/projeto-oficina': typeof ProjetoOficinaRoute
   '/pilates': typeof PilatesRouteWithChildren
+  '/projeto-oficina': typeof ProjetoOficinaRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
@@ -149,8 +149,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
-  '/projeto-oficina': typeof ProjetoOficinaRoute
   '/pilates': typeof PilatesRouteWithChildren
+  '/projeto-oficina': typeof ProjetoOficinaRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
@@ -170,6 +170,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/osteopatia'
     | '/pilates'
+    | '/projeto-oficina'
     | '/visualizacao'
     | '/pilates/alertas'
     | '/pilates/alunos'
@@ -187,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/osteopatia'
     | '/pilates'
+    | '/projeto-oficina'
     | '/visualizacao'
     | '/pilates/alertas'
     | '/pilates/alunos'
@@ -203,8 +205,8 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/osteopatia'
-    | '/projeto-oficina'
     | '/pilates'
+    | '/projeto-oficina'
     | '/visualizacao'
     | '/pilates/alertas'
     | '/pilates/alunos'
@@ -223,6 +225,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OsteopatiaRoute: typeof OsteopatiaRoute
   PilatesRoute: typeof PilatesRouteWithChildren
+  ProjetoOficinaRoute: typeof ProjetoOficinaRoute
   VisualizacaoRoute: typeof VisualizacaoRouteWithChildren
 }
 
@@ -249,18 +252,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OsteopatiaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projeto-oficina': {
-      id: '/projeto-oficina'
-      path: '/projeto-oficina'
-      fullPath: '/projeto-oficina'
-      preLoaderRoute: typeof ProjetoOficinaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/pilates': {
       id: '/pilates'
       path: '/pilates'
       fullPath: '/pilates'
       preLoaderRoute: typeof PilatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projeto-oficina': {
+      id: '/projeto-oficina'
+      path: '/projeto-oficina'
+      fullPath: '/projeto-oficina'
+      preLoaderRoute: typeof ProjetoOficinaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/visualizacao': {
@@ -396,8 +399,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   OsteopatiaRoute: OsteopatiaRoute,
-  ProjetoOficinaRoute: ProjetoOficinaRoute,
   PilatesRoute: PilatesRouteWithChildren,
+  ProjetoOficinaRoute: ProjetoOficinaRoute,
   VisualizacaoRoute: VisualizacaoRouteWithChildren,
 }
 export const routeTree = rootRouteImport

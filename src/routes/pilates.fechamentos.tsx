@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useDataSync } from "@/hooks/useDataSync";
 import {
   CircleDollarSign,
   Landmark,
@@ -204,30 +205,7 @@ function Fechamentos() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-    const ch = supabase.channel("fechamentos-realtime");
-    [
-      "student_payments",
-      "student_plans",
-      "private_lesson_students",
-      "teacher_financial_entries",
-      "financial_split_settings",
-    ].forEach((table) =>
-      ch.on(
-        "postgres_changes",
-        { event: "*", schema: "public", table },
-        () => void load()
-      )
-    );
-    ch.subscribe();
-    const onFocus = () => void load();
-    window.addEventListener("focus", onFocus);
-    return () => {
-      supabase.removeChannel(ch);
-      window.removeEventListener("focus", onFocus);
-    };
-  }, []);
+  useDataSync(load);
 
   const m = useMemo(() => {
     const studentName = (id: string) =>
