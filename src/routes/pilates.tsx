@@ -91,9 +91,9 @@ function Dashboard() {
     return {
       activeStudents: activeStudents.length, inactive: inactiveStudents.length,
       activePlans: active.length, closed: sp.filter((x: any) => x.status !== "Ativo").length,
-      recurring: active.reduce((a: number, x: any) => a + Number(x.monthly_value || 0), 0),
+      recurring: financialPayments.reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
       current: financialPayments.filter((x: any) => x.status === "Pago").reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
-      expected: active.reduce((a: number, x: any) => a + Number(x.monthly_value || 0), 0),
+      expected: financialPayments.filter((x: any) => x.status !== "Pago").reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
       overdue: financialPayments.filter((x: any) => x.status !== "Pago" && x.due_date && x.due_date < today).reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
       clinicReceived, professorReceived, cashExpenses, cashBalance,
       trials: t.filter((x: any) => !x.scheduled_date || (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd)).length,
