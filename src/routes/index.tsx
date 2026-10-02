@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({ component: Index });
 function Index() {
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-[#f7f7f5] text-[#1b1b1b]">
+      <div className="min-h-screen bg-white text-[#1b1b1b]">
       <TopBar />
       <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-2xl">

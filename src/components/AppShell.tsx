@@ -19,7 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="text-[#1b1b1b]">
-      <aside className={`fixed top-16 bottom-0 left-0 z-30 border-r border-black/10 bg-[#f7f7f5] transition-[width,transform] duration-200 lg:translate-x-0 ${collapsed ? "w-20" : "w-64"} ${open ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed top-16 bottom-0 left-0 z-30 border-r border-black/10 bg-white transition-[width,transform] duration-200 lg:translate-x-0 ${collapsed ? "w-20" : "w-64"} ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between px-4 py-4">
             {!collapsed && <span className="text-xs font-semibold uppercase tracking-[0.12em] text-black/40">Pilates</span>}

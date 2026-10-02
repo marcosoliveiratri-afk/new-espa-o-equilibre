@@ -21,7 +21,7 @@ export const Route = createFileRoute("/visualizacao/osteopatia")({
 
 function VisualizacaoOsteopatia() {
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
+    <div className="min-h-screen bg-white">
       <TopBar />
       <AppShell>
         <div className="mx-auto max-w-7xl">

@@ -8,7 +8,7 @@ export const Route = createFileRoute("/projeto-oficina")({ component: ProjetoOfi
 function ProjetoOficina() {
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-[#f7f7f5]">
+      <div className="min-h-screen bg-white">
         <TopBar />
         <AppShell>
           <div className="mx-auto max-w-7xl">

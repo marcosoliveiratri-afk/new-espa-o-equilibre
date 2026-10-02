@@ -19,6 +19,6 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     return () => { active = false; listener.subscription.unsubscribe(); };
   }, [navigate]);
 
-  if (checking) return <div className="min-h-screen bg-[#f7f7f5]" />;
+  if (checking) return <div className="min-h-screen bg-white" />;
   return <>{children}</>;
 }

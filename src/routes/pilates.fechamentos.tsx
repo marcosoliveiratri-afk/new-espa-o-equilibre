@@ -49,39 +49,39 @@ const ACCENTS: Record<
 > = {
   sky: {
     ring: "border-sky-200/70",
-    bg: "bg-gradient-to-br from-sky-50 to-white",
+    bg: "bg-white
     chip: "bg-sky-500/10 text-sky-700",
     bar: "bg-sky-500",
   },
   emerald: {
     ring: "border-emerald-200/70",
-    bg: "bg-gradient-to-br from-emerald-50 to-white",
+    bg: "bg-white
     chip: "bg-emerald-500/10 text-emerald-700",
     bar: "bg-emerald-500",
   },
   violet: {
     ring: "border-violet-200/70",
-    bg: "bg-gradient-to-br from-violet-50 to-white",
+    bg: "bg-white
     chip: "bg-violet-500/10 text-violet-700",
     bar: "bg-violet-500",
   },
   amber: {
     ring: "border-amber-200/70",
-    bg: "bg-gradient-to-br from-amber-50 to-white",
+    bg: "bg-white
     chip: "bg-amber-500/10 text-amber-700",
     bar: "bg-amber-500",
   },
   rose: {
     ring: "border-rose-200/70",
-    bg: "bg-gradient-to-br from-rose-50 to-white",
+    bg: "bg-white
     chip: "bg-rose-500/10 text-rose-700",
     bar: "bg-rose-500",
   },
   slate: {
     ring: "border-slate-200/70",
-    bg: "bg-gradient-to-br from-slate-50 to-white",
-    chip: "bg-slate-500/10 text-slate-700",
-    bar: "bg-slate-500",
+    bg: "bg-white
+    chip: "bg-white0/10 text-slate-700",
+    bar: "bg-white0",
   },
 };
 
@@ -328,7 +328,7 @@ function Fechamentos() {
       ? {
           label: "Fechamento equilibrado",
           detail: "Nenhum valor a repassar neste período.",
-          box: "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
+          box: "border-emerald-200 bg-white
           bar: "bg-emerald-500",
           text: "text-emerald-700",
           icon: CheckCircle2,
@@ -337,7 +337,7 @@ function Fechamentos() {
       ? {
           label: `Professor deve repassar ${brl(m.adjustment)} para a Clínica`,
           detail: "O professor recebeu acima da cota de 50%.",
-          box: "border-amber-200 bg-gradient-to-br from-amber-50 to-white",
+          box: "border-amber-200 bg-white
           bar: "bg-amber-500",
           text: "text-amber-700",
           icon: ArrowLeftRight,
@@ -345,7 +345,7 @@ function Fechamentos() {
       : {
           label: `Clínica deve repassar ${brl(m.adjustment)} para o Professor`,
           detail: "A clínica recebeu acima da cota de 50%.",
-          box: "border-sky-200 bg-gradient-to-br from-sky-50 to-white",
+          box: "border-sky-200 bg-white
           bar: "bg-sky-500",
           text: "text-sky-700",
           icon: ArrowLeftRight,
@@ -616,7 +616,7 @@ function Fechamentos() {
           {Object.entries(m.byType).map(([type, value]) => (
             <div
               key={type}
-              className="relative overflow-hidden rounded-xl border border-amber-200/70 bg-gradient-to-br from-amber-50 to-white p-4"
+              className="relative overflow-hidden rounded-xl border border-amber-200/70 bg-white p-4"
             >
               <span className="absolute inset-x-0 top-0 h-1 bg-amber-500" />
               <div className="text-sm font-medium text-amber-800">{type}</div>
