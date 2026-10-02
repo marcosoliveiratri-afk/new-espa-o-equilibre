@@ -12,9 +12,9 @@ export const Route = createFileRoute("/pilates")({ component: Pilates });
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const ACCENT_COLORS = {
-  info: { bg: "#EAF2FF", icon: "#3B82F6" },
-  receiving: { bg: "#E8F7EF", icon: "#16A36A" },
-  overdue: { bg: "#FDECEC", icon: "#E05252" },
+  info: { bg: "#F2F2F7", icon: "#1D1D1F" },
+  receiving: { bg: "#F2F2F7", icon: "#1D1D1F" },
+  overdue: { bg: "#F2F2F7", icon: "#1D1D1F" },
 } as const;
 
 function Card({
