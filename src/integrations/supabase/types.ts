@@ -22,6 +22,7 @@ export type Database = {
           description: string
           expense_date: string
           id: string
+          module_id: string | null
           notes: string | null
           payment_method: string | null
           status: string
@@ -33,6 +34,7 @@ export type Database = {
           description: string
           expense_date?: string
           id?: string
+          module_id?: string | null
           notes?: string | null
           payment_method?: string | null
           status?: string
@@ -44,38 +46,59 @@ export type Database = {
           description?: string
           expense_date?: string
           id?: string
+          module_id?: string | null
           notes?: string | null
           payment_method?: string | null
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "clinic_cash_expenses_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       financial_split_settings: {
         Row: {
           clinic_percentage: number
           id: string
+          module_id: string | null
           professor_percentage: number
           updated_at: string
         }
         Insert: {
           clinic_percentage?: number
           id?: string
+          module_id?: string | null
           professor_percentage?: number
           updated_at?: string
         }
         Update: {
           clinic_percentage?: number
           id?: string
+          module_id?: string | null
           professor_percentage?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "financial_split_settings_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       physical_assessments: {
         Row: {
           assessment_date: string
           created_at: string
           id: string
+          module_id: string | null
           next_assessment_date: string | null
           notes: string | null
           status: string
@@ -85,6 +108,7 @@ export type Database = {
           assessment_date: string
           created_at?: string
           id?: string
+          module_id?: string | null
           next_assessment_date?: string | null
           notes?: string | null
           status?: string
@@ -94,12 +118,20 @@ export type Database = {
           assessment_date?: string
           created_at?: string
           id?: string
+          module_id?: string | null
           next_assessment_date?: string | null
           notes?: string | null
           status?: string
           student_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "physical_assessments_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "physical_assessments_student_id_fkey"
             columns: ["student_id"]
@@ -112,23 +144,34 @@ export type Database = {
       plans: {
         Row: {
           created_at: string
-          duration_months: number
+          duration_months: number | null
           id: string
+          module_id: string | null
           name: string
         }
         Insert: {
           created_at?: string
-          duration_months: number
+          duration_months?: number | null
           id?: string
+          module_id?: string | null
           name: string
         }
         Update: {
           created_at?: string
-          duration_months?: number
+          duration_months?: number | null
           id?: string
+          module_id?: string | null
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "plans_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       private_lesson_students: {
         Row: {
@@ -139,6 +182,7 @@ export type Database = {
           id: string
           lesson_date: string | null
           lesson_value: number
+          module_id: string | null
           notes: string | null
           paid: boolean
           paid_at: string | null
@@ -156,6 +200,7 @@ export type Database = {
           id?: string
           lesson_date?: string | null
           lesson_value?: number
+          module_id?: string | null
           notes?: string | null
           paid?: boolean
           paid_at?: string | null
@@ -173,6 +218,7 @@ export type Database = {
           id?: string
           lesson_date?: string | null
           lesson_value?: number
+          module_id?: string | null
           notes?: string | null
           paid?: boolean
           paid_at?: string | null
@@ -183,6 +229,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "private_lesson_students_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "private_lesson_students_plan_id_fkey"
             columns: ["plan_id"]
@@ -199,6 +252,30 @@ export type Database = {
           },
         ]
       }
+      service_modules: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          key: string
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          key: string
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          key?: string
+          name?: string
+        }
+        Relationships: []
+      }
       student_audit_log: {
         Row: {
           action: string
@@ -206,6 +283,7 @@ export type Database = {
           created_at: string
           details: Json
           id: string
+          module_id: string | null
           student_id: string
         }
         Insert: {
@@ -214,6 +292,7 @@ export type Database = {
           created_at?: string
           details?: Json
           id?: string
+          module_id?: string | null
           student_id: string
         }
         Update: {
@@ -222,9 +301,17 @@ export type Database = {
           created_at?: string
           details?: Json
           id?: string
+          module_id?: string | null
           student_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "student_audit_log_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_audit_log_student_id_fkey"
             columns: ["student_id"]
@@ -240,6 +327,7 @@ export type Database = {
           created_at: string
           end_date: string
           id: string
+          module_id: string | null
           renewed_from_id: string | null
           start_date: string
           status: string
@@ -250,6 +338,7 @@ export type Database = {
           created_at?: string
           end_date: string
           id?: string
+          module_id?: string | null
           renewed_from_id?: string | null
           start_date: string
           status?: string
@@ -260,12 +349,20 @@ export type Database = {
           created_at?: string
           end_date?: string
           id?: string
+          module_id?: string | null
           renewed_from_id?: string | null
           start_date?: string
           status?: string
           student_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "student_contracts_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_contracts_renewed_from_id_fkey"
             columns: ["renewed_from_id"]
@@ -289,6 +386,7 @@ export type Database = {
           destination: string
           due_date: string
           id: string
+          module_id: string | null
           paid_at: string | null
           payment_method: string | null
           plan_id: string | null
@@ -301,6 +399,7 @@ export type Database = {
           destination: string
           due_date: string
           id?: string
+          module_id?: string | null
           paid_at?: string | null
           payment_method?: string | null
           plan_id?: string | null
@@ -313,6 +412,7 @@ export type Database = {
           destination?: string
           due_date?: string
           id?: string
+          module_id?: string | null
           paid_at?: string | null
           payment_method?: string | null
           plan_id?: string | null
@@ -320,6 +420,13 @@ export type Database = {
           student_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "student_payments_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_payments_plan_id_fkey"
             columns: ["plan_id"]
@@ -341,6 +448,7 @@ export type Database = {
           created_at: string
           due_date: string | null
           id: string
+          module_id: string | null
           monthly_value: number
           plan_id: string
           start_date: string
@@ -352,6 +460,7 @@ export type Database = {
           created_at?: string
           due_date?: string | null
           id?: string
+          module_id?: string | null
           monthly_value: number
           plan_id: string
           start_date: string
@@ -363,6 +472,7 @@ export type Database = {
           created_at?: string
           due_date?: string | null
           id?: string
+          module_id?: string | null
           monthly_value?: number
           plan_id?: string
           start_date?: string
@@ -371,6 +481,13 @@ export type Database = {
           teacher_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "student_plans_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_plans_plan_id_fkey"
             columns: ["plan_id"]
@@ -404,6 +521,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          module_id: string | null
           notes: string | null
           phone: string | null
           photo_url: string | null
@@ -419,6 +537,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          module_id?: string | null
           notes?: string | null
           phone?: string | null
           photo_url?: string | null
@@ -434,13 +553,22 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          module_id?: string | null
           notes?: string | null
           phone?: string | null
           photo_url?: string | null
           updated_at?: string
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "students_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       teacher_financial_entries: {
         Row: {
@@ -450,6 +578,7 @@ export type Database = {
           destination: string
           entry_date: string
           id: string
+          module_id: string | null
           status: string
           teacher_id: string
         }
@@ -460,6 +589,7 @@ export type Database = {
           destination?: string
           entry_date?: string
           id?: string
+          module_id?: string | null
           status?: string
           teacher_id: string
         }
@@ -470,10 +600,18 @@ export type Database = {
           destination?: string
           entry_date?: string
           id?: string
+          module_id?: string | null
           status?: string
           teacher_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "teacher_financial_entries_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "teacher_financial_entries_teacher_id_fkey"
             columns: ["teacher_id"]
@@ -487,6 +625,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          module_id: string | null
           month: string
           snapshot: Json
           teacher_id: string | null
@@ -496,6 +635,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          module_id?: string | null
           month: string
           snapshot?: Json
           teacher_id?: string | null
@@ -505,13 +645,22 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          module_id?: string | null
           month?: string
           snapshot?: Json
           teacher_id?: string | null
           teacher_name?: string
           total?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "teacher_financial_reports_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       teachers: {
         Row: {
@@ -519,6 +668,7 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          module_id: string | null
           name: string
           phone: string | null
         }
@@ -527,6 +677,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          module_id?: string | null
           name: string
           phone?: string | null
         }
@@ -535,10 +686,19 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          module_id?: string | null
           name?: string
           phone?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "teachers_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trial_classes: {
         Row: {
@@ -546,6 +706,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          module_id: string | null
           notes: string | null
           phone: string | null
           plan_id: string | null
@@ -557,6 +718,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          module_id?: string | null
           notes?: string | null
           phone?: string | null
           plan_id?: string | null
@@ -568,6 +730,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          module_id?: string | null
           notes?: string | null
           phone?: string | null
           plan_id?: string | null
@@ -575,6 +738,13 @@ export type Database = {
           teacher_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "trial_classes_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "trial_classes_plan_id_fkey"
             columns: ["plan_id"]
@@ -597,6 +767,7 @@ export type Database = {
           body: string
           id: string
           key: string
+          module_id: string | null
           title: string
           updated_at: string
         }
@@ -605,6 +776,7 @@ export type Database = {
           body: string
           id?: string
           key: string
+          module_id?: string | null
           title: string
           updated_at?: string
         }
@@ -613,10 +785,19 @@ export type Database = {
           body?: string
           id?: string
           key?: string
+          module_id?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_message_templates_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "service_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
