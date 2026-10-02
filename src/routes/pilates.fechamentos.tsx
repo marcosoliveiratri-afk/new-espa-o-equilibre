@@ -49,37 +49,37 @@ const ACCENTS: Record<
 > = {
   sky: {
     ring: "border-sky-200/70",
-    bg: "bg-white
+    bg: "bg-white",
     chip: "bg-sky-500/10 text-sky-700",
     bar: "bg-sky-500",
   },
   emerald: {
     ring: "border-emerald-200/70",
-    bg: "bg-white
+    bg: "bg-white",
     chip: "bg-emerald-500/10 text-emerald-700",
     bar: "bg-emerald-500",
   },
   violet: {
     ring: "border-violet-200/70",
-    bg: "bg-white
+    bg: "bg-white",
     chip: "bg-violet-500/10 text-violet-700",
     bar: "bg-violet-500",
   },
   amber: {
     ring: "border-amber-200/70",
-    bg: "bg-white
+    bg: "bg-white",
     chip: "bg-amber-500/10 text-amber-700",
     bar: "bg-amber-500",
   },
   rose: {
     ring: "border-rose-200/70",
-    bg: "bg-white
+    bg: "bg-white",
     chip: "bg-rose-500/10 text-rose-700",
     bar: "bg-rose-500",
   },
   slate: {
     ring: "border-slate-200/70",
-    bg: "bg-white
+    bg: "bg-white",
     chip: "bg-white0/10 text-slate-700",
     bar: "bg-white0",
   },
@@ -328,7 +328,7 @@ function Fechamentos() {
       ? {
           label: "Fechamento equilibrado",
           detail: "Nenhum valor a repassar neste período.",
-          box: "border-emerald-200 bg-white
+          box: "border-emerald-200 bg-white",
           bar: "bg-emerald-500",
           text: "text-emerald-700",
           icon: CheckCircle2,
@@ -337,7 +337,7 @@ function Fechamentos() {
       ? {
           label: `Professor deve repassar ${brl(m.adjustment)} para a Clínica`,
           detail: "O professor recebeu acima da cota de 50%.",
-          box: "border-amber-200 bg-white
+          box: "border-amber-200 bg-white",
           bar: "bg-amber-500",
           text: "text-amber-700",
           icon: ArrowLeftRight,
@@ -345,7 +345,7 @@ function Fechamentos() {
       : {
           label: `Clínica deve repassar ${brl(m.adjustment)} para o Professor`,
           detail: "A clínica recebeu acima da cota de 50%.",
-          box: "border-sky-200 bg-white
+          box: "border-sky-200 bg-white",
           bar: "bg-sky-500",
           text: "text-sky-700",
           icon: ArrowLeftRight,
