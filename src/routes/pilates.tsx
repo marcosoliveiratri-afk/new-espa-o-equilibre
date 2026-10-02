@@ -28,7 +28,7 @@ function Card({
   return (
     <div
       className="rounded-2xl border border-gray-200 p-5 transition-all duration-200 hover:-translate-y-0.5"
-      style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(16, 24, 40, 0.05)", display: "flex", flexDirection: "column", gap: 16 }}
+      style={{ background: "#FFFFFF", display: "flex", flexDirection: "column", gap: 16 }}
     >
       <div style={{ width: 36, height: 36, borderRadius: 10, background: c.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         {IconComponent ? <IconComponent size={18} color={c.icon} /> : null}
