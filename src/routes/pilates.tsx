@@ -24,7 +24,7 @@ function Card({
   accent?: "info" | "receiving" | "overdue";
 }) {
   const c = ACCENT_COLORS[accent] || ACCENT_COLORS.info;
-  const IconComponent = Icon && typeof Icon === "function" ? Icon : null;
+  const IconComponent = Icon || null;
   return (
     <div
       className="rounded-2xl border border-gray-200 p-5 transition-all duration-200 hover:-translate-y-0.5"
