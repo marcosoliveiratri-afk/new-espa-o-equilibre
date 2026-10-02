@@ -133,7 +133,7 @@ function Dashboard() {
   return (
     <div className="mx-auto max-w-7xl" style={{ background: "#FFFFFF", minHeight: "100vh" }}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-black/80 sm:text-4xl">Dashboard Pilates</h1>
+        <h1 className="text-[30px] font-bold leading-tight tracking-[-0.02em] text-[#111827]">Dashboard Pilates</h1>
       </div>
 
       <div className="mb-8 flex flex-wrap items-end gap-4 rounded-2xl border border-black/10 bg-white p-5">
