@@ -437,7 +437,7 @@ function Fechamentos() {
         <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/60">
           Pilates
         </p>
-        <h1 className="text-3xl font-bold tracking-tight text-black/80">Fechamento</h1>
+        <h1 className="text-[30px] font-bold leading-tight tracking-[-0.02em] text-[#111827]">Fechamento</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/70">
           Divisão automática 50% / 50% sobre tudo que foi efetivamente recebido
           no período — mensalidades, parcelas, planos e aulas avulsas pagas.
