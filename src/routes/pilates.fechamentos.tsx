@@ -356,9 +356,12 @@ function Fechamentos() {
   const saveReport = async () => {
     setSavingReport(true);
     setError("");
+    const moduleId = await getServiceModuleId("pilates");
+    if (!moduleId) { setError("Módulo Pilates não configurado."); setSavingReport(false); return; }
     const { error } = await (supabase as any)
       .from("teacher_financial_reports")
       .insert({
+        module_id: moduleId,
         month,
         teacher_id: teacher === "all" ? null : teacher,
         teacher_name: teacherName,
