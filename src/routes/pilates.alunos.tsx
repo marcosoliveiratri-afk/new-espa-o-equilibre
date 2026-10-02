@@ -106,7 +106,7 @@ function Alunos(){
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#64748B",whiteSpace:"nowrap"}}>{x.phone||"—"}</td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#334155",fontWeight:500,whiteSpace:"nowrap"}}>{x.plan}</td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.teacher}</td>
-         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{fmt(x.due)}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.due ? `Dia ${String(x.due).slice(8,10)}` : "—"}</td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:x.active?"#ECFDF5":"#F8FAFC",color:x.active?"#047857":"#64748B",border:`1px solid ${x.active?"#A7F3D0":"#E2E8F0"}`}}>{x.active?"Ativo":"Inativo"}</span></td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:contractRisk?"#FEF2F2":contractNext?"#FFFBEB":"#ECFDF5",color:contractRisk?"#B91C1C":contractNext?"#B45309":"#047857",border:`1px solid ${contractRisk?"#FECACA":contractNext?"#FDE68A":"#A7F3D0"}`}}>{x.contract||"—"}</span></td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.assessment||"—"}</td>
