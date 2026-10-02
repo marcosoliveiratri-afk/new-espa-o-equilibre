@@ -27,7 +27,7 @@ function Alunos(){
  const [form,setForm]=useState({full_name:"",phone:"",plan_id:"",teacher_id:"",monthly_value:"",start_date:new Date().toISOString().slice(0,10),due_date:"",payment_method:"",destination:"Clínica"});
  async function load(){
   setLoading(true);setError("");
-  const db=supabase as any;
+  const db=supabase as any;const moduleId=await getServiceModuleId("pilates");if(!moduleId){setError("Módulo Pilates não configurado.");setLoading(false);return;}
   const [s,p,t]=await Promise.all([db.from("students").select("*,student_plans(plan_id,teacher_id,due_date,status,plans(name),teachers(name)),student_contracts(status,end_date),physical_assessments(status,next_assessment_date),student_payments(status,due_date,destination)").eq("module_id", moduleId).order("full_name"),db.from("plans").select("*").eq("module_id", moduleId).order("duration_months"),db.from("teachers").select("*").eq("module_id", moduleId).eq("active",true).order("name")]);
   if(s.error){setError(s.error.message);setLoading(false);return;} if(p.error||t.error){setError(p.error?.message||t.error?.message||"Erro ao carregar dados");}
   setPlans(p.data||[]);setTeachers(t.data||[]);
