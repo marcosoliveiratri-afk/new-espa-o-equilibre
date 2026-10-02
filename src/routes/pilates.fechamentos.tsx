@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { escapeHtml } from "@/lib/escape-html";
 import { useDataSync } from "@/hooks/useDataSync";
+import { getServiceModuleId } from "@/lib/serviceModule";
 import {
   CircleDollarSign,
   Landmark,
@@ -180,14 +181,16 @@ function Fechamentos() {
 
   const load = async () => {
     const db = supabase as any;
+    const moduleId = await getServiceModuleId("pilates");
+    if (!moduleId) { setError("Módulo Pilates não configurado."); return; }
     const [t, sp, p, st, pl, e, fs] = await Promise.all([
-      db.from("teachers").select("*").order("name"),
-      db.from("student_plans").select("*"),
-      db.from("student_payments").select("*"),
-      db.from("students").select("id,full_name"),
-      db.from("private_lesson_students").select("*"),
-      db.from("teacher_financial_entries").select("*"),
-      db.from("financial_split_settings").select("*").limit(1).maybeSingle(),
+      db.from("teachers").select("*").eq("module_id", moduleId).order("name"),
+      db.from("student_plans").select("*").eq("module_id", moduleId),
+      db.from("student_payments").select("*").eq("module_id", moduleId),
+      db.from("students").select("id,full_name").eq("module_id", moduleId),
+      db.from("private_lesson_students").select("*").eq("module_id", moduleId),
+      db.from("teacher_financial_entries").select("*").eq("module_id", moduleId),
+      db.from("financial_split_settings").select("*").eq("module_id", moduleId).limit(1).maybeSingle(),
     ]);
     const err = [t, sp, p, st, pl, e, fs].find((x: any) => x?.error);
     setError(err ? err.error.message : "");
