@@ -155,7 +155,12 @@ function Dashboard() {
 
       {groups.map(([title, accent, cards]: any) => (
         <section key={title} className="mb-9">
-          <div className="mb-4"><h2 className="text-lg font-bold tracking-tight text-black/80">{title}</h2></div>
+          <div className="mb-4 flex items-center gap-3">
+            <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${accent === "receiving" ? "bg-[#E8F7EF]" : "bg-[#EAF2FF]"}`}>
+              {accent === "receiving" ? <CircleDollarSign size={18} color="#16A36A" /> : title === "Aulas experimentais" ? <CalendarClock size={18} color="#3B82F6" /> : <Users size={18} color="#3B82F6" />}
+            </div>
+            <h2 className="text-lg font-bold tracking-tight text-black/80">{title}</h2>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: 16 }}>
             {cards.map((x: any) => <Card key={x[0]} title={x[0]} value={x[1]} icon={x[2]} detail={x[3]} accent={accent} />)}
           </div>
