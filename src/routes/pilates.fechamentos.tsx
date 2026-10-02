@@ -48,37 +48,37 @@ const ACCENTS: Record<
   { ring: string; bg: string; chip: string; bar: string }
 > = {
   sky: {
-    ring: "border-sky-200/70",
+    ring: "border-gray-200",
     bg: "bg-white",
     chip: "bg-sky-500/10 text-sky-700",
     bar: "bg-sky-500",
   },
   emerald: {
-    ring: "border-emerald-200/70",
+    ring: "border-gray-200",
     bg: "bg-white",
     chip: "bg-emerald-500/10 text-emerald-700",
     bar: "bg-emerald-500",
   },
   violet: {
-    ring: "border-violet-200/70",
+    ring: "border-gray-200",
     bg: "bg-white",
     chip: "bg-violet-500/10 text-violet-700",
     bar: "bg-violet-500",
   },
   amber: {
-    ring: "border-amber-200/70",
+    ring: "border-gray-200",
     bg: "bg-white",
     chip: "bg-amber-500/10 text-amber-700",
     bar: "bg-amber-500",
   },
   rose: {
-    ring: "border-rose-200/70",
+    ring: "border-gray-200",
     bg: "bg-white",
     chip: "bg-rose-500/10 text-rose-700",
     bar: "bg-rose-500",
   },
   slate: {
-    ring: "border-slate-200/70",
+    ring: "border-gray-200",
     bg: "bg-white",
     chip: "bg-white0/10 text-slate-700",
     bar: "bg-white0",
@@ -102,7 +102,7 @@ function Card({
   return (
     <div
       className={
-        "group relative overflow-hidden rounded-2xl border p-5 shadow-[0_1px_2px_rgba(16,24,40,.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-12px_rgba(16,24,40,.25)] " +
+        "group relative overflow-hidden rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-0.5 " +
         a.ring +
         " " +
         a.bg
@@ -434,11 +434,11 @@ function Fechamentos() {
 
   return (
     <div className="w-full max-w-none">
-      <div className="mb-7 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 p-7 text-white shadow-[0_18px_40px_-24px_rgba(6,78,59,.9)]">
+      <div className="mb-7">
         <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/60">
           Pilates
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight">Fechamento</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-black/80">Fechamento</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/70">
           Divisão automática 50% / 50% sobre tudo que foi efetivamente recebido
           no período — mensalidades, parcelas, planos e aulas avulsas pagas.
@@ -451,7 +451,7 @@ function Fechamentos() {
         </div>
       )}
 
-      <div className="mb-7 flex flex-wrap items-end gap-4 rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+      <div className="mb-7 flex flex-wrap items-end gap-4 rounded-2xl border border-gray-200 bg-white p-5">
         <div>
           <label className="text-xs font-medium text-black/50">Mês</label>
           <select
@@ -565,7 +565,7 @@ function Fechamentos() {
       <section className="mb-8">
         <div
           className={
-            "relative overflow-hidden rounded-2xl border p-6 shadow-sm " +
+            "relative overflow-hidden rounded-2xl border p-6 " +
             statusUi.box
           }
         >
