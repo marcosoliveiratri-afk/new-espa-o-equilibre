@@ -5,7 +5,7 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDataSync } from "@/hooks/useDataSync";
-import { Activity, CalendarClock, CheckCircle2, CircleDollarSign, Landmark, Users, UserRoundCheck, UserX, Wallet } from "lucide-react";
+import { Activity, CalendarClock, CheckCircle2, CircleDollarSign, Landmark, Users, UserRoundCheck, UserX, Wallet, ClipboardList, UserRound } from "lucide-react";
 
 export const Route = createFileRoute("/pilates")({ component: Pilates });
 
@@ -164,13 +164,13 @@ function Dashboard() {
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div className="rounded-2xl border border-black/10 bg-white p-6" style={{ boxShadow: "0 8px 24px rgba(16, 24, 40, 0.05)" }}>
-          <h2 className="text-lg font-bold tracking-tight text-black/80">Alunos ativos por plano</h2>
+          <div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EAF2FF]"><ClipboardList size={18} color="#3B82F6" /></div><h2 className="text-lg font-bold tracking-tight text-black/80">Alunos ativos por plano</h2></div>
           <div className="mt-5 space-y-3">
             {m.byPlan?.map((x: any) => <div key={x[0]} className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm" style={{ background: "rgba(0,0,0,0.02)" }}><span>{x[0]}</span><strong>{x[1]}</strong></div>)}
           </div>
         </div>
         <div className="rounded-2xl border border-black/10 bg-white p-6" style={{ boxShadow: "0 8px 24px rgba(16, 24, 40, 0.05)" }}>
-          <h2 className="text-lg font-bold tracking-tight text-black/80">Alunos ativos por professor</h2>
+          <div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F7EF]"><UserRound size={18} color="#16A36A" /></div><h2 className="text-lg font-bold tracking-tight text-black/80">Alunos ativos por professor</h2></div>
           <div className="mt-5 space-y-3">
             {m.byTeacher?.length ? m.byTeacher.map((x: any) => <div key={x[0]} className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm" style={{ background: "rgba(0,0,0,0.02)" }}><span>{x[0]}</span><strong>{x[1]}</strong></div>) : <p className="text-sm text-black/45">Nenhum aluno vinculado.</p>}
           </div>
