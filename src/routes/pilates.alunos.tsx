@@ -42,7 +42,7 @@ function Alunos(){
  return (
   <div style={{background:"#FFFFFF",minHeight:"100vh",padding:"24px 24px 40px"}}>
    {/* Header */}
-   <h1 style={{fontSize:30,fontWeight:700,color:"#111827",marginBottom:24,letterSpacing:"-0.02em"}}>Cadastro de Alunos</h1>
+   <h1 style={{fontSize:30,fontWeight:700,lineHeight:1.2,color:"#111827",marginBottom:24,letterSpacing:"-0.02em"}}>Cadastro de Alunos</h1>
 
    {/* Botão novo */}
    <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
