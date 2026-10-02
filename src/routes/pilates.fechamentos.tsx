@@ -50,38 +50,38 @@ const ACCENTS: Record<
   sky: {
     ring: "border-gray-200",
     bg: "bg-white",
-    chip: "bg-sky-500/10 text-sky-700",
-    bar: "bg-sky-500",
+    chip: "bg-black/[.04] text-black/55",
+    bar: "bg-transparent",
   },
   emerald: {
     ring: "border-gray-200",
     bg: "bg-white",
-    chip: "bg-emerald-500/10 text-emerald-700",
-    bar: "bg-emerald-500",
+    chip: "bg-black/[.04] text-black/55",
+    bar: "bg-transparent",
   },
   violet: {
     ring: "border-gray-200",
     bg: "bg-white",
-    chip: "bg-violet-500/10 text-violet-700",
-    bar: "bg-violet-500",
+    chip: "bg-black/[.04] text-black/55",
+    bar: "bg-transparent",
   },
   amber: {
     ring: "border-gray-200",
     bg: "bg-white",
-    chip: "bg-amber-500/10 text-amber-700",
-    bar: "bg-amber-500",
+    chip: "bg-black/[.04] text-black/55",
+    bar: "bg-transparent",
   },
   rose: {
     ring: "border-gray-200",
     bg: "bg-white",
-    chip: "bg-rose-500/10 text-rose-700",
-    bar: "bg-rose-500",
+    chip: "bg-black/[.04] text-black/55",
+    bar: "bg-transparent",
   },
   slate: {
     ring: "border-gray-200",
     bg: "bg-white",
-    chip: "bg-white0/10 text-slate-700",
-    bar: "bg-white0",
+    chip: "bg-black/[.04] text-black/55",
+    bar: "bg-transparent",
   },
 };
 
@@ -108,7 +108,6 @@ function Card({
         a.bg
       }
     >
-      <span className={"absolute inset-x-0 top-0 h-1 " + a.bar} />
       <div className="flex items-start justify-between gap-3">
         <p className="text-[13px] font-semibold uppercase tracking-wide text-black/50">
           {title}
@@ -328,26 +327,26 @@ function Fechamentos() {
       ? {
           label: "Fechamento equilibrado",
           detail: "Nenhum valor a repassar neste período.",
-          box: "border-emerald-200 bg-white",
-          bar: "bg-emerald-500",
-          text: "text-emerald-700",
+          box: "border-gray-200 bg-white",
+          bar: "bg-transparent",
+          text: "text-black/70",
           icon: CheckCircle2,
         }
       : m.status === "professor"
       ? {
           label: `Professor deve repassar ${brl(m.adjustment)} para a Clínica`,
           detail: "O professor recebeu acima da cota de 50%.",
-          box: "border-amber-200 bg-white",
-          bar: "bg-amber-500",
-          text: "text-amber-700",
+          box: "border-gray-200 bg-white",
+          bar: "bg-transparent",
+          text: "text-black/70",
           icon: ArrowLeftRight,
         }
       : {
           label: `Clínica deve repassar ${brl(m.adjustment)} para o Professor`,
           detail: "A clínica recebeu acima da cota de 50%.",
-          box: "border-sky-200 bg-white",
-          bar: "bg-sky-500",
-          text: "text-sky-700",
+          box: "border-gray-200 bg-white",
+          bar: "bg-transparent",
+          text: "text-black/70",
           icon: ArrowLeftRight,
         };
 
@@ -569,7 +568,6 @@ function Fechamentos() {
             statusUi.box
           }
         >
-          <span className={"absolute inset-x-0 top-0 h-1 " + statusUi.bar} />
           <div className="flex items-center gap-4">
             <span
               className={
@@ -616,10 +614,9 @@ function Fechamentos() {
           {Object.entries(m.byType).map(([type, value]) => (
             <div
               key={type}
-              className="relative overflow-hidden rounded-xl border border-amber-200/70 bg-white p-4"
+              className="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-4"
             >
-              <span className="absolute inset-x-0 top-0 h-1 bg-amber-500" />
-              <div className="text-sm font-medium text-amber-800">{type}</div>
+              <div className="text-sm font-medium text-black/65">{type}</div>
               <strong className="mt-2 block text-xl font-bold tracking-tight text-black/85">
                 {brl(value)}
               </strong>
@@ -635,7 +632,7 @@ function Fechamentos() {
 
       <section className="mb-10">
         <SectionTitle title="Detalhamento do fechamento" count={m.rows.length} />
-        <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
           <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="border-b border-black/10 bg-black/[.04] text-xs font-semibold uppercase tracking-wide text-black/55">
               <tr>
@@ -663,8 +660,8 @@ function Fechamentos() {
                       className={
                         "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold " +
                         (x.destination === "Professor"
-                          ? "bg-sky-100 text-sky-700 ring-1 ring-sky-200"
-                          : "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200")
+                          ? "bg-black/[.04] text-black/60 ring-1 ring-black/10"
+                          : "bg-black/[.04] text-black/60 ring-1 ring-black/10")
                       }
                     >
                       {x.destination}
