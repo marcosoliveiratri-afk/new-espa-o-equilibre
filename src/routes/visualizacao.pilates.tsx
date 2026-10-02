@@ -6,7 +6,7 @@ export const Route = createFileRoute("/visualizacao/pilates")({ component: Visua
 
 function VisualizacaoPilates() {
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
+    <div className="min-h-screen bg-white">
       <TopBar />
       <AppShell>
         <div className="mx-auto max-w-7xl">

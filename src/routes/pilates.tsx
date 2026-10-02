@@ -186,7 +186,7 @@ function Pilates() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-[#F5F6FA]">
+      <div className="min-h-screen bg-white">
         <TopBar />
         <AppShell>
           {pathname === "/pilates" ? <Dashboard /> : <Outlet />}
