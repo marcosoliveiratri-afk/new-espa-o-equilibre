@@ -43,32 +43,37 @@ function Alunos(){
  return (
   <div style={{background:"#FFFFFF",minHeight:"100vh",padding:"24px 24px 40px"}}>
    {/* Header */}
-   <h1 className="mt-1 text-[30px] font-bold leading-[1.2] tracking-[-0.02em] text-[#111827] mb-6">Cadastro de Alunos</h1>
-
-   {/* Botão novo */}
-   <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
-    <button onClick={()=>setShowForm(true)} style={{display:"inline-flex",alignItems:"center",gap:8,background:"#111827",color:"white",borderRadius:12,padding:"12px 20px",fontSize:14,fontWeight:500,border:"none",cursor:"pointer",boxShadow:"0 4px 12px rgba(0,0,0,0.15)"}}>
-     <Plus size={18}/>Novo aluno
+   <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:20,marginBottom:20}}>
+    <div>
+     <h1 className="mt-1 text-[30px] font-bold leading-[1.2] tracking-[-0.02em] text-[#111827]" style={{marginBottom:4}}>Cadastro de Alunos</h1>
+     <p style={{margin:0,fontSize:13,color:"#64748B"}}>{rows.length} {rows.length===1?"aluno cadastrado":"alunos cadastrados"}</p>
+    </div>
+    <button onClick={()=>setShowForm(true)} style={{display:"inline-flex",alignItems:"center",gap:8,background:"#0057B8",color:"white",borderRadius:8,padding:"10px 16px",fontSize:14,fontWeight:600,border:"none",cursor:"pointer"}}>
+     <Plus size={17}/>Novo aluno
     </button>
    </div>
 
    {error&&<div style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:12,padding:"12px 16px",marginBottom:16,fontSize:14,color:"#B91C1C"}}>{error}</div>}
 
    {/* Filtros */}
-   <div style={{...whiteCard,padding:"20px 24px",marginBottom:16}}>
-    <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:16}}>
-     <div style={{position:"relative",flex:1}}>
-      <Search style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"rgba(0,0,0,0.4)"}} size={18}/>
-      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar aluno por nome ou telefone..." style={{width:"100%",borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",background:"#FFFFFF",padding:"12px 12px 12px 40px",fontSize:14}}/>
-     </div>
-     <Filter style={{color:"rgba(0,0,0,0.4)",flexShrink:0}} size={18}/>
+   <div style={{...whiteCard,padding:"16px 18px",marginBottom:16}}>
+    <div style={{display:"flex",gap:4,alignItems:"center",background:"#F1F3F7",borderRadius:10,padding:3,marginBottom:12,overflowX:"auto"}}>
+     <button type="button" onClick={()=>setPlan("Todos")} style={{flex:"0 0 22%",minWidth:120,border:plan==="Todos"?"1px solid #E5E7EB":"1px solid transparent",background:plan==="Todos"?"#FFFFFF":"transparent",boxShadow:plan==="Todos"?"0 1px 2px rgba(0,0,0,0.06)":"none",borderRadius:8,padding:"7px 12px",fontSize:12,fontWeight:plan==="Todos"?600:500,color:"#475569",cursor:"pointer"}}>Todos</button>
+     {plans.map(p=><button key={p.id} type="button" onClick={()=>setPlan(p.name)} style={{flex:"1 0 140px",border:"1px solid transparent",background:plan===p.name?"#FFFFFF":"transparent",boxShadow:plan===p.name?"0 1px 2px rgba(0,0,0,0.06)":"none",borderRadius:8,padding:"7px 12px",fontSize:12,fontWeight:plan===p.name?600:500,color:"#475569",cursor:"pointer",whiteSpace:"nowrap"}}>{p.name}</button>)}
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,alignItems:"center"}}>
-     <select value={activity} onChange={e=>setActivity(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option><option>Ativos</option><option>Inativos</option></select>
-     <select value={teacher} onChange={e=>setTeacher(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option>{teachers.map(t=><option key={t.id}>{t.name}</option>)}</select>
-     <select value={plan} onChange={e=>setPlan(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option>{plans.map(p=><option key={p.id}>{p.name}</option>)}</select>
-     <select value={destination} onChange={e=>setDestination(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option><option>Professor</option><option>Clínica</option></select>
-     <div style={{fontSize:14,color:"#64748B",padding:"10px 4px",whiteSpace:"nowrap"}}>{filtered.length} aluno(s)</div>
+    <div style={{display:"flex",gap:10,alignItems:"center"}}>
+     <div style={{position:"relative",flex:1}}>
+      <Search style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#94A3B8"}} size={17}/>
+      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por nome ou telefone..." style={{width:"100%",height:38,boxSizing:"border-box",borderRadius:9,border:"1px solid #E5E7EB",background:"#FFFFFF",padding:"8px 12px 8px 38px",fontSize:13,color:"#111827",outline:"none"}}/>
+     </div>
+     <div style={{display:"flex",gap:6}}>
+      {["Todos","Ativos","Inativos"].map(v=><button key={v} type="button" onClick={()=>setActivity(v)} style={{height:38,padding:"0 14px",borderRadius:8,border:"1px solid #E5E7EB",background:activity===v?"#0057B8":"#FFFFFF",color:activity===v?"#FFFFFF":"#475569",fontSize:12,fontWeight:600,cursor:"pointer"}}>{v}</button>)}
+     </div>
+    </div>
+    <div style={{display:"flex",gap:8,marginTop:10}}>
+     <select value={teacher} onChange={e=>setTeacher(e.target.value)} style={{height:34,borderRadius:8,border:"1px solid #E5E7EB",padding:"0 10px",fontSize:12,background:"#FFFFFF",color:"#475569"}}><option>Todos os professores</option><option>Todos</option>{teachers.map(t=><option key={t.id}>{t.name}</option>)}</select>
+     <select value={destination} onChange={e=>setDestination(e.target.value)} style={{height:34,borderRadius:8,border:"1px solid #E5E7EB",padding:"0 10px",fontSize:12,background:"#FFFFFF",color:"#475569"}}><option>Todos os destinos</option><option>Todos</option><option>Professor</option><option>Clínica</option></select>
+     <div style={{fontSize:12,color:"#64748B",padding:"8px 4px"}}>{filtered.length} resultados</div>
     </div>
    </div>
 
