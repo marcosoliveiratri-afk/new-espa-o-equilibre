@@ -17,8 +17,7 @@ export const Route=createFileRoute("/pilates/alunos")({component:Alunos});
 const whiteCard: React.CSSProperties={
   background:"#FFFFFF",
   borderRadius:16,
-  border:"none",
-  boxShadow:"0 8px 24px rgba(16,24,40,0.05)",
+  border:"1px solid #E5E7EB",
 };
 
 function Alunos(){
@@ -74,32 +73,47 @@ function Alunos(){
 
    {/* Tabela */}
    <div style={{...whiteCard,overflow:"hidden"}}>
+    <div style={{padding:"18px 20px",borderBottom:"1px solid #E5E7EB",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+     <div>
+      <p style={{margin:0,fontSize:16,fontWeight:650,color:"#111827"}}>Alunos cadastrados</p>
+      <p style={{margin:"4px 0 0",fontSize:13,color:"#64748B"}}>{filtered.length} {filtered.length===1?"aluno encontrado":"alunos encontrados"}</p>
+     </div>
+     <div style={{fontSize:12,color:"#64748B",background:"#F8FAFC",border:"1px solid #E5E7EB",borderRadius:9999,padding:"6px 10px"}}>{activity}</div>
+    </div>
     <div style={{overflowX:"auto"}}>
-     <table style={{width:"100%",minWidth:1400,fontSize:14,textAlign:"left"}}>
-      <thead style={{background:"rgba(0,0,0,0.025)",fontSize:11,textTransform:"uppercase",color:"#64748B",letterSpacing:"0.05em",fontWeight:600}}>
-       <tr>{["Nome","Telefone","Plano atual","Professor","Vencimento","Status plano","Contrato","Avaliação física","Financeiro","Destino pag.","Ações"].map((h,i)=><th key={h} style={{padding:"14px 16px",fontWeight:600}}>{h}</th>)}</tr>
+     <table style={{width:"100%",minWidth:1420,borderCollapse:"separate",borderSpacing:0,fontSize:13,textAlign:"left"}}>
+      <thead style={{background:"#F8FAFC",fontSize:11,textTransform:"uppercase",color:"#64748B",letterSpacing:"0.045em",fontWeight:650}}>
+       <tr>{["Aluno","Telefone","Plano","Professor","Vencimento","Situação","Contrato","Avaliação","Financeiro","Destino",""].map(h=><th key={h} style={{padding:"12px 16px",fontWeight:650,borderBottom:"1px solid #E5E7EB",whiteSpace:"nowrap"}}>{h}</th>)}</tr>
       </thead>
-      <tbody style={{borderTop:"1px solid rgba(0,0,0,0.05)"}}>
-       {filtered.map(x=>(
-        <tr key={x.id} style={{borderBottom:"1px solid rgba(0,0,0,0.05)",transition:"background 0.15s"}} onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(0,0,0,0.02)";}} onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="transparent";}}>
-         <td style={{padding:"16px",fontWeight:500}}><Link to="/pilates/alunos/$alunoId" params={{alunoId:x.id}} style={{color:"#111827",textDecoration:"none",fontWeight:500}}>{x.full_name}</Link></td>
-         <td style={{padding:"16px",color:"#64748B"}}>{x.phone||"—"}</td>
-         <td style={{padding:"16px",color:"#374151"}}>{x.plan}</td>
-         <td style={{padding:"16px",color:"#374151"}}>{x.teacher}</td>
-         <td style={{padding:"16px",color:"#374151"}}>{fmt(x.due)}</td>
-         <td style={{padding:"16px"}}><span style={{borderRadius:"9999px",padding:"4px 10px",fontSize:12,fontWeight:500,background:x.active?"#ECFDF5":"#F9FAFB",color:x.active?"#059669":"#9CA3AF"}}>{x.active?"Ativo":"Inativo"}</span></td>
-         <td style={{padding:"16px"}}><span style={{borderRadius:"9999px",padding:"4px 10px",fontSize:12,fontWeight:500,...(x.contract&&["Vencida","Vencendo","Pendente","Vencido"].includes(x.contract)?{background:"#FEF2F2",color:"#DC2626"}:x.contract.includes("Próxima")?{background:"#FFFBEB",color:"#D97706"}:{background:"#ECFDF5",color:"#059669"})}}>{x.contract}</span></td>
-         <td style={{padding:"16px",color:"#374151"}}>{x.assessment||"—"}</td>
-         <td style={{padding:"16px",color:"#374151"}}>{x.financial}</td>
-         <td style={{padding:"16px",color:"#374151"}}>{x.destination}</td>
-         <td style={{padding:"16px"}}><button onClick={()=>setDeleting(x)} style={{background:"none",border:"none",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:6,color:"#DC2626",fontSize:13}}><Trash2 size={15}/>Excluir</button></td>
-        </tr>
-       ))}
-       {!loading&&!filtered.length&&<tr><td colSpan={11} style={{padding:"48px 16px",textAlign:"center",color:"#9CA3AF"}}>Nenhum aluno cadastrado.</td></tr>}
+      <tbody>
+       {filtered.map(x=>{
+        const initials=x.full_name.split(" ").filter(Boolean).slice(0,2).map(n=>n[0]).join("").toUpperCase();
+        const contractRisk=x.contract&&["Vencida","Vencendo","Pendente","Vencido"].includes(x.contract);
+        const contractNext=x.contract&&x.contract.includes("Próxima");
+        return <tr key={x.id} style={{borderBottom:"1px solid #F1F5F9",transition:"background 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.background="#F8FAFC";}} onMouseLeave={e=>{e.currentTarget.style.background="#FFFFFF";}}>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}>
+          <Link to="/pilates/alunos/$alunoId" params={{alunoId:x.id}} style={{display:"flex",alignItems:"center",gap:11,color:"#111827",textDecoration:"none"}}>
+           <span style={{width:34,height:34,borderRadius:10,background:"#F2F2F7",color:"#1D1D1F",display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{initials}</span>
+           <span style={{display:"flex",flexDirection:"column",gap:3,minWidth:150}}><strong style={{fontSize:13.5,fontWeight:600,color:"#111827"}}>{x.full_name}</strong><span style={{fontSize:11.5,color:"#94A3B8"}}>{x.active?"Aluno ativo":"Aluno inativo"}</span></span>
+          </Link>
+         </td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#64748B",whiteSpace:"nowrap"}}>{x.phone||"—"}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#334155",fontWeight:500,whiteSpace:"nowrap"}}>{x.plan}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.teacher}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{fmt(x.due)}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:x.active?"#ECFDF5":"#F8FAFC",color:x.active?"#047857":"#64748B",border:`1px solid ${x.active?"#A7F3D0":"#E2E8F0"}`}}>{x.active?"Ativo":"Inativo"}</span></td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:contractRisk?"#FEF2F2":contractNext?"#FFFBEB":"#ECFDF5",color:contractRisk?"#B91C1C":contractNext?"#B45309":"#047857",border:`1px solid ${contractRisk?"#FECACA":contractNext?"#FDE68A":"#A7F3D0"}`}}>{x.contract||"—"}</span></td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.assessment||"—"}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.financial}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",borderRadius:8,padding:"5px 8px",fontSize:11.5,fontWeight:500,background:"#F8FAFC",color:"#475569",border:"1px solid #E2E8F0"}}>{x.destination||"—"}</span></td>
+         <td style={{padding:"14px 12px",borderBottom:"1px solid #F1F5F9",textAlign:"right"}}><button onClick={()=>setDeleting(x)} aria-label={`Excluir ${x.full_name}`} title="Excluir aluno" style={{width:32,height:32,borderRadius:9,background:"#FFFFFF",border:"1px solid #E5E7EB",cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",color:"#94A3B8"}}><Trash2 size={15}/></button></td>
+        </tr>;
+       })}
+       {!loading&&!filtered.length&&<tr><td colSpan={11} style={{padding:"64px 16px",textAlign:"center",color:"#94A3B8"}}><div style={{fontSize:14,fontWeight:500,color:"#475569"}}>Nenhum aluno encontrado</div><div style={{fontSize:13,marginTop:5}}>Tente ajustar os filtros ou a busca.</div></td></tr>}
       </tbody>
      </table>
     </div>
-    {loading&&<div style={{padding:"32px 16px",textAlign:"center",color:"#9CA3AF",fontSize:14}}>Carregando alunos...</div>}
+    {loading&&<div style={{padding:"36px 16px",textAlign:"center",color:"#94A3B8",fontSize:14}}>Carregando alunos...</div>}
    </div>
 
    {/* Modal novo aluno */}
