@@ -136,7 +136,7 @@ function Dashboard() {
         <h1 className="text-3xl font-bold tracking-tight text-black/80 sm:text-4xl">Dashboard Pilates</h1>
       </div>
 
-      <div className="mb-8 flex flex-wrap items-end gap-4 rounded-2xl border border-black/10 bg-white p-5" style={{ boxShadow: "0 8px 24px rgba(16, 24, 40, 0.05)" }}>
+      <div className="mb-8 flex flex-wrap items-end gap-4 rounded-2xl border border-black/10 bg-white p-5">
         <div>
           <label className="text-xs font-medium text-black/50">Período do Dashboard</label>
           <input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="mt-1 block rounded-xl border border-black/10 px-3 py-2 text-sm" />
