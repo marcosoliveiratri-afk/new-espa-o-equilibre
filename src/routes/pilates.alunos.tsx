@@ -41,7 +41,7 @@ function Alunos(){
 
  if(pathname!=="/pilates/alunos")return <Outlet/>;
  return (
-  <div style={{background:"#F5F6FA",minHeight:"100vh",padding:"24px 24px 40px"}}>
+  <div style={{background:"#FFFFFF",minHeight:"100vh",padding:"24px 24px 40px"}}>
    {/* Header */}
    <h1 style={{fontSize:30,fontWeight:700,color:"#111827",marginBottom:24,letterSpacing:"-0.02em"}}>Cadastro de Alunos</h1>
 
@@ -59,15 +59,15 @@ function Alunos(){
     <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:16}}>
      <div style={{position:"relative",flex:1}}>
       <Search style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"rgba(0,0,0,0.4)"}} size={18}/>
-      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar aluno por nome ou telefone..." style={{width:"100%",borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",background:"#FAFAFA",padding:"12px 12px 12px 40px",fontSize:14}}/>
+      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar aluno por nome ou telefone..." style={{width:"100%",borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",background:"#FFFFFF",padding:"12px 12px 12px 40px",fontSize:14}}/>
      </div>
      <Filter style={{color:"rgba(0,0,0,0.4)",flexShrink:0}} size={18}/>
     </div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,alignItems:"center"}}>
-     <select value={activity} onChange={e=>setActivity(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FAFAFA",color:"#374151"}}><option>Todos</option><option>Ativos</option><option>Inativos</option></select>
-     <select value={teacher} onChange={e=>setTeacher(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FAFAFA",color:"#374151"}}><option>Todos</option>{teachers.map(t=><option key={t.id}>{t.name}</option>)}</select>
-     <select value={plan} onChange={e=>setPlan(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FAFAFA",color:"#374151"}}><option>Todos</option>{plans.map(p=><option key={p.id}>{p.name}</option>)}</select>
-     <select value={destination} onChange={e=>setDestination(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FAFAFA",color:"#374151"}}><option>Todos</option><option>Professor</option><option>Clínica</option></select>
+     <select value={activity} onChange={e=>setActivity(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option><option>Ativos</option><option>Inativos</option></select>
+     <select value={teacher} onChange={e=>setTeacher(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option>{teachers.map(t=><option key={t.id}>{t.name}</option>)}</select>
+     <select value={plan} onChange={e=>setPlan(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option>{plans.map(p=><option key={p.id}>{p.name}</option>)}</select>
+     <select value={destination} onChange={e=>setDestination(e.target.value)} style={{borderRadius:12,border:"1px solid rgba(0,0,0,0.1)",padding:"10px 12px",fontSize:14,background:"#FFFFFF",color:"#374151"}}><option>Todos</option><option>Professor</option><option>Clínica</option></select>
      <div style={{fontSize:14,color:"#64748B",padding:"10px 4px",whiteSpace:"nowrap"}}>{filtered.length} aluno(s)</div>
     </div>
    </div>

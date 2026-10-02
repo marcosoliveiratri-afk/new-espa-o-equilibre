@@ -131,7 +131,7 @@ function Dashboard() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl" style={{ background: "#F5F6FA", minHeight: "100vh" }}>
+    <div className="mx-auto max-w-7xl" style={{ background: "#FFFFFF", minHeight: "100vh" }}>
       <div className="mb-8 overflow-hidden rounded-3xl border p-7 text-white" style={{ background: "linear-gradient(to right, #1f2937, #334155, #0f766e)", boxShadow: "0 18px 40px -24px rgba(15,23,42,.7)" }}>
         <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/60">Módulo Pilates</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Dashboard Pilates</h1>
