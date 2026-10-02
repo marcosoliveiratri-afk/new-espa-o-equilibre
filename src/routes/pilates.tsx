@@ -5,6 +5,7 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDataSync } from "@/hooks/useDataSync";
+import { getServiceModuleId } from "@/lib/serviceModule";
 import { Activity, CalendarClock, CheckCircle2, CircleDollarSign, Landmark, Users, UserRoundCheck, UserX, Wallet, ClipboardList, UserRound } from "lucide-react";
 
 export const Route = createFileRoute("/pilates")({ component: Pilates });
@@ -52,14 +53,16 @@ function Dashboard() {
 
   const load = async () => {
     const db = supabase as any;
+    const moduleId = await getServiceModuleId("pilates");
+    if (!moduleId) { setError("Módulo Pilates não configurado."); setLoading(false); return; }
     const [s, sp, p, t, pl, te, ce] = await Promise.all([
-      db.from("students").select("*"),
-      db.from("student_plans").select("*"),
-      db.from("student_payments").select("*"),
-      db.from("trial_classes").select("*"),
-      db.from("plans").select("*"),
-      db.from("teachers").select("*"),
-      db.from("clinic_cash_expenses").select("*"),
+      db.from("students").select("*").eq("module_id", moduleId),
+      db.from("student_plans").select("*").eq("module_id", moduleId),
+      db.from("student_payments").select("*").eq("module_id", moduleId),
+      db.from("trial_classes").select("*").eq("module_id", moduleId),
+      db.from("plans").select("*").eq("module_id", moduleId),
+      db.from("teachers").select("*").eq("module_id", moduleId),
+      db.from("clinic_cash_expenses").select("*").eq("module_id", moduleId),
     ]);
     const e = [s, sp, p, t, pl, te, ce].find((x: any) => x.error)?.error;
     if (e) setError(e.message);
