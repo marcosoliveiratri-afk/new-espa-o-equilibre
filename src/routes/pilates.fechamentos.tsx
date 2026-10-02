@@ -386,38 +386,489 @@ function Fechamentos() {
 
   const printReport = () => {
     const e = escapeHtml;
+    const generatedAt = new Intl.DateTimeFormat("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date());
+
+    const periodLabel = `${MONTHS[Number(monthNum) - 1]} de ${year}`;
+    const statusLabel =
+      m.status === "equal"
+        ? "Fechamento equilibrado"
+        : m.status === "professor"
+        ? `Professor deve repassar ${brl(m.adjustment)} para a Clínica`
+        : `Clínica deve repassar ${brl(m.adjustment)} para o Professor`;
+
+    const statusDetail =
+      m.status === "equal"
+        ? "Os valores recebidos estão alinhados com a divisão configurada."
+        : `Diferença identificada de ${brl(m.adjustment)} para equalização do fechamento.`;
+
+    const statusTone =
+      m.status === "equal"
+        ? { bg: "#ECFDF3", border: "#BBF7D0", text: "#166534", dot: "#16A34A" }
+        : { bg: "#FFF7ED", border: "#FED7AA", text: "#9A3412", dot: "#EA580C" };
+
+    const typeRows = Object.entries(m.byType)
+      .sort((a, b) => Number(b[1]) - Number(a[1]))
+      .map(
+        ([type, value]) =>
+          `<div class="mini-row"><span>${e(type)}</span><strong>${e(
+            brl(value)
+          )}</strong></div>`
+      )
+      .join("");
+
     const rows = m.rows
       .map(
         (x) =>
-          `<tr><td>${e(fmtDate(x.date))}</td><td>${e(x.student)}</td><td>${e(
-            x.type
-          )}</td><td>${e(brl(x.amount))}</td><td>${e(x.destination)}</td></tr>`
+          `<tr>
+            <td>${e(fmtDate(x.date))}</td>
+            <td><strong>${e(x.student)}</strong></td>
+            <td>${e(x.type)}</td>
+            <td>${e(x.method || "—")}</td>
+            <td class="money">${e(brl(x.amount))}</td>
+            <td><span class="tag">${e(x.destination)}</span></td>
+          </tr>`
       )
       .join("");
+
     const w = window.open("", "_blank");
     if (!w) return;
+
     w.document.write(
-      `<!doctype html><html><head><meta charset="utf-8"><title>Fechamento ${e(month)}</title><style>body{font-family:Arial,sans-serif;color:#222;padding:32px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #ddd;padding:8px;text-align:left}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.card{border:1px solid #ddd;padding:14px;border-radius:8px}.value{font-size:20px;font-weight:bold}</style></head><body>` +
-        `<h1>Fechamento — ${e(MONTHS[Number(monthNum) - 1])}/${e(year)}</h1><p>${e(teacherName)}</p>` +
-        `<div class="grid"><div class="card">Total recebido<div class="value">${e(brl(
-          m.total
-        ))}</div></div><div class="card">Professor recebeu<div class="value">${e(brl(
-          m.receivedProfessor
-        ))}</div></div><div class="card">Clínica recebeu<div class="value">${e(brl(
-          m.receivedClinic
-        ))}</div></div><div class="card">Cota do professor (50%)<div class="value">${e(brl(
-          m.shareProfessor
-        ))}</div></div><div class="card">Cota da clínica (50%)<div class="value">${e(brl(
-          m.shareClinic
-        ))}</div></div><div class="card">Ajuste<div class="value">${e(brl(
-          m.adjustment
-        ))}</div></div></div>` +
-        `<h2>${e(statusUi.label)}</h2>` +
-        `<h2>Detalhamento</h2><table><thead><tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Valor</th><th>Recebido por</th></tr></thead><tbody>${
-          rows || "<tr><td colspan=5>Nenhum recebimento no período</td></tr>"
-        }</tbody></table>` +
-        `<script>window.onload=()=>window.print()</script></body></html>`
+      `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fechamento Financeiro — ${e(periodLabel)}</title>
+<style>
+  @page { size: A4; margin: 14mm 12mm 16mm; }
+
+  :root {
+    --ink: #111827;
+    --muted: #64748b;
+    --soft: #f8fafc;
+    --line: #e5e7eb;
+    --dark: #111827;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    font-size: 11px;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .report { max-width: 900px; margin: 0 auto; }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    gap: 28px;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .brand {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 7px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 27px;
+    line-height: 1.08;
+    letter-spacing: -.035em;
+  }
+
+  .subtitle {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .meta {
+    min-width: 210px;
+    text-align: right;
+  }
+
+  .meta-label {
+    display: block;
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .meta-value {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .hero {
+    margin-top: 20px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--soft);
+  }
+
+  .hero-label {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .hero-value {
+    margin-top: 4px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .metric {
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: #fff;
+  }
+
+  .metric-label {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .metric-value {
+    margin-top: 5px;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .section { margin-top: 22px; }
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 9px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: -.01em;
+  }
+
+  .section-note {
+    color: #94a3b8;
+    font-size: 9px;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .split-card {
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: #fff;
+  }
+
+  .split-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .split-value {
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .split-detail {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 9px;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 13px 14px;
+    border: 1px solid ${statusTone.border};
+    border-radius: 11px;
+    background: ${statusTone.bg};
+    color: ${statusTone.text};
+  }
+
+  .status-dot {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    border-radius: 50%;
+    background: ${statusTone.dot};
+  }
+
+  .status-title { font-size: 11px; font-weight: 800; }
+  .status-detail { margin-top: 2px; font-size: 9px; opacity: .86; }
+
+  .composition {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .mini {
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .mini-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mini-row:last-child { border-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    font-size: 9.5px;
+  }
+
+  thead th {
+    padding: 9px 10px;
+    background: #f8fafc;
+    color: #475569;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  tbody td {
+    padding: 9px 10px;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+  .money { text-align: right; font-weight: 800; white-space: nowrap; }
+  .tag {
+    display: inline-block;
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 8px;
+    font-weight: 700;
+  }
+
+  tfoot td {
+    padding: 10px;
+    background: #f8fafc;
+    border-top: 1px solid var(--line);
+    font-weight: 800;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 22px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    color: #94a3b8;
+    font-size: 8px;
+  }
+
+  .empty {
+    padding: 18px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+
+  @media print {
+    .report { max-width: none; }
+  }
+
+  @media (max-width: 700px) {
+    .top, .hero-grid, .split, .composition { grid-template-columns: 1fr; }
+    .top { display: block; }
+    .meta { margin-top: 14px; text-align: left; }
+    .composition { display: grid; }
+  }
+</style>
+</head>
+<body>
+<main class="report">
+  <header class="top">
+    <div>
+      <div class="brand">Espaço Equilibre · Pilates</div>
+      <h1>Fechamento financeiro</h1>
+      <p class="subtitle">${e(periodLabel)} · ${e(teacherName)}</p>
+    </div>
+    <div class="meta">
+      <span class="meta-label">Relatório</span>
+      <div class="meta-value">${e(month)}</div>
+      <span class="meta-label">Gerado em</span>
+      <div class="meta-value">${e(generatedAt)}</div>
+    </div>
+  </header>
+
+  <section class="hero avoid-break">
+    <div class="hero-label">Total efetivamente recebido</div>
+    <div class="hero-value">${e(brl(m.total))}</div>
+    <div class="hero-grid">
+      <div class="metric">
+        <div class="metric-label">Professor recebeu</div>
+        <div class="metric-value">${e(brl(m.receivedProfessor))}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Clínica recebeu</div>
+        <div class="metric-value">${e(brl(m.receivedClinic))}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Lançamentos</div>
+        <div class="metric-value">${e(String(m.rows.length))}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section avoid-break">
+    <div class="section-title">
+      <h2>Divisão financeira</h2>
+      <span class="section-note">Percentuais configurados para o período</span>
+    </div>
+    <div class="split">
+      <div class="split-card">
+        <div class="split-head">
+          <span>Professor · ${e(String(split.professor_percentage))}%</span>
+          <span>Recebido: ${e(brl(m.receivedProfessor))}</span>
+        </div>
+        <div class="split-value">${e(brl(m.shareProfessor))}</div>
+        <div class="split-detail">Cota prevista do professor no fechamento.</div>
+      </div>
+      <div class="split-card">
+        <div class="split-head">
+          <span>Clínica · ${e(String(split.clinic_percentage))}%</span>
+          <span>Recebido: ${e(brl(m.receivedClinic))}</span>
+        </div>
+        <div class="split-value">${e(brl(m.shareClinic))}</div>
+        <div class="split-detail">Cota prevista da clínica no fechamento.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section avoid-break">
+    <div class="section-title"><h2>Status do fechamento</h2></div>
+    <div class="status">
+      <span class="status-dot"></span>
+      <div>
+        <div class="status-title">${e(statusLabel)}</div>
+        <div class="status-detail">${e(statusDetail)}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section avoid-break">
+    <div class="section-title">
+      <h2>Composição dos recebimentos</h2>
+      <span class="section-note">${e(brl(m.total))} no período</span>
+    </div>
+    <div class="mini">
+      ${typeRows || '<div class="empty">Nenhum recebimento no período.</div>'}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">
+      <h2>Detalhamento dos recebimentos</h2>
+      <span class="section-note">${e(String(m.rows.length))} lançamento(s)</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Aluno / descrição</th>
+          <th>Tipo</th>
+          <th>Forma</th>
+          <th style="text-align:right">Valor</th>
+          <th>Destino</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows || '<tr><td colspan="6" class="empty">Nenhum recebimento no período selecionado.</td></tr>'}
+      </tbody>
+      ${m.rows.length ? `<tfoot><tr><td colspan="4">Total recebido</td><td class="money">${e(brl(m.total))}</td><td></td></tr></tfoot>` : ""}
+    </table>
+  </section>
+
+  <footer class="footer">
+    <span>Espaço Equilibre · Fechamento financeiro</span>
+    <span>Documento gerado pelo sistema</span>
+  </footer>
+</main>
+<script>
+  window.onload = () => {
+    setTimeout(() => window.print(), 180);
+  };
+</script>
+</body>
+</html>`
     );
+
     w.document.close();
   };
 
