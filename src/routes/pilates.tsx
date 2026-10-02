@@ -55,7 +55,7 @@ function Dashboard() {
     const db = supabase as any;
     const moduleId = await getServiceModuleId("pilates");
     if (!moduleId) { setError("Módulo Pilates não configurado."); setLoading(false); return; }
-    const [s, sp, p, t, pl, te, ce] = await Promise.all([
+    const [s, sp, p, t, pl, te, ce, ls, fe] = await Promise.all([
       db.from("students").select("*").eq("module_id", moduleId),
       db.from("student_plans").select("*").eq("module_id", moduleId),
       db.from("student_payments").select("*").eq("module_id", moduleId),
@@ -63,17 +63,19 @@ function Dashboard() {
       db.from("plans").select("*").eq("module_id", moduleId),
       db.from("teachers").select("*").eq("module_id", moduleId),
       db.from("clinic_cash_expenses").select("*").eq("module_id", moduleId),
+      db.from("private_lesson_students").select("*").eq("module_id", moduleId),
+      db.from("teacher_financial_entries").select("*").eq("module_id", moduleId),
     ]);
-    const e = [s, sp, p, t, pl, te, ce].find((x: any) => x.error)?.error;
+    const e = [s, sp, p, t, pl, te, ce, ls, fe].find((x: any) => x.error)?.error;
     if (e) setError(e.message);
-    setD({ s: s.data || [], sp: sp.data || [], p: p.data || [], t: t.data || [], pl: pl.data || [], te: te.data || [], ce: ce.data || [] });
+    setD({ s: s.data || [], sp: sp.data || [], p: p.data || [], t: t.data || [], pl: pl.data || [], te: te.data || [], ce: ce.data || [], ls: ls.data || [], fe: fe.data || [] });
     setLoading(false);
   };
 
   useDataSync(load);
 
   const m = useMemo(() => {
-    const { s = [], sp = [], p = [], t = [], pl = [], te = [], ce = [] } = d;
+    const { s = [], sp = [], p = [], t = [], pl = [], te = [], ce = [], ls = [], fe = [] } = d;
     const monthStart = `${month}-01`;
     const monthEnd = new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0).toISOString().slice(0, 10);
     const today = new Date().toISOString().slice(0, 10);
@@ -86,16 +88,24 @@ function Dashboard() {
     const financialPayments = p.filter((x: any) => activeIds.has(x.student_id) && matchTeacher(x.plan_id) && x.status !== "Cancelado" && x.due_date >= monthStart && x.due_date <= monthEnd);
     const clinicReceived = financialPayments.filter((x: any) => x.status === "Pago" && x.destination === "Clínica").reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
     const professorReceived = financialPayments.filter((x: any) => x.status === "Pago" && x.destination === "Professor").reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
+    const paidLessons = ls.filter((x: any) => x.paid && String(x.paid_at || x.lesson_date || "").slice(0, 7) === month);
+    const paidEntries = fe.filter((x: any) => ["pago", "recebido", "pago parcial"].includes(String(x.status || "").toLowerCase()) && String(x.entry_date || "").slice(0, 7) === month);
+    const lessonClinic = paidLessons.filter((x: any) => x.destination === "Clínica").reduce((a: number, x: any) => a + Number(x.lesson_value || 0), 0);
+    const lessonProfessor = paidLessons.filter((x: any) => x.destination === "Professor").reduce((a: number, x: any) => a + Number(x.lesson_value || 0), 0);
+    const entryClinic = paidEntries.filter((x: any) => x.destination === "Clínica").reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
+    const entryProfessor = paidEntries.filter((x: any) => x.destination === "Professor").reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
+    const totalClinicReceived = clinicReceived + lessonClinic + entryClinic;
+    const totalProfessorReceived = professorReceived + lessonProfessor + entryProfessor;
     const cashExpenses = ce.filter((x: any) => String(x.expense_date || "").slice(0, 7) === month && x.status !== "Cancelado").reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
-    const cashBalance = clinicReceived - cashExpenses;
+    const cashBalance = totalClinicReceived - cashExpenses;
     return {
       activeStudents: activeStudents.length, inactive: inactiveStudents.length,
       activePlans: active.length, closed: sp.filter((x: any) => x.status !== "Ativo").length,
       recurring: financialPayments.reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
-      current: financialPayments.filter((x: any) => x.status === "Pago").reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
+      current: financialPayments.filter((x: any) => x.status === "Pago").reduce((a: number, x: any) => a + Number(x.amount || 0), 0) + paidLessons.reduce((a: number, x: any) => a + Number(x.lesson_value || 0), 0) + paidEntries.reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
       expected: financialPayments.filter((x: any) => x.status !== "Pago").reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
       overdue: financialPayments.filter((x: any) => x.status !== "Pago" && x.due_date && x.due_date < today).reduce((a: number, x: any) => a + Number(x.amount || 0), 0),
-      clinicReceived, professorReceived, cashExpenses, cashBalance,
+      clinicReceived: totalClinicReceived, professorReceived: totalProfessorReceived, cashExpenses, cashBalance,
       trials: t.filter((x: any) => !x.scheduled_date || (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd)).length,
       scheduled: t.filter((x: any) => x.status === "Agendada" && (!x.scheduled_date || (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))).length,
       done: t.filter((x: any) => x.status === "Realizada" && (!x.scheduled_date || (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))).length,
