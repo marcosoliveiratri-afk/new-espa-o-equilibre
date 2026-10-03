@@ -130,10 +130,19 @@ function Osteopatia() {
     try {
       manual ? setRefreshing(true) : setLoading(true);
       setError("");
-      const selected = await readTab(source);
-      const comparison = source === "202610" ? await readTab("202609") : selected;
+      const [selected, september, october] = await Promise.all([
+        readTab(source),
+        readTab("202609"),
+        readTab("202610"),
+      ]);
       setRows(selected);
-      setAllRows([...comparison, ...selected]);
+      const merged = [...september, ...october];
+      const seen = new Set<string>();
+      setAllRows(merged.filter(r => {
+        if (seen.has(r.id)) return false;
+        seen.add(r.id);
+        return true;
+      }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao carregar a planilha.");
     } finally {
@@ -191,7 +200,7 @@ function Osteopatia() {
     <div className="min-h-screen bg-white text-[#0a0a0a]">
       <TopBar/>
       <AppShell>
-        <main className="mx-auto max-w-[1040px] pb-10">
+        <main className="mx-auto max-w-[1040px] pb-10 px-1 sm:px-0">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e5e5] pb-4">
             <div className="flex items-center gap-2.5 text-[14px] font-semibold">
               <div className="flex h-7 w-7 items-center justify-center rounded-full text-white" style={{background:"radial-gradient(circle at 30% 30%,#e3b7a6,#a8705e)"}}>
@@ -221,11 +230,13 @@ function Osteopatia() {
           </section>
 
           <section className="mb-5 rounded-[14px] border border-[#e5e5e5] bg-white p-4">
-            <div className="grid gap-2 md:grid-cols-5">
+            <div className="grid gap-2 md:grid-cols-4 xl:grid-cols-7">
               <label className="text-[11px] text-[#52525b]">Competência<select value={source} onChange={e=>setSource(e.target.value)} className="mt-1 h-9 w-full rounded-lg border border-[#e5e5e5] bg-white px-2 text-xs"><option value="202609">Setembro/2026</option><option value="202610">Outubro/2026</option><option value="202611">Novembro/2026</option><option value="202612">Dezembro/2026</option></select></label>
               <label className="text-[11px] text-[#52525b]">Pagamento<select value={payment} onChange={e=>setPayment(e.target.value)} className="mt-1 h-9 w-full rounded-lg border border-[#e5e5e5] bg-white px-2 text-xs"><option value="TODOS">Todos</option>{payments.map(x=><option key={x}>{x}</option>)}</select></label>
               <label className="text-[11px] text-[#52525b]">Plano<select value={plan} onChange={e=>setPlan(e.target.value)} className="mt-1 h-9 w-full rounded-lg border border-[#e5e5e5] bg-white px-2 text-xs"><option value="TODOS">Todos</option>{plans.map(x=><option key={x}>{x}</option>)}</select></label>
               <label className="text-[11px] text-[#52525b]">Nota fiscal<select value={invoice} onChange={e=>setInvoice(e.target.value)} className="mt-1 h-9 w-full rounded-lg border border-[#e5e5e5] bg-white px-2 text-xs"><option value="TODOS">Todos</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select></label>
+              <label className="text-[11px] text-[#52525b]">De<input type="date" value={from} onChange={e=>setFrom(e.target.value)} className="mt-1 h-9 w-full rounded-lg border border-[#e5e5e5] bg-white px-2 text-xs"/></label>
+              <label className="text-[11px] text-[#52525b]">Até<input type="date" value={to} onChange={e=>setTo(e.target.value)} className="mt-1 h-9 w-full rounded-lg border border-[#e5e5e5] bg-white px-2 text-xs"/></label>
               <button onClick={clear} className="mt-4 h-9 rounded-lg px-3 text-xs font-semibold text-[#71717a] hover:bg-[#f4f4f5]">Limpar filtros</button>
             </div>
           </section>
@@ -284,7 +295,7 @@ function Osteopatia() {
               <div className="mt-2 overflow-x-auto"><table className="w-full min-w-[680px] text-xs"><thead><tr><th className="py-2 text-left">Data</th><th className="py-2 text-left">Plano</th><th className="py-2 text-right">Status</th><th className="py-2 text-right">Método</th><th className="py-2 text-right">NF</th><th className="py-2 text-right">Valor</th></tr></thead><tbody>{filtered.slice(0,20).map(r=><tr key={r.id}><td className="text-left">{dayLabel(r.date)}</td><td className="text-left">{r.plan||"—"}</td><td><span className={`rounded-lg px-2 py-1 text-[10px] font-bold ${r.payment==="PAGO"?"bg-[#BFE8D6] text-[#2E8B68]":"bg-[#FBD5C0] text-[#C2643A]"}`}>{r.payment||"—"}</span></td><td>{r.method||"—"}</td><td>{r.invoice==="SIM"?"SIM":"—"}</td><td>{r.value!==null?money(r.value):"—"}</td></tr>)}</tbody></table></div>
             </div>
 
-            <footer className="mt-5 flex flex-wrap justify-between gap-2 text-[10.5px] text-[#71717a]"><span>Fonte: Google Sheets · abas 202609 e 202610 · sem nomes de pacientes ou responsáveis</span><span>Atualização automática a cada 60 segundos</span></footer>
+            <footer className="mt-5 flex flex-wrap justify-between gap-2 text-[10.5px] text-[#71717a]"><span>Fonte: Google Sheets · {SOURCES.find(x=>x[0]===source)?.[1]} · sem nomes de pacientes ou responsáveis</span><span>Atualização automática a cada 60 segundos</span></footer>
           </>}
         </main>
       </AppShell>
