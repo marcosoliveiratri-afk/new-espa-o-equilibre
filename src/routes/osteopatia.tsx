@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertCircle, ArrowDownRight, ArrowUpRight, CheckCircle2, CircleDollarSign, FileCheck2, RefreshCw, WalletCards } from "lucide-react";
+import { AlertCircle, ArrowDownRight, ArrowUpRight, CheckCircle2, CircleDollarSign, FileCheck2, RefreshCw, Settings, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { Link } from "@tanstack/react-router";
 import { TopBar } from "@/components/TopBar";
 import { AuthGuard } from "@/components/AuthGuard";
 
 export const Route = createFileRoute("/osteopatia")({ component: Osteopatia });
 
-const SHEET_ID = "17h3G-GNIUNJMBN5UlIYQNgRR_OUHVDb4";
+const DEFAULT_SHEET_ID = "17h3G-GNIUNJMBN5UlIYQNgRR_OUHVDb4";
+const SHEET_STORAGE_KEY = "equilibre:osteopatia:google-sheet-id";
 const SOURCES = [
   ["202610", "Outubro/2026"], ["202609", "Setembro/2026"], ["202611", "Novembro/2026"], ["202612", "Dezembro/2026"],
 ] as const;
@@ -30,7 +32,8 @@ function money(v:number){return v.toLocaleString("pt-BR",{style:"currency",curre
 function date(v:Date|null){return v?v.toLocaleDateString("pt-BR"):"—";}
 
 async function readTab(tab:string):Promise<Row[]> {
-  const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}`,{cache:"no-store"});
+  const sheetId = typeof window !== "undefined" ? (window.localStorage.getItem(SHEET_STORAGE_KEY) || DEFAULT_SHEET_ID) : DEFAULT_SHEET_ID;
+  const res=await fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}`,{cache:"no-store"});
   if(!res.ok) throw new Error(`Não foi possível ler a aba ${tab}.`);
   const text=await res.text(),a=text.indexOf("{"),b=text.lastIndexOf("}");
   if(a<0||b<a) throw new Error("O Google Sheets não retornou dados legíveis.");
@@ -79,7 +82,7 @@ function Osteopatia(){
   return <AuthGuard><div className="min-h-screen bg-[#f7f7f6]"><TopBar/><AppShell><main className="mx-auto max-w-[1440px] pb-12">
     <header className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
       <div><p className="text-xs font-semibold uppercase tracking-[.16em] text-black/35">Gestão financeira e operacional</p><h1 className="mt-2 text-[34px] font-semibold tracking-[-.035em]">Osteopatia</h1><p className="mt-1.5 text-sm text-black/50">Visão consolidada da agenda, pagamentos e notas fiscais.</p></div>
-      <div className="flex items-center gap-2"><span className="hidden text-xs text-black/35 sm:inline">Atualização automática a cada 60s</span><button onClick={()=>void load(true)} disabled={refreshing} className="inline-flex h-10 items-center gap-2 rounded-xl border border-black/10 bg-white px-4 text-sm font-medium shadow-sm transition hover:bg-black/[.02] disabled:opacity-50"><RefreshCw size={15} className={refreshing?"animate-spin":""}/>Atualizar</button></div>
+      <div className="flex items-center gap-2"><Link to="/osteopatia/configuracoes" className="inline-flex h-10 items-center gap-2 rounded-xl border border-black/10 bg-white px-3 text-sm font-medium shadow-sm hover:bg-black/[.02]"><Settings size={15}/>Configurações</Link><span className="hidden text-xs text-black/35 sm:inline">Atualização automática a cada 60s</span><button onClick={()=>void load(true)} disabled={refreshing} className="inline-flex h-10 items-center gap-2 rounded-xl border border-black/10 bg-white px-4 text-sm font-medium shadow-sm transition hover:bg-black/[.02] disabled:opacity-50"><RefreshCw size={15} className={refreshing?"animate-spin":""}/>Atualizar</button></div>
     </header>
 
     {error&&<div className="mb-6 flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle size={18}/><div><b>Não foi possível atualizar os dados.</b><p className="mt-1">{error}</p><p className="mt-2 text-xs">Verifique se a planilha está compartilhada como “Qualquer pessoa com o link — Leitor”.</p></div></div>}
