@@ -98,6 +98,11 @@ const PilatesFluxoCaixaRoute = PilatesFluxoCaixaRouteImport.update({
   path: '/fluxo-caixa',
   getParentRoute: () => PilatesRoute,
 } as any)
+const ProjetoOficinaAlertasRoute = ProjetoOficinaAlertasRouteImport.update({
+  id: '/alertas',
+  path: '/alertas',
+  getParentRoute: () => ProjetoOficinaRoute,
+} as any)
 const ProjetoOficinaAlunosRoute = ProjetoOficinaAlunosRouteImport.update({
   id: '/alunos',
   path: '/alunos',
@@ -131,6 +136,11 @@ const ProjetoOficinaProfessoresRoute =
     path: '/professores',
     getParentRoute: () => ProjetoOficinaRoute,
   } as any)
+const ProjetoOficinaAlunosAlunoIdRoute = ProjetoOficinaAlunosAlunoIdRouteImport.update({
+  id: '/$alunoId',
+  path: '/$alunoId',
+  getParentRoute: () => ProjetoOficinaAlunosRoute,
+} as any)
 const VisualizacaoOsteopatiaRoute = VisualizacaoOsteopatiaRouteImport.update({
   id: '/osteopatia',
   path: '/osteopatia',
@@ -397,12 +407,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilatesFluxoCaixaRouteImport
       parentRoute: typeof PilatesRoute
     }
+    '/projeto-oficina/alertas': {
+      id: '/projeto-oficina/alertas'
+      path: '/alertas'
+      fullPath: '/projeto-oficina/alertas'
+      preLoaderRoute: typeof ProjetoOficinaAlertasRouteImport
+      parentRoute: typeof ProjetoOficinaRoute
+    }
     '/projeto-oficina/alunos': {
       id: '/projeto-oficina/alunos'
       path: '/alunos'
       fullPath: '/projeto-oficina/alunos'
       preLoaderRoute: typeof ProjetoOficinaAlunosRouteImport
       parentRoute: typeof ProjetoOficinaRoute
+    }
+    '/projeto-oficina/alunos/$alunoId': {
+      id: '/projeto-oficina/alunos/$alunoId'
+      path: '/$alunoId'
+      fullPath: '/projeto-oficina/alunos/$alunoId'
+      preLoaderRoute: typeof ProjetoOficinaAlunosAlunoIdRouteImport
+      parentRoute: typeof ProjetoOficinaAlunosRoute
     }
     '/projeto-oficina/aulas': {
       id: '/projeto-oficina/aulas'
@@ -498,8 +522,18 @@ const PilatesRouteChildren: PilatesRouteChildren = {
 const PilatesRouteWithChildren =
   PilatesRoute._addFileChildren(PilatesRouteChildren)
 
+interface ProjetoOficinaAlunosRouteChildren {
+  ProjetoOficinaAlunosAlunoIdRoute: typeof ProjetoOficinaAlunosAlunoIdRoute
+}
+const ProjetoOficinaAlunosRouteChildren: ProjetoOficinaAlunosRouteChildren = {
+  ProjetoOficinaAlunosAlunoIdRoute: ProjetoOficinaAlunosAlunoIdRoute,
+}
+const ProjetoOficinaAlunosRouteWithChildren = ProjetoOficinaAlunosRoute._addFileChildren(ProjetoOficinaAlunosRouteChildren)
+
 interface ProjetoOficinaRouteChildren {
-  ProjetoOficinaAlunosRoute: typeof ProjetoOficinaAlunosRoute
+  ProjetoOficinaAlertasRoute: typeof ProjetoOficinaAlertasRoute
+  ProjetoOficinaAlunosRoute: typeof ProjetoOficinaAlunosRouteWithChildren
+ typeof ProjetoOficinaAlunosRoute
   ProjetoOficinaAulasRoute: typeof ProjetoOficinaAulasRoute
   ProjetoOficinaFechamentosRoute: typeof ProjetoOficinaFechamentosRoute
   ProjetoOficinaFinanceiroRoute: typeof ProjetoOficinaFinanceiroRoute
@@ -508,7 +542,8 @@ interface ProjetoOficinaRouteChildren {
 }
 
 const ProjetoOficinaRouteChildren: ProjetoOficinaRouteChildren = {
-  ProjetoOficinaAlunosRoute: ProjetoOficinaAlunosRoute,
+  ProjetoOficinaAlertasRoute: ProjetoOficinaAlertasRoute,
+  ProjetoOficinaAlunosRoute: ProjetoOficinaAlunosRouteWithChildren,
   ProjetoOficinaAulasRoute: ProjetoOficinaAulasRoute,
   ProjetoOficinaFechamentosRoute: ProjetoOficinaFechamentosRoute,
   ProjetoOficinaFinanceiroRoute: ProjetoOficinaFinanceiroRoute,
