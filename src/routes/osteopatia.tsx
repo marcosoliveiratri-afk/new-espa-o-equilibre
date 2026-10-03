@@ -216,7 +216,7 @@ function Osteopatia() {
           </header>
 
           <div className="py-5">
-            <h1>Painel de Notas Fiscais e Atendimentos</h1>
+            <h1 className="text-[20px] font-bold leading-tight tracking-[-.35px]">Painel de Notas Fiscais e Atendimentos</h1>
             <p className="mt-1 text-xs text-[#71717a]">Visão consolidada da Osteopatia · dados atualizados diretamente da Google Sheets</p>
           </div>
 
@@ -242,7 +242,7 @@ function Osteopatia() {
           </section>
 
           {loading ? <div className="rounded-[14px] border border-[#e5e5e5] bg-white p-16 text-center text-sm text-[#71717a]">Carregando painel...</div> : <>
-            <h2>Receita</h2>
+            <h2 className="mb-2 mt-6 text-[14.5px] font-semibold">Receita</h2>
             <section className="grid gap-3 lg:grid-cols-[1.8fr_1fr]">
               <div className="rounded-[14px] border border-[#e5e5e5] bg-white p-[17px]">
                 <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="text-[13px] font-semibold">Receita diária</div><div className="mt-0.5 text-[11px] text-[#71717a]">Valor recebido por dia, separado por nota fiscal</div></div><div className="flex gap-3 text-[11px] text-[#52525b]"><span><i className="mr-1 inline-block h-2 w-2 rounded-[3px] bg-[#D6CDF6]"/>Com nota</span><span><i className="mr-1 inline-block h-2 w-2 rounded-[3px] bg-[#BEDCF4]"/>Sem nota</span></div></div>
@@ -267,7 +267,7 @@ function Osteopatia() {
               </div>
             </section>
 
-            <h2>Notas fiscais e pagamentos</h2>
+            <h2 className="mb-2 mt-6 text-[14.5px] font-semibold">Notas fiscais e pagamentos</h2>
             <section className="grid gap-3 lg:grid-cols-3">
               <div className="rounded-[14px] border border-[#e5e5e5] bg-white p-[17px]">
                 <div className="text-[13px] font-semibold">Situação das notas fiscais</div>
