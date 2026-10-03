@@ -199,7 +199,7 @@ export interface FileRoutesByTo {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
-  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRoute
+  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRouteWithChildren
   '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
   '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
@@ -224,7 +224,7 @@ export interface FileRoutesById {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
-  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRoute
+  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRouteWithChildren
   '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
   '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
