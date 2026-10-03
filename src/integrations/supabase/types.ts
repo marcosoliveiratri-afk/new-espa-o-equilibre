@@ -167,6 +167,7 @@ export type Database = {
         Row: {
           active: boolean
           address: string | null
+          age: number | null
           birth_date: string | null
           cpf: string | null
           created_at: string
@@ -175,12 +176,14 @@ export type Database = {
           id: string
           notes: string | null
           phone: string | null
+          responsible_name: string | null
           updated_at: string
           whatsapp: string | null
         }
         Insert: {
           active?: boolean
           address?: string | null
+          age?: number | null
           birth_date?: string | null
           cpf?: string | null
           created_at?: string
@@ -189,12 +192,14 @@ export type Database = {
           id?: string
           notes?: string | null
           phone?: string | null
+          responsible_name?: string | null
           updated_at?: string
           whatsapp?: string | null
         }
         Update: {
           active?: boolean
           address?: string | null
+          age?: number | null
           birth_date?: string | null
           cpf?: string | null
           created_at?: string
@@ -203,6 +208,7 @@ export type Database = {
           id?: string
           notes?: string | null
           phone?: string | null
+          responsible_name?: string | null
           updated_at?: string
           whatsapp?: string | null
         }
