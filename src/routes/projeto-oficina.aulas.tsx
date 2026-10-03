@@ -21,7 +21,12 @@ function ProjetoOficina(){
  async function changeStatus(a:Aula,s:Aula["status"]){await supabase.from("oficina_aulas").update({status:s}).eq("id",a.id);await load()} async function openStudents(turmaId:string){const {data}=await supabase.from("oficina_turma_alunos").select("aluno_id").eq("turma_id",turmaId).eq("active",true);setSelectedStudents((data??[]).map(x=>x.aluno_id));setManageTurma(turmaId)} async function saveStudents(){if(!manageTurma)return;await supabase.from("oficina_turma_alunos").delete().eq("turma_id",manageTurma);if(selectedStudents.length)await supabase.from("oficina_turma_alunos").insert(selectedStudents.map(aluno_id=>({turma_id:manageTurma,aluno_id,active:true})));setManageTurma("")}
  async function addTurma(e:React.FormEvent){e.preventDefault();await supabase.from("oficina_turmas").insert({name:form.name.trim(),teacher_name:form.teacher_name.trim(),weekday:Number(form.weekday),start_time:form.start_time,duration_minutes:Number(form.duration_minutes),hourly_rate:Number(form.hourly_rate),active:true});setShow(false);setForm({name:"",teacher_name:"",weekday:"1",start_time:"14:00",duration_minutes:"60",hourly_rate:"0"});await load()}
  const realizadas=aulas.filter(a=>a.status==="realizada"); const horas=realizadas.reduce((s,a)=>s+a.duration_minutes/60,0); const total=realizadas.reduce((s,a)=>s+(a.duration_minutes/60)*Number(a.hourly_rate),0);
- const grouped=useMemo(()=>aulas.reduce<Record<string,Aula[]>>((x,a)=>(x[a.aula_date]??=[]).push(a),x),[aulas]);
+ const grouped=useMemo(()=>aulas.reduce<Record<string,Aula[]>>((groups,a)=>{
+  const day=groups[a.aula_date]??[];
+  day.push(a);
+  groups[a.aula_date]=day;
+  return groups;
+ },{}),[aulas]);
  return <AuthGuard><div className="min-h-screen bg-white text-[#1b1b1b]"><TopBar/><main className="p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-7xl">
   <header className="mb-8"><p className="text-xs font-semibold uppercase tracking-[.12em] text-black/40">Projeto Oficina</p><h1 className="mt-1 text-[30px] font-bold leading-[1.2] tracking-[-0.02em] text-[#111827]">Aulas realizadas</h1><p className="mt-2 text-sm text-black/55">Cada ocorrência precisa ser marcada individualmente. Somente “Realizada” entra no pagamento do professor.</p></header>
   <div className="mb-6 grid gap-4 sm:grid-cols-3"><Card label="Aulas realizadas" value={String(realizadas.length)} icon={<CalendarCheck2 size={18}/>}/><Card label="Horas realizadas" value={horas.toFixed(1)+" h"} icon={<Clock3 size={18}/>}/><Card label="Professor no mês" value={money(total)} icon={<Check size={18}/>}/></div>
