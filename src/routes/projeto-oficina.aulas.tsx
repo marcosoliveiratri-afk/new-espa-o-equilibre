@@ -12,10 +12,10 @@ export const Route=createFileRoute("/projeto-oficina/aulas")({component:ProjetoO
 
 function ProjetoOficina(){
  const [month,setMonth]=useState(()=>new Date(new Date().getFullYear(),new Date().getMonth(),1));
- const [turmas,setTurmas]=useState<Turma[]>([]); const [aulas,setAulas]=useState<Aula[]>([]); const [show,setShow]=useState(false);
+ const [turmas,setTurmas]=useState<Turma[]>([]); const [aulas,setAulas]=useState<Aula[]>([]); const [teachers,setTeachers]=useState<any[]>([]); const [show,setShow]=useState(false);
  const [form,setForm]=useState({name:"",teacher_name:"",weekday:"1",start_time:"14:00",duration_minutes:"60",hourly_rate:"0"});
  const first=fmtDate(month),last=fmtDate(new Date(month.getFullYear(),month.getMonth()+1,0));
- async function load(){const [{data:t},{data:a}]=await Promise.all([supabase.from("oficina_turmas").select("*").order("weekday").order("start_time"),supabase.from("oficina_aulas").select("*").gte("aula_date",first).lte("aula_date",last).order("aula_date").order("start_time")]);setTurmas((t??[]) as Turma[]);setAulas((a??[]) as Aula[])}
+ async function load(){const [{data:t},{data:a},{data:teachersData}]=await Promise.all([supabase.from("oficina_turmas").select("*").order("weekday").order("start_time"),supabase.from("oficina_aulas").select("*").gte("aula_date",first).lte("aula_date",last).order("aula_date").order("start_time")]);setTurmas((t??[]) as Turma[]);setAulas((a??[]) as Aula[])}
  useEffect(()=>{void load()},[first,last]);
  async function generate(){const rows:any[]=[];const d=new Date(month);while(d.getMonth()===month.getMonth()){const wd=d.getDay()||7;turmas.filter(t=>t.active&&t.weekday===wd).forEach(t=>rows.push({turma_id:t.id,aula_date:fmtDate(d),start_time:t.start_time,duration_minutes:t.duration_minutes,teacher_name:t.teacher_name,hourly_rate:t.hourly_rate,status:"pendente"}));d.setDate(d.getDate()+1)}if(rows.length)await supabase.from("oficina_aulas").upsert(rows,{onConflict:"turma_id,aula_date",ignoreDuplicates:true});await load()}
  async function changeStatus(a:Aula,s:Aula["status"]){await supabase.from("oficina_aulas").update({status:s}).eq("id",a.id);await load()}
