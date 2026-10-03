@@ -171,6 +171,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
+  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRoute
+  '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
+  '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
+  '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
+  '/projeto-oficina/planos': typeof ProjetoOficinaPlanosRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRouteWithChildren
@@ -193,7 +199,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRouteWithChildren
-  '/projeto-oficina': typeof ProjetoOficinaRoute
+  '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
+  '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
+  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRoute
+  '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
+  '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
+  '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
+  '/projeto-oficina/planos': typeof ProjetoOficinaPlanosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
