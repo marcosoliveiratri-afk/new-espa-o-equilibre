@@ -1,130 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Hammer, LayoutDashboard, Menu, X } from "lucide-react";
-import { useState } from "react";
-import { TopBar } from "@/components/TopBar";
+import { CalendarCheck2, Check, Clock3, Plus, XCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
+import { TopBar } from "@/components/TopBar";
+import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/projeto-oficina")({
-  component: ProjetoOficina,
-  head: () => ({
-    meta: [
-      { title: "Projeto Oficina | Espaço Equilibre" },
-      {
-        name: "description",
-        content: "Área de gestão do Projeto Oficina do Espaço Equilibre.",
-      },
-      { property: "og:title", content: "Projeto Oficina | Espaço Equilibre" },
-      {
-        property: "og:description",
-        content: "Área de gestão do Projeto Oficina do Espaço Equilibre.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-});
+type Turma={id:string;name:string;teacher_name:string;weekday:number;start_time:string;duration_minutes:number;hourly_rate:number;active:boolean};
+type Aula={id:string;turma_id:string;aula_date:string;start_time:string;duration_minutes:number;teacher_name:string;hourly_rate:number;status:"pendente"|"realizada"|"nao_realizada"};
+const days=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
+export const Route=createFileRoute("/projeto-oficina")({component:ProjetoOficina});
 
-function OficinaShell({ children }: { children: React.ReactNode }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  return (
-    <div className="text-foreground">
-      {menuOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-foreground/20 lg:hidden"
-          aria-hidden="true"
-          onClick={() => setMenuOpen(false)}
-        />
-      )}
-
-      <aside
-        className={`fixed bottom-0 left-0 top-16 z-30 w-64 border-r border-border bg-background transition-transform duration-200 lg:translate-x-0 ${
-          menuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between px-4 py-4">
-            <span className="text-xs font-semibold uppercase text-muted-foreground">Projeto Oficina</span>
-            <button
-              type="button"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground lg:hidden"
-              aria-label="Fechar menu"
-              onClick={() => setMenuOpen(false)}
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <nav className="flex-1 px-3" aria-label="Navegação do Projeto Oficina">
-            <a
-              href="/projeto-oficina"
-              className="flex items-center gap-3 rounded-xl bg-muted px-4 py-3 text-sm font-medium text-foreground"
-              aria-current="page"
-            >
-              <LayoutDashboard size={18} strokeWidth={1.8} />
-              <span>Dashboard</span>
-            </a>
-          </nav>
-        </div>
-      </aside>
-
-      <div className="lg:pl-64">
-        <div className="flex h-14 items-center border-b border-border px-4 lg:hidden">
-          <button
-            type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            aria-label="Abrir menu"
-            onClick={() => setMenuOpen(true)}
-          >
-            <Menu size={20} />
-          </button>
-          <span className="ml-3 text-sm font-semibold text-foreground">Projeto Oficina</span>
-        </div>
-        <main className="min-h-[calc(100vh-4rem)] bg-background p-4 sm:p-6 lg:p-8">{children}</main>
-      </div>
-    </div>
-  );
+function ProjetoOficina(){
+ const [month,setMonth]=useState(()=>new Date(new Date().getFullYear(),new Date().getMonth(),1));
+ const [turmas,setTurmas]=useState<Turma[]>([]); const [aulas,setAulas]=useState<Aula[]>([]); const [show,setShow]=useState(false);
+ const [form,setForm]=useState({name:"",teacher_name:"",weekday:"1",start_time:"14:00",duration_minutes:"60",hourly_rate:"0"});
+ const first=fmtDate(month),last=fmtDate(new Date(month.getFullYear(),month.getMonth()+1,0));
+ async function load(){const [{data:t},{data:a}]=await Promise.all([supabase.from("oficina_turmas").select("*").order("weekday").order("start_time"),supabase.from("oficina_aulas").select("*").gte("aula_date",first).lte("aula_date",last).order("aula_date").order("start_time")]);setTurmas((t??[]) as Turma[]);setAulas((a??[]) as Aula[])}
+ useEffect(()=>{void load()},[first,last]);
+ async function generate(){const rows:any[]=[];const d=new Date(month);while(d.getMonth()===month.getMonth()){const wd=d.getDay()||7;turmas.filter(t=>t.active&&t.weekday===wd).forEach(t=>rows.push({turma_id:t.id,aula_date:fmtDate(d),start_time:t.start_time,duration_minutes:t.duration_minutes,teacher_name:t.teacher_name,hourly_rate:t.hourly_rate,status:"pendente"}));d.setDate(d.getDate()+1)}if(rows.length)await supabase.from("oficina_aulas").upsert(rows,{onConflict:"turma_id,aula_date",ignoreDuplicates:true});await load()}
+ async function changeStatus(a:Aula,s:Aula["status"]){await supabase.from("oficina_aulas").update({status:s}).eq("id",a.id);await load()}
+ async function addTurma(e:React.FormEvent){e.preventDefault();await supabase.from("oficina_turmas").insert({name:form.name.trim(),teacher_name:form.teacher_name.trim(),weekday:Number(form.weekday),start_time:form.start_time,duration_minutes:Number(form.duration_minutes),hourly_rate:Number(form.hourly_rate),active:true});setShow(false);setForm({name:"",teacher_name:"",weekday:"1",start_time:"14:00",duration_minutes:"60",hourly_rate:"0"});await load()}
+ const realizadas=aulas.filter(a=>a.status==="realizada"); const horas=realizadas.reduce((s,a)=>s+a.duration_minutes/60,0); const total=realizadas.reduce((s,a)=>s+(a.duration_minutes/60)*Number(a.hourly_rate),0);
+ const grouped=useMemo(()=>aulas.reduce<Record<string,Aula[]>>((x,a)=>(x[a.aula_date]??=[]).push(a),x),[aulas]);
+ return <AuthGuard><div className="min-h-screen bg-white text-[#1b1b1b]"><TopBar/><main className="p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-7xl">
+  <header className="mb-8"><p className="text-xs font-semibold uppercase tracking-[.12em] text-black/40">Projeto Oficina</p><h1 className="mt-1 text-[30px] font-bold leading-[1.2] tracking-[-0.02em] text-[#111827]">Aulas realizadas</h1><p className="mt-2 text-sm text-black/55">Cada ocorrência precisa ser marcada individualmente. Somente “Realizada” entra no pagamento do professor.</p></header>
+  <div className="mb-6 grid gap-4 sm:grid-cols-3"><Card label="Aulas realizadas" value={String(realizadas.length)} icon={<CalendarCheck2 size={18}/>}/><Card label="Horas realizadas" value={horas.toFixed(1)+" h"} icon={<Clock3 size={18}/>}/><Card label="Professor no mês" value={money(total)} icon={<Check size={18}/>}/></div>
+  <section className="mb-6 rounded-2xl border border-black/10 bg-white p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="font-semibold">Turmas recorrentes</h2><p className="mt-1 text-sm text-black/50">Cadastre dia, horário, duração e valor/hora. Depois gere as ocorrências do mês.</p></div><div className="flex gap-2"><button onClick={()=>setShow(true)} className="inline-flex items-center gap-2 rounded-xl border border-black/10 px-4 py-2.5 text-sm font-medium hover:bg-black/5"><Plus size={16}/> Nova turma</button><button onClick={generate} disabled={!turmas.length} className="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-40">Gerar mês</button></div></div>
+   <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{turmas.map(t=><div key={t.id} className="rounded-xl border border-black/10 p-4"><p className="font-medium">{t.name}</p><p className="mt-1 text-sm text-black/50">{days[t.weekday-1]} · {t.start_time.slice(0,5)} · {t.duration_minutes} min</p><p className="mt-1 text-xs text-black/45">{t.teacher_name} · {money(Number(t.hourly_rate))}/h</p></div>)}{!turmas.length&&<p className="text-sm text-black/45">Nenhuma turma cadastrada.</p>}</div>
+  </section>
+  <section className="rounded-2xl border border-black/10 bg-white"><div className="flex items-center justify-between border-b border-black/10 p-4"><button onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()-1,1))} className="rounded-lg px-3 py-2 hover:bg-black/5">‹</button><div className="text-center"><p className="font-semibold capitalize">{month.toLocaleDateString("pt-BR",{month:"long",year:"numeric"})}</p><p className="text-xs text-black/45">{aulas.length} ocorrências</p></div><button onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()+1,1))} className="rounded-lg px-3 py-2 hover:bg-black/5">›</button></div>
+   <div className="divide-y divide-black/10">{!aulas.length&&<div className="p-10 text-center"><CalendarCheck2 className="mx-auto text-black/30"/><p className="mt-3 font-medium">Nenhuma ocorrência neste mês</p><p className="mt-1 text-sm text-black/50">Cadastre uma turma e clique em “Gerar mês”.</p></div>}{Object.entries(grouped).map(([date,list])=><div key={date} className="p-4"><p className="mb-3 text-sm font-semibold capitalize text-black/65">{longDate(date)}</p><div className="space-y-2">{list.map(a=><AulaRow key={a.id} aula={a} onStatus={changeStatus}/>)}</div></div>)}</div>
+  </section>
+  {show&&<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"><form onSubmit={addTurma} className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"><div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-semibold">Nova turma</h2><button type="button" onClick={()=>setShow(false)}><XCircle size={18}/></button></div><div className="grid gap-4 sm:grid-cols-2">{Field("Nome",<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>)}{Field("Professor",<input required value={form.teacher_name} onChange={e=>setForm({...form,teacher_name:e.target.value})}/>)}{Field("Dia",<select value={form.weekday} onChange={e=>setForm({...form,weekday:e.target.value})}>{days.map((d,i)=><option key={d} value={i+1}>{d}</option>)}</select>)}{Field("Horário",<input required type="time" value={form.start_time} onChange={e=>setForm({...form,start_time:e.target.value})}/>)}{Field("Duração (min)",<input required type="number" min="15" step="15" value={form.duration_minutes} onChange={e=>setForm({...form,duration_minutes:e.target.value})}/>)}{Field("Valor/hora",<input required type="number" min="0" step=".01" value={form.hourly_rate} onChange={e=>setForm({...form,hourly_rate:e.target.value})}/>)}</div><button type="submit" className="mt-6 w-full rounded-xl bg-[#111827] px-4 py-3 text-sm font-medium text-white">Salvar turma</button></form></div>}
+ </div></main></div></AuthGuard>
 }
-
-function ProjetoOficina() {
-  return (
-    <AuthGuard>
-      <div className="min-h-screen bg-background">
-        <TopBar />
-        <OficinaShell>
-          <div className="mx-auto max-w-7xl">
-            <header className="mb-8">
-              <h1 className="mt-1 text-[30px] font-bold leading-[1.2] text-foreground" style={{ letterSpacing: "-0.02em" }}>
-                Projeto Oficina
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Módulo em construção — as funcionalidades serão adicionadas em breve.
-              </p>
-            </header>
-
-            <section aria-labelledby="visao-geral-oficina">
-              <h2 id="visao-geral-oficina" className="mb-4 text-lg font-bold text-foreground">
-                Visão geral
-              </h2>
-
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <article className="rounded-2xl border border-border bg-card p-5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-muted text-foreground">
-                    <Hammer size={18} strokeWidth={1.8} />
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-[13px] text-muted-foreground">Status do módulo</p>
-                    <p className="mt-1 text-[26px] font-bold leading-none text-foreground">Em construção</p>
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      Área reservada para a gestão do Projeto Oficina.
-                    </p>
-                  </div>
-                </article>
-              </div>
-            </section>
-          </div>
-        </OficinaShell>
-      </div>
-    </AuthGuard>
-  );
-}
+function Card({label,value,icon}:{label:string;value:string;icon:React.ReactNode}){return <article className="rounded-2xl border border-black/10 p-5"><div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-black/5">{icon}</div><p className="mt-4 text-[13px] text-black/50">{label}</p><p className="mt-1 text-2xl font-bold text-[#111827]">{value}</p></article>}
+function AulaRow({aula,onStatus}:{aula:Aula;onStatus:(a:Aula,s:Aula["status"])=>void}){const amount=aula.duration_minutes/60*Number(aula.hourly_rate);return <div className="flex flex-col gap-3 rounded-xl border border-black/10 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{aula.teacher_name}</p><p className="mt-1 text-sm text-black/50">{aula.start_time.slice(0,5)} · {aula.duration_minutes} min · {money(amount)}</p></div><div className="flex flex-wrap gap-2"><button onClick={()=>onStatus(aula,"realizada")} className={"rounded-lg border px-3 py-2 text-xs font-medium "+(aula.status==="realizada"?"border-emerald-200 bg-emerald-50 text-emerald-700":"border-black/10 text-black/45")}><Check size={14} className="mr-1 inline"/>Realizada</button><button onClick={()=>onStatus(aula,"nao_realizada")} className={"rounded-lg border px-3 py-2 text-xs font-medium "+(aula.status==="nao_realizada"?"border-red-200 bg-red-50 text-red-700":"border-black/10 text-black/45")}><XCircle size={14} className="mr-1 inline"/>Não realizada</button><button onClick={()=>onStatus(aula,"pendente")} className={"rounded-lg border px-3 py-2 text-xs font-medium "+(aula.status==="pendente"?"bg-black/5 text-black":"border-black/10 text-black/45")}>Pendente</button></div></div>}
+function Field(label:string,child:React.ReactNode){return <label className="block"><span className="mb-1.5 block text-xs font-medium text-black/60">{label}</span><div className="[&_input]:w-full [&_input]:rounded-xl [&_input]:border [&_input]:border-black/10 [&_input]:px-3 [&_input]:py-2.5 [&_input]:text-sm [&_select]:w-full [&_select]:rounded-xl [&_select]:border [&_select]:border-black/10 [&_select]:px-3 [&_select]:py-2.5 [&_select]:text-sm">{child}</div></label>}
+function fmtDate(d:Date){return d.toISOString().slice(0,10)} function longDate(s:string){return new Date(s+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit"})} function money(v:number){return new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(v)}
