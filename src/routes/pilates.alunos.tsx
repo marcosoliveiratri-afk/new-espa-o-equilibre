@@ -23,7 +23,7 @@ const whiteCard: React.CSSProperties={
 
 function Alunos(){
  const pathname=useRouterState({select:s=>s.location.pathname}); const [rows,setRows]=useState<Student[]>([]); const [plans,setPlans]=useState<any[]>([]); const [teachers,setTeachers]=useState<any[]>([]);
- const [loading,setLoading]=useState(true),[error,setError]=useState(""); const [search,setSearch]=useState(""),[activity,setActivity]=useState("Todos"),[teacher,setTeacher]=useState("Todos"),[plan,setPlan]=useState("Todos"),[destination,setDestination]=useState("Todos"),[showForm,setShowForm]=useState(false),[deleting,setDeleting]=useState<Student|null>(null);
+ const [loading,setLoading]=useState(true),[error,setError]=useState(""); const [search,setSearch]=useState(""),[activity,setActivity]=useState("Ativos"),[teacher,setTeacher]=useState("Todos"),[plan,setPlan]=useState("Todos"),[destination,setDestination]=useState("Todos"),[showForm,setShowForm]=useState(false),[deleting,setDeleting]=useState<Student|null>(null);
  const [form,setForm]=useState({full_name:"",phone:"",plan_id:"",teacher_id:"",monthly_value:"",start_date:new Date().toISOString().slice(0,10),due_date:"",payment_method:"",destination:"Clínica"});
  async function load(){
   setLoading(true);setError("");
