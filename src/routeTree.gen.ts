@@ -245,6 +245,12 @@ export interface FileRouteTypes {
     | '/pilates/alunos/$alunoId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/projeto-oficina/aulas'
+    | '/projeto-oficina/alunos'
+    | '/projeto-oficina/professores'
+    | '/projeto-oficina/financeiro'
+    | '/projeto-oficina/fechamentos'
+    | '/projeto-oficina/planos'
     | '/'
     | '/login'
     | '/osteopatia'
@@ -262,6 +268,12 @@ export interface FileRouteTypes {
     | '/visualizacao/pilates'
     | '/pilates/alunos/$alunoId'
   id:
+    | '/projeto-oficina/aulas'
+    | '/projeto-oficina/alunos'
+    | '/projeto-oficina/professores'
+    | '/projeto-oficina/financeiro'
+    | '/projeto-oficina/fechamentos'
+    | '/projeto-oficina/planos'
     | '__root__'
     | '/'
     | '/login'
