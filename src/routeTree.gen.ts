@@ -14,6 +14,11 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
 import { Route as PilatesRouteImport } from './routes/pilates'
 import { Route as ProjetoOficinaRouteImport } from './routes/projeto-oficina'
+import { Route as ProjetoOficinaAulasRouteImport } from './routes/projeto-oficina.aulas'
+import { Route as ProjetoOficinaAlunosRouteImport } from './routes/projeto-oficina.alunos'
+import { Route as ProjetoOficinaProfessoresRouteImport } from './routes/projeto-oficina.professores'
+import { Route as ProjetoOficinaFinanceiroRouteImport } from './routes/projeto-oficina.financeiro'
+import { Route as ProjetoOficinaFechamentosRouteImport } from './routes/projeto-oficina.fechamentos'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
 import { Route as PilatesAlertasRouteImport } from './routes/pilates.alertas'
 import { Route as PilatesAlunosRouteImport } from './routes/pilates.alunos'
@@ -51,6 +56,32 @@ const ProjetoOficinaRoute = ProjetoOficinaRouteImport.update({
   path: '/projeto-oficina',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjetoOficinaAulasRoute = ProjetoOficinaAulasRouteImport.update({
+  id: '/aulas',
+  path: '/aulas',
+  getParentRoute: () => ProjetoOficinaRoute,
+} as any)
+const ProjetoOficinaAlunosRoute = ProjetoOficinaAlunosRouteImport.update({
+  id: '/alunos',
+  path: '/alunos',
+  getParentRoute: () => ProjetoOficinaRoute,
+} as any)
+const ProjetoOficinaProfessoresRoute = ProjetoOficinaProfessoresRouteImport.update({
+  id: '/professores',
+  path: '/professores',
+  getParentRoute: () => ProjetoOficinaRoute,
+} as any)
+const ProjetoOficinaFinanceiroRoute = ProjetoOficinaFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => ProjetoOficinaRoute,
+} as any)
+const ProjetoOficinaFechamentosRoute = ProjetoOficinaFechamentosRouteImport.update({
+  id: '/fechamentos',
+  path: '/fechamentos',
+  getParentRoute: () => ProjetoOficinaRoute,
+} as any)
+
 const VisualizacaoRoute = VisualizacaoRouteImport.update({
   id: '/visualizacao',
   path: '/visualizacao',
@@ -113,8 +144,13 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRouteWithChildren
-  '/projeto-oficina': typeof ProjetoOficinaRoute
+  '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
+  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRoute
+  '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
+  '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
+  '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
   '/pilates/aulas-avulsas': typeof PilatesAulasAvulsasRoute
@@ -131,7 +167,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRoute
   '/pilates': typeof PilatesRouteWithChildren
-  '/projeto-oficina': typeof ProjetoOficinaRoute
+  '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
@@ -172,6 +208,11 @@ export interface FileRouteTypes {
     | '/pilates'
     | '/projeto-oficina'
     | '/visualizacao'
+    | '/projeto-oficina/aulas'
+    | '/projeto-oficina/alunos'
+    | '/projeto-oficina/professores'
+    | '/projeto-oficina/financeiro'
+    | '/projeto-oficina/fechamentos'
     | '/pilates/alertas'
     | '/pilates/alunos'
     | '/pilates/aulas-avulsas'
@@ -225,7 +266,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OsteopatiaRoute: typeof OsteopatiaRoute
   PilatesRoute: typeof PilatesRouteWithChildren
-  ProjetoOficinaRoute: typeof ProjetoOficinaRoute
+  ProjetoOficinaRoute: typeof ProjetoOficinaRouteWithChildren
   VisualizacaoRoute: typeof VisualizacaoRouteWithChildren
 }
 
@@ -265,6 +306,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/projeto-oficina'
       preLoaderRoute: typeof ProjetoOficinaRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/projeto-oficina/aulas': {
+      id: '/projeto-oficina/aulas'
+      path: '/aulas'
+      fullPath: '/projeto-oficina/aulas'
+      preLoaderRoute: typeof ProjetoOficinaAulasRouteImport
+      parentRoute: typeof ProjetoOficinaRoute
+    }
+    '/projeto-oficina/alunos': {
+      id: '/projeto-oficina/alunos'
+      path: '/alunos'
+      fullPath: '/projeto-oficina/alunos'
+      preLoaderRoute: typeof ProjetoOficinaAlunosRouteImport
+      parentRoute: typeof ProjetoOficinaRoute
+    }
+    '/projeto-oficina/professores': {
+      id: '/projeto-oficina/professores'
+      path: '/professores'
+      fullPath: '/projeto-oficina/professores'
+      preLoaderRoute: typeof ProjetoOficinaProfessoresRouteImport
+      parentRoute: typeof ProjetoOficinaRoute
+    }
+    '/projeto-oficina/financeiro': {
+      id: '/projeto-oficina/financeiro'
+      path: '/financeiro'
+      fullPath: '/projeto-oficina/financeiro'
+      preLoaderRoute: typeof ProjetoOficinaFinanceiroRouteImport
+      parentRoute: typeof ProjetoOficinaRoute
+    }
+    '/projeto-oficina/fechamentos': {
+      id: '/projeto-oficina/fechamentos'
+      path: '/fechamentos'
+      fullPath: '/projeto-oficina/fechamentos'
+      preLoaderRoute: typeof ProjetoOficinaFechamentosRouteImport
+      parentRoute: typeof ProjetoOficinaRoute
     }
     '/visualizacao': {
       id: '/visualizacao'
@@ -395,12 +471,28 @@ const VisualizacaoRouteWithChildren = VisualizacaoRoute._addFileChildren(
   VisualizacaoRouteChildren,
 )
 
+interface ProjetoOficinaRouteChildren {
+  ProjetoOficinaAulasRoute: typeof ProjetoOficinaAulasRoute
+  ProjetoOficinaAlunosRoute: typeof ProjetoOficinaAlunosRoute
+  ProjetoOficinaProfessoresRoute: typeof ProjetoOficinaProfessoresRoute
+  ProjetoOficinaFinanceiroRoute: typeof ProjetoOficinaFinanceiroRoute
+  ProjetoOficinaFechamentosRoute: typeof ProjetoOficinaFechamentosRoute
+}
+const ProjetoOficinaRouteChildren: ProjetoOficinaRouteChildren = {
+  ProjetoOficinaAulasRoute,
+  ProjetoOficinaAlunosRoute,
+  ProjetoOficinaProfessoresRoute,
+  ProjetoOficinaFinanceiroRoute,
+  ProjetoOficinaFechamentosRoute,
+}
+const ProjetoOficinaRouteWithChildren = ProjetoOficinaRoute._addFileChildren(ProjetoOficinaRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   OsteopatiaRoute: OsteopatiaRoute,
   PilatesRoute: PilatesRouteWithChildren,
-  ProjetoOficinaRoute: ProjetoOficinaRoute,
+  ProjetoOficinaRoute: ProjetoOficinaRouteWithChildren,
   VisualizacaoRoute: VisualizacaoRouteWithChildren,
 }
 export const routeTree = rootRouteImport
