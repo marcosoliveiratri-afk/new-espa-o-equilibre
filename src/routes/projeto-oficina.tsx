@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Bell, CalendarCheck2, CircleDollarSign, ClipboardList, UsersRound, UserRoundCog, WalletCards } from "lucide-react";
+import { CalendarCheck2, CircleDollarSign, ClipboardList, UsersRound, UserRoundCog, WalletCards } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
