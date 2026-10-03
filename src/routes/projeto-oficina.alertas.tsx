@@ -3,6 +3,7 @@ import { AlertTriangle, CalendarClock, CheckCircle2, CreditCard, UsersRound } fr
 import { useEffect, useMemo, useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
 import { TopBar } from "@/components/TopBar";
+import { OficinaSidebar } from "@/components/OficinaSidebar";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route=createFileRoute("/projeto-oficina/alertas")({component:Alertas});
@@ -44,7 +45,7 @@ function Alertas(){
  },[data]);
  const sendCharge=(x:any)=>{const phone=String(x.student?.whatsapp||x.student?.phone||"").replace(/\D/g,"");if(!phone){setError("O aluno não possui telefone/WhatsApp cadastrado.");return}const p=phone.startsWith("55")?phone:"55"+phone;const text=`Olá! Tudo bem? Passando para lembrar a cobrança da Oficina no valor de ${money(x.amount)}, com vencimento em ${fmt(x.due_date)}.`;window.open("https://wa.me/"+p+"?text="+encodeURIComponent(text),"_blank","noopener,noreferrer")};
  if(loading)return <AuthGuard><div className="p-8 text-center text-sm text-black/45">Carregando central de alertas...</div></AuthGuard>;
- return <AuthGuard><div className="min-h-screen bg-white"><TopBar/><main className="p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-7xl">
+ return <AuthGuard><div className="min-h-screen bg-white"><TopBar/><div className="flex min-h-[calc(100vh-64px)]"><OficinaSidebar/><div className="min-w-0 flex-1"><main className="p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-7xl">
   <header className="mb-8"><p className="text-xs font-semibold uppercase tracking-[.12em] text-black/40">Projeto Oficina</p><h1 className="mt-1 text-[30px] font-bold text-[#111827]">Central de Alertas</h1><p className="mt-2 text-sm text-black/55">Acompanhe cobranças, vencimentos e pendências dos alunos da Oficina.</p></header>
   {error&&<div className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</div>}
   <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Card icon={<CreditCard size={18}/>} label="Cobranças pendentes" value={m.currentAlerts.length}/><Card icon={<CalendarClock size={18}/>} label="Planos em vencimento" value={m.planAlerts.length}/><Card icon={<AlertTriangle size={18}/>} label="Itens vencidos" value={m.currentAlerts.filter((x:any)=>days(x.due_date)<0).length}/><Card icon={<UsersRound size={18}/>} label="Alunos sem plano" value={m.noPlan.length}/></div>
@@ -56,7 +57,7 @@ function Alertas(){
   <Section title="Vigências dos planos" count={m.planAlerts.length}><Table><thead><tr><th>Aluno</th><th>Plano</th><th>Vigência</th><th>Validade</th><th>Status</th><th>Ação</th></tr></thead><tbody>{m.planAlerts.map((x:any)=>{const u=urgency(x.left);return <tr key={x.id}><td><Student name={x.student.full_name} id={x.student.id}/></td><td>{x.plan?.name||"—"}</td><td>{fmt(x.start_date)} a {fmt(x.end_date)}</td><td>{fmt(x.end_date)}</td><td><Badge tone={u[0]}>{u[1]}</Badge></td><td><Link to="/projeto-oficina/alunos/$alunoId" params={{alunoId:x.student.id}} className="text-xs font-medium underline">Abrir perfil</Link></td></tr>})}{!m.planAlerts.length&&<tr><td colSpan={6} className="p-8 text-center text-black/45">Nenhum plano vence nos próximos 15 dias.</td></tr>}</tbody></Table></Section>
 
   <Section title="Alunos sem plano ou sem cobrança" count={m.noPlan.length+m.noCharge.length}><Table><thead><tr><th>Aluno</th><th>Responsável</th><th>Pendência</th><th>Ação</th></tr></thead><tbody>{[...m.noPlan.map((x:any)=>({...x,kind:"Sem plano"})),...m.noCharge.map((x:any)=>({...x,kind:"Sem cobrança gerada"}))].map((x:any)=><tr key={x.id+"-"+x.kind}><td><Student name={x.full_name} id={x.id}/></td><td>{x.responsible_name||"—"}</td><td><Badge tone="warning">{x.kind}</Badge></td><td><Link to="/projeto-oficina/alunos/$alunoId" params={{alunoId:x.id}} className="text-xs font-medium underline">Abrir perfil</Link></td></tr>)}{!m.noPlan.length&&!m.noCharge.length&&<tr><td colSpan={4} className="p-8 text-center text-black/45">Todos os alunos ativos possuem plano e cobrança.</td></tr>}</tbody></Table></Section>
- </div></main></div></AuthGuard>;
+ </div></main></div></div></AuthGuard>;
 }
 function Card({icon,label,value}:{icon:any;label:string;value:number}){return <div className="rounded-2xl border border-gray-200 bg-white p-5"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-black/5">{icon}</div><p className="mt-4 text-xs text-black/45">{label}</p><p className="mt-1 text-2xl font-bold">{value}</p></div>}
 function Section({title,count,children}:{title:string;count:number;children:any}){return <section className="mb-8"><div className="mb-4 flex items-center gap-2"><h2 className="text-lg font-bold tracking-tight text-black/80">{title}</h2><span className="text-sm font-semibold text-black/45">{count}</span></div><div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">{children}</div></section>}
