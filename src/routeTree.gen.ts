@@ -173,7 +173,9 @@ export interface FileRoutesByFullPath {
   '/pilates/configuracoes': typeof PilatesConfiguracoesRoute
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
-  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRoute
+  '/projeto-oficina/alertas': typeof ProjetoOficinaAlertasRoute
+  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRouteWithChildren
+  '/projeto-oficina/alunos/$alunoId': typeof ProjetoOficinaAlunosAlunoIdRoute
   '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
   '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
@@ -248,7 +250,9 @@ export interface FileRouteTypes {
     | '/pilates/configuracoes'
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
+    | '/projeto-oficina/alertas'
     | '/projeto-oficina/alunos'
+    | '/projeto-oficina/alunos/$alunoId'
     | '/projeto-oficina/aulas'
     | '/projeto-oficina/fechamentos'
     | '/projeto-oficina/financeiro'
@@ -272,7 +276,9 @@ export interface FileRouteTypes {
     | '/pilates/configuracoes'
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
+    | '/projeto-oficina/alertas'
     | '/projeto-oficina/alunos'
+    | '/projeto-oficina/alunos/$alunoId'
     | '/projeto-oficina/aulas'
     | '/projeto-oficina/fechamentos'
     | '/projeto-oficina/financeiro'
