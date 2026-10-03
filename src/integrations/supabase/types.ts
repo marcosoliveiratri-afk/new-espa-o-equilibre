@@ -93,6 +93,473 @@ export type Database = {
           },
         ]
       }
+      oficina_aluno_planos: {
+        Row: {
+          agreed_value: number
+          aluno_id: string
+          created_at: string
+          destination: string | null
+          due_day: number | null
+          end_date: string | null
+          id: string
+          payment_method: string | null
+          plano_id: string
+          professor_id: string | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agreed_value?: number
+          aluno_id: string
+          created_at?: string
+          destination?: string | null
+          due_day?: number | null
+          end_date?: string | null
+          id?: string
+          payment_method?: string | null
+          plano_id: string
+          professor_id?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agreed_value?: number
+          aluno_id?: string
+          created_at?: string
+          destination?: string | null
+          due_day?: number | null
+          end_date?: string | null
+          id?: string
+          payment_method?: string | null
+          plano_id?: string
+          professor_id?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oficina_aluno_planos_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_alunos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oficina_aluno_planos_plano_id_fkey"
+            columns: ["plano_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_planos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oficina_aluno_planos_professor_id_fkey"
+            columns: ["professor_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_professores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oficina_alunos: {
+        Row: {
+          active: boolean
+          address: string | null
+          birth_date: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      oficina_aulas: {
+        Row: {
+          aula_date: string
+          created_at: string
+          duration_minutes: number
+          hourly_rate: number
+          id: string
+          notes: string | null
+          professor_id: string | null
+          realized_at: string | null
+          start_time: string
+          status: string
+          teacher_amount: number | null
+          teacher_name: string
+          turma_id: string
+          turma_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          aula_date: string
+          created_at?: string
+          duration_minutes: number
+          hourly_rate?: number
+          id?: string
+          notes?: string | null
+          professor_id?: string | null
+          realized_at?: string | null
+          start_time: string
+          status?: string
+          teacher_amount?: number | null
+          teacher_name: string
+          turma_id: string
+          turma_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aula_date?: string
+          created_at?: string
+          duration_minutes?: number
+          hourly_rate?: number
+          id?: string
+          notes?: string | null
+          professor_id?: string | null
+          realized_at?: string | null
+          start_time?: string
+          status?: string
+          teacher_amount?: number | null
+          teacher_name?: string
+          turma_id?: string
+          turma_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oficina_aulas_professor_id_fkey"
+            columns: ["professor_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_professores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oficina_aulas_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_turmas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oficina_despesas: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          description: string
+          expense_date: string
+          id: string
+          notes: string | null
+          payment_method: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string
+          description: string
+          expense_date?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          description?: string
+          expense_date?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+        }
+        Relationships: []
+      }
+      oficina_fechamentos: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          reference_month: string
+          status: string
+          total_despesas: number
+          total_professores: number
+          total_receitas: number
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reference_month: string
+          status?: string
+          total_despesas?: number
+          total_professores?: number
+          total_receitas?: number
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reference_month?: string
+          status?: string
+          total_despesas?: number
+          total_professores?: number
+          total_receitas?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oficina_pagamentos: {
+        Row: {
+          aluno_plano_id: string
+          amount: number
+          created_at: string
+          destination: string | null
+          due_date: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          aluno_plano_id: string
+          amount?: number
+          created_at?: string
+          destination?: string | null
+          due_date: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          aluno_plano_id?: string
+          amount?: number
+          created_at?: string
+          destination?: string | null
+          due_date?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oficina_pagamentos_aluno_plano_id_fkey"
+            columns: ["aluno_plano_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_aluno_planos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oficina_planos: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          duration_months: number
+          id: string
+          monthly_value: number
+          name: string
+          payment_method: string | null
+          total_value: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_months: number
+          id?: string
+          monthly_value?: number
+          name: string
+          payment_method?: string | null
+          total_value?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_months?: number
+          id?: string
+          monthly_value?: number
+          name?: string
+          payment_method?: string | null
+          total_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oficina_professores: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oficina_turma_alunos: {
+        Row: {
+          active: boolean
+          aluno_id: string
+          joined_at: string
+          left_at: string | null
+          turma_id: string
+        }
+        Insert: {
+          active?: boolean
+          aluno_id: string
+          joined_at?: string
+          left_at?: string | null
+          turma_id: string
+        }
+        Update: {
+          active?: boolean
+          aluno_id?: string
+          joined_at?: string
+          left_at?: string | null
+          turma_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oficina_turma_alunos_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_alunos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oficina_turma_alunos_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_turmas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oficina_turmas: {
+        Row: {
+          active: boolean
+          created_at: string
+          duration_minutes: number
+          hourly_rate: number
+          id: string
+          name: string
+          professor_id: string | null
+          start_time: string
+          teacher_name: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          duration_minutes: number
+          hourly_rate?: number
+          id?: string
+          name: string
+          professor_id?: string | null
+          start_time: string
+          teacher_name: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          duration_minutes?: number
+          hourly_rate?: number
+          id?: string
+          name?: string
+          professor_id?: string | null
+          start_time?: string
+          teacher_name?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oficina_turmas_professor_id_fkey"
+            columns: ["professor_id"]
+            isOneToOne: false
+            referencedRelation: "oficina_professores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       physical_assessments: {
         Row: {
           assessment_date: string
