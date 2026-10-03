@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
+import { Route as OsteopatiaConfiguracoesRouteImport } from './routes/osteopatia.configuracoes'
 import { Route as PilatesRouteImport } from './routes/pilates'
 import { Route as ProjetoOficinaRouteImport } from './routes/projeto-oficina'
 import { Route as ProjetoOficinaAlertasRouteImport } from './routes/projeto-oficina.alertas'
@@ -48,6 +49,11 @@ const OsteopatiaRoute = OsteopatiaRouteImport.update({
   id: '/osteopatia',
   path: '/osteopatia',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OsteopatiaConfiguracoesRoute = OsteopatiaConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => OsteopatiaRoute,
 } as any)
 const PilatesRoute = PilatesRouteImport.update({
   id: '/pilates',
@@ -576,10 +582,18 @@ const VisualizacaoRouteWithChildren = VisualizacaoRoute._addFileChildren(
   VisualizacaoRouteChildren,
 )
 
+interface OsteopatiaRouteChildren {
+  OsteopatiaConfiguracoesRoute: typeof OsteopatiaConfiguracoesRoute
+}
+const OsteopatiaRouteChildren: OsteopatiaRouteChildren = {
+  OsteopatiaConfiguracoesRoute: OsteopatiaConfiguracoesRoute,
+}
+const OsteopatiaRouteWithChildren = OsteopatiaRoute._addFileChildren(OsteopatiaRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
-  OsteopatiaRoute: OsteopatiaRoute,
+  OsteopatiaRoute: OsteopatiaRouteWithChildren,
   PilatesRoute: PilatesRouteWithChildren,
   ProjetoOficinaRoute: ProjetoOficinaRouteWithChildren,
   VisualizacaoRoute: VisualizacaoRouteWithChildren,
