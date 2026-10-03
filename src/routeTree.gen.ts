@@ -533,7 +533,6 @@ const ProjetoOficinaAlunosRouteWithChildren = ProjetoOficinaAlunosRoute._addFile
 interface ProjetoOficinaRouteChildren {
   ProjetoOficinaAlertasRoute: typeof ProjetoOficinaAlertasRoute
   ProjetoOficinaAlunosRoute: typeof ProjetoOficinaAlunosRouteWithChildren
- typeof ProjetoOficinaAlunosRoute
   ProjetoOficinaAulasRoute: typeof ProjetoOficinaAulasRoute
   ProjetoOficinaFechamentosRoute: typeof ProjetoOficinaFechamentosRoute
   ProjetoOficinaFinanceiroRoute: typeof ProjetoOficinaFinanceiroRoute
