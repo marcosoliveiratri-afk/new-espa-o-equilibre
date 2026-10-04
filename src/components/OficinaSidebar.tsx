@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import { Bell, CalendarCheck2, ChevronLeft, ChevronRight, ClipboardList, LayoutDashboard, LogOut, Menu, ReceiptText, UsersRound, UserRoundCog, WalletCards, X } from "lucide-react";
 import { useState } from "react";
 
@@ -25,8 +25,7 @@ export function OficinaSidebar() {
     items.map(({ to, label, icon: Icon, exact }) => {
       const isActive = active(to, exact);
       return (
-        <Link
-          key={to}
+        <a key={to} href={to}
           to={to}
           onClick={() => mobile && setMobileOpen(false)}
           className={`group flex items-center rounded-xl transition ${mobile ? "gap-3 px-4 py-3" : collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2.5"} ${isActive ? "bg-black/[.06] text-black" : "text-black/55 hover:bg-black/[.035] hover:text-black"}`}
@@ -34,7 +33,7 @@ export function OficinaSidebar() {
         >
           <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
           {(mobile || !collapsed) && <span className={`text-sm ${isActive ? "font-semibold" : "font-medium"}`}>{label}</span>}
-        </Link>
+        </a>
       );
     });
 
@@ -68,7 +67,7 @@ export function OficinaSidebar() {
               <Link to="/projeto-oficina" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-black/50 hover:bg-black/[.035] hover:text-black">
                 <LogOut size={18} />
                 <span>Início da Oficina</span>
-              </Link>
+              </a>
             </div>
           </aside>
         </div>
@@ -92,7 +91,7 @@ export function OficinaSidebar() {
             <Link to="/projeto-oficina" className={`flex items-center rounded-xl text-black/50 hover:bg-black/[.035] hover:text-black ${collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2.5"}`} title={collapsed ? "Início da Oficina" : undefined}>
               <LogOut size={18} />
               {!collapsed && <span className="text-sm font-medium">Início da Oficina</span>}
-            </Link>
+            </a>
           </div>
         </div>
       </aside>
