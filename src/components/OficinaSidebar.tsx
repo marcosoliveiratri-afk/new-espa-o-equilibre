@@ -67,7 +67,7 @@ export function OficinaSidebar() {
               <Link to="/projeto-oficina" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-black/50 hover:bg-black/[.035] hover:text-black">
                 <LogOut size={18} />
                 <span>Início da Oficina</span>
-              </a>
+              </Link>
             </div>
           </aside>
         </div>
@@ -91,7 +91,7 @@ export function OficinaSidebar() {
             <Link to="/projeto-oficina" className={`flex items-center rounded-xl text-black/50 hover:bg-black/[.035] hover:text-black ${collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2.5"}`} title={collapsed ? "Início da Oficina" : undefined}>
               <LogOut size={18} />
               {!collapsed && <span className="text-sm font-medium">Início da Oficina</span>}
-            </a>
+            </Link>
           </div>
         </div>
       </aside>
