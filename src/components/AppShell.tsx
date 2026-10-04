@@ -38,8 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <nav className="flex-1 space-y-1 px-3">
             {items.map(({ label, to, icon: Icon }) => {
               const active = to === "/pilates" ? pathname === "/pilates" : pathname.startsWith(to);
-              return (
-                {isOsteopatia && label === "Configurações" ? (
+              return isOsteopatia && label === "Configurações" ? (
                 <a key={label} href={to} onClick={() => setOpen(false)} title={collapsed ? label : undefined} className={`flex items-center rounded-xl py-3 text-sm transition ${collapsed ? "justify-center px-2" : "gap-3 px-4"} ${active ? "bg-black/10 text-[#111]" : "text-black/55 hover:bg-black/5 hover:text-black"}`}>
                   <Icon size={18} strokeWidth={1.8} />
                   {!collapsed && <span>{label}</span>}
@@ -49,7 +48,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Icon size={18} strokeWidth={1.8} />
                   {!collapsed && <span>{label}</span>}
                 </Link>
-              )}
               );
             })}
           </nav>
