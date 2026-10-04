@@ -55,6 +55,8 @@ function Alunos(){
   if(!responsible){setError("Informe o nome do responsável.");return}
   if(!Number.isInteger(age)||age<0||age>18){setError("Informe uma idade válida.");return}
   setSaving(true);
+  const {data:sessionData}=await supabase.auth.getSession();
+  if(!sessionData.session){setSaving(false);setError("Sua sessão não está autenticada. Faça login novamente.");return}
   const {error}=await supabase.from("oficina_alunos").insert({full_name:name,responsible_name:responsible,age,birth_date:form.birth_date||null,phone:form.phone.replace(/\D/g,"")||null,whatsapp:form.whatsapp.replace(/\D/g,"")||null,email:form.email.trim()||null,cpf:form.cpf.trim()||null,address:form.address.trim()||null,notes:form.notes.trim()||null});
   setSaving(false);
   if(error){setError(error.message);return}
