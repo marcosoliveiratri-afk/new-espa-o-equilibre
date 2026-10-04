@@ -4,7 +4,8 @@ import { useState } from "react";
 
 const items: { to: string; label: string; icon: typeof Menu; exact?: boolean }[] = [
   { to: "/projeto-oficina", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/projeto-oficina/aulas", label: "Aulas e Turmas", icon: CalendarCheck2 },
+  { to: "/projeto-oficina/aulas", label: "Aulas", icon: CalendarCheck2 },
+  { to: "/projeto-oficina/turmas", label: "Turmas", icon: CalendarCheck2 },
   { to: "/projeto-oficina/alunos", label: "Alunos", icon: UsersRound },
   { to: "/projeto-oficina/planos", label: "Planos", icon: ClipboardList },
   { to: "/projeto-oficina/professores", label: "Professores", icon: UserRoundCog },
