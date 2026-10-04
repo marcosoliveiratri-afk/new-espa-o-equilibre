@@ -19,7 +19,7 @@ const pilatesItems = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isOsteopatia = pathname.startsWith("/osteopatia");
   const items = isOsteopatia ? osteopatiaItems : pilatesItems;
