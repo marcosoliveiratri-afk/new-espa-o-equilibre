@@ -6,7 +6,7 @@ import { TopBar } from "@/components/TopBar";
 import { OficinaSidebar } from "@/components/OficinaSidebar";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route=createFileRoute("/projeto-oficina/alunos")({component:Alunos});
+export const Route=createFileRoute("/projeto-oficina/alunos/")({component:Alunos});
 
 const money=(v:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(v);
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";

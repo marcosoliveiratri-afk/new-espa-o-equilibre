@@ -7,7 +7,7 @@ import { TopBar } from "@/components/TopBar";
 import { OficinaSidebar } from "@/components/OficinaSidebar";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route=createFileRoute("/projeto-oficina")({component:ProjetoOficina});
+export const Route=createFileRoute("/projeto-oficina/")({component:ProjetoOficina});
 function ProjetoOficina(){
  const [stats,setStats]=useState({alunos:0,professores:0,turmas:0,realizadas:0,receitas:0,professor:0});
  async function load(){
