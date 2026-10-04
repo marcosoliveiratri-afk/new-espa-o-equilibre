@@ -12,10 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
-import { Route as OsteopatiaConfiguracoesRouteImport } from './routes/osteopatia.configuracoes'
 import { Route as PilatesRouteImport } from './routes/pilates'
 import { Route as ProjetoOficinaRouteImport } from './routes/projeto-oficina'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
+import { Route as OsteopatiaConfiguracoesRouteImport } from './routes/osteopatia.configuracoes'
 import { Route as PilatesAlertasRouteImport } from './routes/pilates.alertas'
 import { Route as PilatesAlunosRouteImport } from './routes/pilates.alunos'
 import { Route as PilatesAulasAvulsasRouteImport } from './routes/pilates.aulas-avulsas'
@@ -50,11 +50,6 @@ const OsteopatiaRoute = OsteopatiaRouteImport.update({
   path: '/osteopatia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OsteopatiaConfiguracoesRoute = OsteopatiaConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => OsteopatiaRoute,
-} as any)
 const PilatesRoute = PilatesRouteImport.update({
   id: '/pilates',
   path: '/pilates',
@@ -69,6 +64,11 @@ const VisualizacaoRoute = VisualizacaoRouteImport.update({
   id: '/visualizacao',
   path: '/visualizacao',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OsteopatiaConfiguracoesRoute = OsteopatiaConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => OsteopatiaRoute,
 } as any)
 const PilatesAlertasRoute = PilatesAlertasRouteImport.update({
   id: '/alertas',
@@ -169,10 +169,11 @@ const ProjetoOficinaAlunosAlunoIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/osteopatia': typeof OsteopatiaRoute
+  '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
   '/pilates/aulas-avulsas': typeof PilatesAulasAvulsasRoute
@@ -195,10 +196,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/osteopatia': typeof OsteopatiaRoute
+  '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
   '/pilates/aulas-avulsas': typeof PilatesAulasAvulsasRoute
@@ -222,10 +224,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/osteopatia': typeof OsteopatiaRoute
+  '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
   '/pilates/aulas-avulsas': typeof PilatesAulasAvulsasRoute
@@ -254,6 +257,7 @@ export interface FileRouteTypes {
     | '/pilates'
     | '/projeto-oficina'
     | '/visualizacao'
+    | '/osteopatia/configuracoes'
     | '/pilates/alertas'
     | '/pilates/alunos'
     | '/pilates/aulas-avulsas'
@@ -280,6 +284,7 @@ export interface FileRouteTypes {
     | '/pilates'
     | '/projeto-oficina'
     | '/visualizacao'
+    | '/osteopatia/configuracoes'
     | '/pilates/alertas'
     | '/pilates/alunos'
     | '/pilates/aulas-avulsas'
@@ -306,6 +311,7 @@ export interface FileRouteTypes {
     | '/pilates'
     | '/projeto-oficina'
     | '/visualizacao'
+    | '/osteopatia/configuracoes'
     | '/pilates/alertas'
     | '/pilates/alunos'
     | '/pilates/aulas-avulsas'
@@ -329,7 +335,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
-  OsteopatiaRoute: typeof OsteopatiaRoute
+  OsteopatiaRoute: typeof OsteopatiaRouteWithChildren
   PilatesRoute: typeof PilatesRouteWithChildren
   ProjetoOficinaRoute: typeof ProjetoOficinaRouteWithChildren
   VisualizacaoRoute: typeof VisualizacaoRouteWithChildren
@@ -378,6 +384,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/visualizacao'
       preLoaderRoute: typeof VisualizacaoRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/osteopatia/configuracoes': {
+      id: '/osteopatia/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/osteopatia/configuracoes'
+      preLoaderRoute: typeof OsteopatiaConfiguracoesRouteImport
+      parentRoute: typeof OsteopatiaRoute
     }
     '/pilates/alertas': {
       id: '/pilates/alertas'
@@ -508,6 +521,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface OsteopatiaRouteChildren {
+  OsteopatiaConfiguracoesRoute: typeof OsteopatiaConfiguracoesRoute
+}
+
+const OsteopatiaRouteChildren: OsteopatiaRouteChildren = {
+  OsteopatiaConfiguracoesRoute: OsteopatiaConfiguracoesRoute,
+}
+
+const OsteopatiaRouteWithChildren = OsteopatiaRoute._addFileChildren(
+  OsteopatiaRouteChildren,
+)
+
 interface PilatesAlunosRouteChildren {
   PilatesAlunosAlunoIdRoute: typeof PilatesAlunosAlunoIdRoute
 }
@@ -591,14 +616,6 @@ const VisualizacaoRouteChildren: VisualizacaoRouteChildren = {
 const VisualizacaoRouteWithChildren = VisualizacaoRoute._addFileChildren(
   VisualizacaoRouteChildren,
 )
-
-interface OsteopatiaRouteChildren {
-  OsteopatiaConfiguracoesRoute: typeof OsteopatiaConfiguracoesRoute
-}
-const OsteopatiaRouteChildren: OsteopatiaRouteChildren = {
-  OsteopatiaConfiguracoesRoute: OsteopatiaConfiguracoesRoute,
-}
-const OsteopatiaRouteWithChildren = OsteopatiaRoute._addFileChildren(OsteopatiaRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,

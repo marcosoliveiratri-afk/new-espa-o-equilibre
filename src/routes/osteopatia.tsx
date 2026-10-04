@@ -24,7 +24,7 @@ type Row = {
 function parseDate(v: unknown): Date | null {
   if (typeof v !== "string") return null;
   const m = v.match(/Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+),\s*(\d+),\s*(\d+))?/);
-  if (m) return new Date(+m[1], +m[2], +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+  if (m) return new Date(+m[1]!, +m[2]!, +m[3]!, +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
   const d = new Date(v);
   return Number.isNaN(d.getTime()) ? null : d;
 }
