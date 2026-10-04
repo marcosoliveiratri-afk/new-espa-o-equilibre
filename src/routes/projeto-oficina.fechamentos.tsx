@@ -14,10 +14,13 @@ type Relatorio={id:string;fechamento_id:string;reference_month:string;title:stri
 function Fechamentos(){
   const [rows,setRows]=useState<Fechamento[]>([]);
   const [loadingReport,setLoadingReport]=useState(false);\n  const [deleting,setDeleting]=useState<string | null>(null);
+  const [reports,setReports]=useState<Record<string,Relatorio>>({});
 
   async function load(){
     const {data}=await supabase.from("oficina_fechamentos").select("*").order("reference_month",{ascending:false});
+    const {data:reportData}=await supabase.from("oficina_relatorios").select("*");
     setRows((data??[]) as Fechamento[]);
+    setReports(Object.fromEntries(((reportData??[]) as Relatorio[]).map(report=>[report.fechamento_id,report])));
   }
   useEffect(()=>{void load()},[]);
 
@@ -34,12 +37,14 @@ function Fechamentos(){
     await load();
   }
 
-  async function deleteClosing(row:Fechamento){
-    if(!window.confirm(`Excluir o fechamento de ${monthBR(row.reference_month)}? Isso remove apenas o registro do fechamento e não apaga pagamentos, despesas ou aulas.`)) return;
+  async function deleteReport(row:Fechamento){
+    if(!window.confirm(`Excluir o relatório de ${monthBR(row.reference_month)}? O fechamento continuará salvo.`)) return;
     setDeleting(row.id);
-    const {error}=await supabase.from("oficina_fechamentos").delete().eq("id",row.id);
+    const report=reports[row.id];
+    if(!report){window.alert("Ainda não existe um relatório gerado para este fechamento.");return}
+    const {error}=await supabase.from("oficina_relatorios").delete().eq("id",report.id);
     setDeleting(null);
-    if(error){window.alert("Não foi possível excluir o fechamento: "+error.message);return}
+    if(error){window.alert("Não foi possível excluir o relatório: "+error.message);return}
     await load();
   }
 
@@ -104,7 +109,7 @@ function Fechamentos(){
 
   return <AuthGuard><div className="min-h-screen bg-white"><TopBar/><div className="flex min-h-[calc(100vh-64px)]"><OficinaSidebar/><div className="min-w-0 flex-1"><main className="p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-6xl">
     <header className="mb-6 flex items-center justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[.12em] text-black/40">Projeto Oficina</p><h1 className="mt-1 text-[30px] font-bold text-[#111827]">Fechamentos</h1><p className="mt-2 text-sm text-black/50">Fechamento mensal com relatório no padrão visual do Espaço Equilibre.</p></div><button onClick={closeMonth} className="inline-flex items-center gap-2 rounded-xl bg-[#111827] px-4 py-2.5 text-sm text-white"><LockKeyhole size={16}/> Fechar mês atual</button></header>
-    <section className="rounded-2xl border border-black/10 overflow-hidden"><table className="w-full text-sm"><thead className="bg-[#fafafa] text-xs text-black/45"><tr><th className="p-4 text-left">Competência</th><th className="p-4 text-left">Receitas</th><th className="p-4 text-left">Despesas</th><th className="p-4 text-left">Professores</th><th className="p-4 text-left">Saldo</th><th className="p-4 text-left">Status</th><th className="p-4 text-right">Ações</th></tr></thead><tbody>{rows.map(x=><tr key={x.id} className="border-t"><td className="p-4">{monthBR(x.reference_month)}</td><td className="p-4">{money(Number(x.total_receitas))}</td><td className="p-4">{money(Number(x.total_despesas))}</td><td className="p-4">{money(Number(x.total_professores))}</td><td className="p-4 font-semibold">{money(Number(x.total_receitas)-Number(x.total_despesas)-Number(x.total_professores))}</td><td className="p-4"><span className="inline-flex items-center gap-1.5 text-emerald-700"><CheckCircle2 size={15}/>{x.status}</span></td><td className="p-4"><div className="flex justify-end gap-2"><button disabled={loadingReport} onClick={()=>void generateReport(x)} className="inline-flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2 text-xs font-medium hover:bg-black/[.03] disabled:opacity-50"><FileText size={15}/>{loadingReport?"Gerando...":"Gerar relatório"}</button><button disabled={deleting===x.id} onClick={()=>void deleteClosing(x)} className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"><Trash2 size={15}/>{deleting===x.id?"Excluindo...":"Excluir"}</button></div></td></tr>)}</tbody></table>{!rows.length&&<div className="p-10 text-center text-sm text-black/45">Nenhum fechamento realizado.</div>}</section>
+    <section className="rounded-2xl border border-black/10 overflow-hidden"><table className="w-full text-sm"><thead className="bg-[#fafafa] text-xs text-black/45"><tr><th className="p-4 text-left">Competência</th><th className="p-4 text-left">Receitas</th><th className="p-4 text-left">Despesas</th><th className="p-4 text-left">Professores</th><th className="p-4 text-left">Saldo</th><th className="p-4 text-left">Status</th><th className="p-4 text-right">Ações</th></tr></thead><tbody>{rows.map(x=><tr key={x.id} className="border-t"><td className="p-4">{monthBR(x.reference_month)}</td><td className="p-4">{money(Number(x.total_receitas))}</td><td className="p-4">{money(Number(x.total_despesas))}</td><td className="p-4">{money(Number(x.total_professores))}</td><td className="p-4 font-semibold">{money(Number(x.total_receitas)-Number(x.total_despesas)-Number(x.total_professores))}</td><td className="p-4"><span className="inline-flex items-center gap-1.5 text-emerald-700"><CheckCircle2 size={15}/>{x.status}</span></td><td className="p-4"><div className="flex justify-end gap-2"><button disabled={loadingReport} onClick={()=>void generateReport(x)} className="inline-flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2 text-xs font-medium hover:bg-black/[.03] disabled:opacity-50"><FileText size={15}/>{loadingReport?"Gerando...":"Gerar relatório"}</button><button disabled={deleting===x.id} onClick={()=>void deleteReport(x)} className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"><Trash2 size={15}/>{deleting===x.id?"Excluindo...":"Excluir relatório"}</button></div></td></tr>)}</tbody></table>{!rows.length&&<div className="p-10 text-center text-sm text-black/45">Nenhum fechamento realizado.</div>}</section>
   </div></main></div></div></div></AuthGuard>
 }
 
