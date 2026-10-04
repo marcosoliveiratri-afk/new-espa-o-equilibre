@@ -28,9 +28,9 @@ function Alertas(){
  }
  useEffect(()=>{void load()},[]);
  const m=useMemo(()=>{
-  const students=new Map(data.students.map((x:any)=>[x.id,x]));
-  const aps=new Map(data.studentPlans.map((x:any)=>[x.id,x]));
-  const plans=new Map(data.plans.map((x:any)=>[x.id,x]));
+  const students=new Map<string,any>(data.students.map((x:any)=>[x.id,x]));
+  const aps=new Map<string,any>(data.studentPlans.map((x:any)=>[x.id,x]));
+  const plans=new Map<string,any>(data.plans.map((x:any)=>[x.id,x]));
   const planByStudent=new Map<string,any>();data.studentPlans.forEach((x:any)=>{if(!planByStudent.has(x.aluno_id))planByStudent.set(x.aluno_id,x)});
   const previousStart=new Date();previousStart.setDate(1);previousStart.setMonth(previousStart.getMonth()-1);
   const previousEnd=new Date(previousStart.getFullYear(),previousStart.getMonth()+1,0);
