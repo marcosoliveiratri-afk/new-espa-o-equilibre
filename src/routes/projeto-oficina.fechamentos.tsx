@@ -93,8 +93,7 @@ function Fechamentos(){
       pages.push(`<section class="page${isLast?' summary-page':''}"><header class="running"><span>${new Date().toLocaleDateString("pt-BR")}</span><span>Gerador de Relatório de Fechamentos</span></header>${isFirst?`<div class="brand"><img src="${logo}" onerror="this.style.display='none'"/></div><h1>RELATÓRIO DE FECHAMENTO - OFICINA</h1><div class="subtitle">Competência: ${monthBR(ref)} | Período: ${dateBR(ref)} a ${dateBR(localDate(periodEnd))}</div>`:''}<table class="main-table"><thead><tr><th>Data</th><th>Turma</th><th>Professor</th><th>Valor</th></tr></thead><tbody>${chunk||"<tr><td colspan='4'>Nenhuma aula realizada no período.</td></tr>"}</tbody></table>${summary}<footer>${pageIndex+1}/${totalClassPages}</footer></section>`);
     }
 
-    popup.document.open();
-    popup.document.write(`<!doctype html><html><head><title>Relatório de Fechamento - ${monthBR(ref)}</title><style>
+    const reportHtml=`<!doctype html><html><head><title>Relatório de Fechamento - ${monthBR(ref)}</title><style>
       @page{size:A4 portrait;margin:0}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#2d2d2d;margin:0;background:white;font-size:12px}
       .page{width:210mm;min-height:297mm;padding:14mm 14mm 13mm;position:relative;page-break-after:always}.page:last-child{page-break-after:auto}
       .running{display:flex;justify-content:space-between;font-size:9px;color:#222;margin-bottom:10mm}.brand{text-align:center;height:25mm}.brand img{width:28mm;height:28mm;object-fit:contain;margin-top:-3mm}
@@ -103,6 +102,10 @@ function Fechamentos(){
       footer{position:absolute;bottom:8mm;right:14mm;font-size:9px;color:#222}.summary-page{padding-top:14mm}.summary{width:75%;margin-top:6mm}.summary-title,.mini-title{background:#c98375;color:#fff;font-weight:700;padding:7px 9px;font-size:12px}.summary-row{display:flex;justify-content:space-between;padding:7px 9px;border:1px solid #e4c6c0;border-top:0;background:#fff}.summary-row:nth-child(odd){background:#f7e9e6}.summary-row.total{font-weight:700}.prof-summary{width:75%;margin-top:8mm}.prof-summary table{border:1px solid #dfbdb5}.prof-summary th{background:#c98375;color:#fff;padding:6px 8px;text-align:left}.prof-summary td{padding:6px 8px;border:1px solid #e4c6c0}.prof-summary tr:nth-child(even) td{background:#f7e9e6}.mini-section{width:100%;margin-top:7mm}.mini-section table{border:1px solid #dfbdb5}.mini-section th{background:#c98375;color:#fff;padding:5px 7px;text-align:left}.mini-section td{padding:5px 7px;border:1px solid #e4c6c0}.mini-section tr:nth-child(even) td{background:#f7e9e6}.last-footer{position:static;margin-top:10mm;border-top:0;text-align:left;font-size:9px;color:#777}
       @media print{.page{break-after:page}.page:last-child{break-after:auto}.no-print{display:none}}
     </style></head><body>${pages.join("")}<div class="no-print" style="position:fixed;top:12px;right:12px"><button onclick="window.print()" style="padding:10px 16px;border:0;border-radius:7px;background:#c98375;color:#fff;cursor:pointer">Imprimir / Salvar em PDF</button></div></body></html>`);
+    const {error:reportError}=await supabase.from("oficina_relatorios").upsert({fechamento_id:row.id,reference_month:ref,title:`Relatório de Fechamento - ${monthBR(ref)}`,content_html:reportHtml,updated_at:new Date().toISOString()},{onConflict:"fechamento_id"});
+    if(reportError){popup.close();setLoadingReport(false);window.alert("Não foi possível salvar o relatório: "+reportError.message);return}
+    popup.document.open();
+    popup.document.write(reportHtml);
     popup.document.close();
     setLoadingReport(false);
   }
