@@ -29,7 +29,7 @@ export function OficinaSidebar(){
     </a>})}
    </nav>
    <div className="border-t border-black/10 p-3">
-    <a href="/projeto-oficina" className={`flex items-center rounded-xl text-black/50 hover:bg-black/[.035] hover:text-black ${collapsed?"justify-center px-2 py-3":"gap-3 px-3 py-2.5"}`} title={collapsed?"Voltar ao início":"Voltar ao início"}><LogOut size={18}/>{!collapsed&&<span className="text-sm font-medium">Início da Oficina</span>}</Link>
+    <a href="/projeto-oficina" className={`flex items-center rounded-xl text-black/50 hover:bg-black/[.035] hover:text-black ${collapsed?"justify-center px-2 py-3":"gap-3 px-3 py-2.5"}`} title={collapsed?"Voltar ao início":"Voltar ao início"}><LogOut size={18}/>{!collapsed&&<span className="text-sm font-medium">Início da Oficina</span>}</a>
    </div>
   </div>
  </aside>
