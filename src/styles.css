@@ -140,5 +140,33 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    overflow-x: hidden;
+  }
+
+  main,
+  section,
+  article,
+  [role="region"] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+  }
+
+  th,
+  td {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
   }
 }
