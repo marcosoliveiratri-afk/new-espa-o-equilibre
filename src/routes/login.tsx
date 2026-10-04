@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { setRememberMePreference } from "@/integrations/supabase/previewAuthStorage";
 import logoAsset from "@/assets/logo-equilibre.png.asset.json";
 
 export const Route = createFileRoute("/login")({
@@ -40,6 +41,7 @@ function Login() {
   async function signIn(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(""); setMessage(""); setLoading(true);
+    setRememberMePreference(remember);
     const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (error) {
