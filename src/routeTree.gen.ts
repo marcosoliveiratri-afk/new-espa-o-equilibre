@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
 import { Route as PilatesRouteImport } from './routes/pilates'
-import { Route as ProjetoOficinaRouteImport } from './routes/projeto-oficina'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
 import { Route as OsteopatiaConfiguracoesRouteImport } from './routes/osteopatia.configuracoes'
 import { Route as PilatesAlertasRouteImport } from './routes/pilates.alertas'
@@ -23,8 +22,8 @@ import { Route as PilatesAulasExperimentaisRouteImport } from './routes/pilates.
 import { Route as PilatesConfiguracoesRouteImport } from './routes/pilates.configuracoes'
 import { Route as PilatesFechamentosRouteImport } from './routes/pilates.fechamentos'
 import { Route as PilatesFluxoCaixaRouteImport } from './routes/pilates.fluxo-caixa'
+import { Route as ProjetoOficinaIndexRouteImport } from './routes/projeto-oficina.index'
 import { Route as ProjetoOficinaAlertasRouteImport } from './routes/projeto-oficina.alertas'
-import { Route as ProjetoOficinaAlunosRouteImport } from './routes/projeto-oficina.alunos'
 import { Route as ProjetoOficinaAulasRouteImport } from './routes/projeto-oficina.aulas'
 import { Route as ProjetoOficinaFechamentosRouteImport } from './routes/projeto-oficina.fechamentos'
 import { Route as ProjetoOficinaFinanceiroRouteImport } from './routes/projeto-oficina.financeiro'
@@ -33,6 +32,7 @@ import { Route as ProjetoOficinaProfessoresRouteImport } from './routes/projeto-
 import { Route as VisualizacaoOsteopatiaRouteImport } from './routes/visualizacao.osteopatia'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 import { Route as PilatesAlunosAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
+import { Route as ProjetoOficinaAlunosIndexRouteImport } from './routes/projeto-oficina.alunos.index'
 import { Route as ProjetoOficinaAlunosAlunoIdRouteImport } from './routes/projeto-oficina.alunos.$alunoId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,11 +53,6 @@ const OsteopatiaRoute = OsteopatiaRouteImport.update({
 const PilatesRoute = PilatesRouteImport.update({
   id: '/pilates',
   path: '/pilates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjetoOficinaRoute = ProjetoOficinaRouteImport.update({
-  id: '/projeto-oficina',
-  path: '/projeto-oficina',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VisualizacaoRoute = VisualizacaoRouteImport.update({
@@ -106,14 +101,14 @@ const PilatesFluxoCaixaRoute = PilatesFluxoCaixaRouteImport.update({
   path: '/fluxo-caixa',
   getParentRoute: () => PilatesRoute,
 } as any)
+const ProjetoOficinaIndexRoute = ProjetoOficinaIndexRouteImport.update({
+  id: '/projeto-oficina/',
+  path: '/projeto-oficina/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjetoOficinaAlertasRoute = ProjetoOficinaAlertasRouteImport.update({
   id: '/alertas',
   path: '/alertas',
-  getParentRoute: () => ProjetoOficinaRoute,
-} as any)
-const ProjetoOficinaAlunosRoute = ProjetoOficinaAlunosRouteImport.update({
-  id: '/alunos',
-  path: '/alunos',
   getParentRoute: () => ProjetoOficinaRoute,
 } as any)
 const ProjetoOficinaAulasRoute = ProjetoOficinaAulasRouteImport.update({
@@ -159,6 +154,12 @@ const PilatesAlunosAlunoIdRoute = PilatesAlunosAlunoIdRouteImport.update({
   path: '/$alunoId',
   getParentRoute: () => PilatesAlunosRoute,
 } as any)
+const ProjetoOficinaAlunosIndexRoute =
+  ProjetoOficinaAlunosIndexRouteImport.update({
+    id: '/projeto-oficina/alunos/',
+    path: '/projeto-oficina/alunos/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProjetoOficinaAlunosAlunoIdRoute =
   ProjetoOficinaAlunosAlunoIdRouteImport.update({
     id: '/$alunoId',
@@ -171,7 +172,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
-  '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
@@ -182,7 +182,6 @@ export interface FileRoutesByFullPath {
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
   '/projeto-oficina/alertas': typeof ProjetoOficinaAlertasRoute
-  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRouteWithChildren
   '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
   '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
@@ -190,15 +189,16 @@ export interface FileRoutesByFullPath {
   '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
+  '/projeto-oficina/': typeof ProjetoOficinaIndexRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
   '/projeto-oficina/alunos/$alunoId': typeof ProjetoOficinaAlunosAlunoIdRoute
+  '/projeto-oficina/alunos/': typeof ProjetoOficinaAlunosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
-  '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
@@ -209,7 +209,6 @@ export interface FileRoutesByTo {
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
   '/projeto-oficina/alertas': typeof ProjetoOficinaAlertasRoute
-  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRouteWithChildren
   '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
   '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
@@ -217,8 +216,10 @@ export interface FileRoutesByTo {
   '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
+  '/projeto-oficina': typeof ProjetoOficinaIndexRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
   '/projeto-oficina/alunos/$alunoId': typeof ProjetoOficinaAlunosAlunoIdRoute
+  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -226,7 +227,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
-  '/projeto-oficina': typeof ProjetoOficinaRouteWithChildren
   '/visualizacao': typeof VisualizacaoRouteWithChildren
   '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
@@ -237,7 +237,6 @@ export interface FileRoutesById {
   '/pilates/fechamentos': typeof PilatesFechamentosRoute
   '/pilates/fluxo-caixa': typeof PilatesFluxoCaixaRoute
   '/projeto-oficina/alertas': typeof ProjetoOficinaAlertasRoute
-  '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosRouteWithChildren
   '/projeto-oficina/aulas': typeof ProjetoOficinaAulasRoute
   '/projeto-oficina/fechamentos': typeof ProjetoOficinaFechamentosRoute
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
@@ -245,8 +244,10 @@ export interface FileRoutesById {
   '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
+  '/projeto-oficina/': typeof ProjetoOficinaIndexRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
   '/projeto-oficina/alunos/$alunoId': typeof ProjetoOficinaAlunosAlunoIdRoute
+  '/projeto-oficina/alunos/': typeof ProjetoOficinaAlunosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -255,7 +256,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/osteopatia'
     | '/pilates'
-    | '/projeto-oficina'
     | '/visualizacao'
     | '/osteopatia/configuracoes'
     | '/pilates/alertas'
@@ -266,7 +266,6 @@ export interface FileRouteTypes {
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
     | '/projeto-oficina/alertas'
-    | '/projeto-oficina/alunos'
     | '/projeto-oficina/aulas'
     | '/projeto-oficina/fechamentos'
     | '/projeto-oficina/financeiro'
@@ -274,15 +273,16 @@ export interface FileRouteTypes {
     | '/projeto-oficina/professores'
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
+    | '/projeto-oficina/'
     | '/pilates/alunos/$alunoId'
     | '/projeto-oficina/alunos/$alunoId'
+    | '/projeto-oficina/alunos/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/osteopatia'
     | '/pilates'
-    | '/projeto-oficina'
     | '/visualizacao'
     | '/osteopatia/configuracoes'
     | '/pilates/alertas'
@@ -293,7 +293,6 @@ export interface FileRouteTypes {
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
     | '/projeto-oficina/alertas'
-    | '/projeto-oficina/alunos'
     | '/projeto-oficina/aulas'
     | '/projeto-oficina/fechamentos'
     | '/projeto-oficina/financeiro'
@@ -301,15 +300,16 @@ export interface FileRouteTypes {
     | '/projeto-oficina/professores'
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
+    | '/projeto-oficina'
     | '/pilates/alunos/$alunoId'
     | '/projeto-oficina/alunos/$alunoId'
+    | '/projeto-oficina/alunos'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/osteopatia'
     | '/pilates'
-    | '/projeto-oficina'
     | '/visualizacao'
     | '/osteopatia/configuracoes'
     | '/pilates/alertas'
@@ -320,7 +320,6 @@ export interface FileRouteTypes {
     | '/pilates/fechamentos'
     | '/pilates/fluxo-caixa'
     | '/projeto-oficina/alertas'
-    | '/projeto-oficina/alunos'
     | '/projeto-oficina/aulas'
     | '/projeto-oficina/fechamentos'
     | '/projeto-oficina/financeiro'
@@ -328,8 +327,10 @@ export interface FileRouteTypes {
     | '/projeto-oficina/professores'
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
+    | '/projeto-oficina/'
     | '/pilates/alunos/$alunoId'
     | '/projeto-oficina/alunos/$alunoId'
+    | '/projeto-oficina/alunos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -337,8 +338,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OsteopatiaRoute: typeof OsteopatiaRouteWithChildren
   PilatesRoute: typeof PilatesRouteWithChildren
-  ProjetoOficinaRoute: typeof ProjetoOficinaRouteWithChildren
   VisualizacaoRoute: typeof VisualizacaoRouteWithChildren
+  ProjetoOficinaIndexRoute: typeof ProjetoOficinaIndexRoute
+  ProjetoOficinaAlunosIndexRoute: typeof ProjetoOficinaAlunosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -369,13 +371,6 @@ declare module '@tanstack/react-router' {
       path: '/pilates'
       fullPath: '/pilates'
       preLoaderRoute: typeof PilatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projeto-oficina': {
-      id: '/projeto-oficina'
-      path: '/projeto-oficina'
-      fullPath: '/projeto-oficina'
-      preLoaderRoute: typeof ProjetoOficinaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/visualizacao': {
@@ -441,18 +436,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilatesFluxoCaixaRouteImport
       parentRoute: typeof PilatesRoute
     }
+    '/projeto-oficina/': {
+      id: '/projeto-oficina/'
+      path: '/projeto-oficina'
+      fullPath: '/projeto-oficina/'
+      preLoaderRoute: typeof ProjetoOficinaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projeto-oficina/alertas': {
       id: '/projeto-oficina/alertas'
       path: '/alertas'
       fullPath: '/projeto-oficina/alertas'
       preLoaderRoute: typeof ProjetoOficinaAlertasRouteImport
-      parentRoute: typeof ProjetoOficinaRoute
-    }
-    '/projeto-oficina/alunos': {
-      id: '/projeto-oficina/alunos'
-      path: '/alunos'
-      fullPath: '/projeto-oficina/alunos'
-      preLoaderRoute: typeof ProjetoOficinaAlunosRouteImport
       parentRoute: typeof ProjetoOficinaRoute
     }
     '/projeto-oficina/aulas': {
@@ -511,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilatesAlunosAlunoIdRouteImport
       parentRoute: typeof PilatesAlunosRoute
     }
+    '/projeto-oficina/alunos/': {
+      id: '/projeto-oficina/alunos/'
+      path: '/projeto-oficina/alunos'
+      fullPath: '/projeto-oficina/alunos/'
+      preLoaderRoute: typeof ProjetoOficinaAlunosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projeto-oficina/alunos/$alunoId': {
       id: '/projeto-oficina/alunos/$alunoId'
       path: '/$alunoId'
@@ -568,41 +570,6 @@ const PilatesRouteChildren: PilatesRouteChildren = {
 const PilatesRouteWithChildren =
   PilatesRoute._addFileChildren(PilatesRouteChildren)
 
-interface ProjetoOficinaAlunosRouteChildren {
-  ProjetoOficinaAlunosAlunoIdRoute: typeof ProjetoOficinaAlunosAlunoIdRoute
-}
-
-const ProjetoOficinaAlunosRouteChildren: ProjetoOficinaAlunosRouteChildren = {
-  ProjetoOficinaAlunosAlunoIdRoute: ProjetoOficinaAlunosAlunoIdRoute,
-}
-
-const ProjetoOficinaAlunosRouteWithChildren =
-  ProjetoOficinaAlunosRoute._addFileChildren(ProjetoOficinaAlunosRouteChildren)
-
-interface ProjetoOficinaRouteChildren {
-  ProjetoOficinaAlertasRoute: typeof ProjetoOficinaAlertasRoute
-  ProjetoOficinaAlunosRoute: typeof ProjetoOficinaAlunosRouteWithChildren
-  ProjetoOficinaAulasRoute: typeof ProjetoOficinaAulasRoute
-  ProjetoOficinaFechamentosRoute: typeof ProjetoOficinaFechamentosRoute
-  ProjetoOficinaFinanceiroRoute: typeof ProjetoOficinaFinanceiroRoute
-  ProjetoOficinaPlanosRoute: typeof ProjetoOficinaPlanosRoute
-  ProjetoOficinaProfessoresRoute: typeof ProjetoOficinaProfessoresRoute
-}
-
-const ProjetoOficinaRouteChildren: ProjetoOficinaRouteChildren = {
-  ProjetoOficinaAlertasRoute: ProjetoOficinaAlertasRoute,
-  ProjetoOficinaAlunosRoute: ProjetoOficinaAlunosRouteWithChildren,
-  ProjetoOficinaAulasRoute: ProjetoOficinaAulasRoute,
-  ProjetoOficinaFechamentosRoute: ProjetoOficinaFechamentosRoute,
-  ProjetoOficinaFinanceiroRoute: ProjetoOficinaFinanceiroRoute,
-  ProjetoOficinaPlanosRoute: ProjetoOficinaPlanosRoute,
-  ProjetoOficinaProfessoresRoute: ProjetoOficinaProfessoresRoute,
-}
-
-const ProjetoOficinaRouteWithChildren = ProjetoOficinaRoute._addFileChildren(
-  ProjetoOficinaRouteChildren,
-)
-
 interface VisualizacaoRouteChildren {
   VisualizacaoOsteopatiaRoute: typeof VisualizacaoOsteopatiaRoute
   VisualizacaoPilatesRoute: typeof VisualizacaoPilatesRoute
@@ -622,8 +589,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OsteopatiaRoute: OsteopatiaRouteWithChildren,
   PilatesRoute: PilatesRouteWithChildren,
-  ProjetoOficinaRoute: ProjetoOficinaRouteWithChildren,
   VisualizacaoRoute: VisualizacaoRouteWithChildren,
+  ProjetoOficinaIndexRoute: ProjetoOficinaIndexRoute,
+  ProjetoOficinaAlunosIndexRoute: ProjetoOficinaAlunosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
