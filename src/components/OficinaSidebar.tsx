@@ -15,7 +15,7 @@ const items: { to: string; label: string; icon: typeof Menu; exact?: boolean }[]
 ];
 
 export function OficinaSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
