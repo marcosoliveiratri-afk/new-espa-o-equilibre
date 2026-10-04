@@ -29,6 +29,7 @@ import { Route as ProjetoOficinaFechamentosRouteImport } from './routes/projeto-
 import { Route as ProjetoOficinaFinanceiroRouteImport } from './routes/projeto-oficina.financeiro'
 import { Route as ProjetoOficinaPlanosRouteImport } from './routes/projeto-oficina.planos'
 import { Route as ProjetoOficinaProfessoresRouteImport } from './routes/projeto-oficina.professores'
+import { Route as ProjetoOficinaTurmasRouteImport } from './routes/projeto-oficina.turmas'
 import { Route as VisualizacaoOsteopatiaRouteImport } from './routes/visualizacao.osteopatia'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
 import { Route as PilatesAlunosAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
@@ -139,6 +140,11 @@ const ProjetoOficinaProfessoresRoute =
     path: '/projeto-oficina/professores',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProjetoOficinaTurmasRoute = ProjetoOficinaTurmasRouteImport.update({
+  id: '/projeto-oficina/turmas',
+  path: '/projeto-oficina/turmas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VisualizacaoOsteopatiaRoute = VisualizacaoOsteopatiaRouteImport.update({
   id: '/osteopatia',
   path: '/osteopatia',
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
   '/projeto-oficina/planos': typeof ProjetoOficinaPlanosRoute
   '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
+  '/projeto-oficina/turmas': typeof ProjetoOficinaTurmasRoute
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/projeto-oficina/': typeof ProjetoOficinaIndexRoute
@@ -271,6 +278,7 @@ export interface FileRouteTypes {
     | '/projeto-oficina/financeiro'
     | '/projeto-oficina/planos'
     | '/projeto-oficina/professores'
+    | '/projeto-oficina/turmas'
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/projeto-oficina/'
@@ -345,6 +353,7 @@ export interface RootRouteChildren {
   ProjetoOficinaFinanceiroRoute: typeof ProjetoOficinaFinanceiroRoute
   ProjetoOficinaPlanosRoute: typeof ProjetoOficinaPlanosRoute
   ProjetoOficinaProfessoresRoute: typeof ProjetoOficinaProfessoresRoute
+  ProjetoOficinaTurmasRoute: typeof ProjetoOficinaTurmasRoute
   ProjetoOficinaIndexRoute: typeof ProjetoOficinaIndexRoute
   ProjetoOficinaAlunosAlunoIdRoute: typeof ProjetoOficinaAlunosAlunoIdRoute
   ProjetoOficinaAlunosIndexRoute: typeof ProjetoOficinaAlunosIndexRoute
@@ -483,6 +492,13 @@ declare module '@tanstack/react-router' {
       path: '/projeto-oficina/planos'
       fullPath: '/projeto-oficina/planos'
       preLoaderRoute: typeof ProjetoOficinaPlanosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projeto-oficina/turmas': {
+      id: '/projeto-oficina/turmas'
+      path: '/projeto-oficina/turmas'
+      fullPath: '/projeto-oficina/turmas'
+      preLoaderRoute: typeof ProjetoOficinaTurmasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projeto-oficina/professores': {
