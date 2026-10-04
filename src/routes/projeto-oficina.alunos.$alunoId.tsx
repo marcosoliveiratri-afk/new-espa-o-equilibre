@@ -35,11 +35,11 @@ function PerfilAluno(){
   const planIds=[...new Set((aps||[]).map(x=>x.plano_id))];const teacherIds=[...new Set((aps||[]).map(x=>x.professor_id).filter(Boolean))];const turmaIds=[...new Set((ta||[]).map(x=>x.turma_id))];
   const [{data:planRows},{data:teacherRows},{data:turmas}]=await Promise.all([
    planIds.length?supabase.from("oficina_planos").select("*").in("id",planIds):Promise.resolve({data:[]}),
-   teacherIds.length?supabase.from("oficina_professores").select("*").in("id",teacherIds):Promise.resolve({data:[]}),
+   teacherIds.length?supabase.from("oficina_professores").select("*").in("id",teacherIds as string[]):Promise.resolve({data:[]}),
    turmaIds.length?supabase.from("oficina_turmas").select("*").in("id",turmaIds):Promise.resolve({data:[]})
   ]);
   const planMap=new Map((planRows||[]).map(x=>[x.id,x]));const teacherMap=new Map((teacherRows||[]).map(x=>[x.id,x]));
-  const enriched=(aps||[]).map(x=>({...x,oficina_planos:planMap.get(x.plano_id),oficina_professores:teacherMap.get(x.professor_id)}));
+  const enriched=(aps||[]).map(x=>({...x,oficina_planos:planMap.get(x.plano_id),oficina_professores:teacherMap.get(x.professor_id as string)}));
   const active=enriched.find(x=>x.id===activePlan?.id)||null;
   setData(a);setInfo(a);setPlan(active);setPlanForm(active||{});setPayments((p||[]).filter(x=>enriched.some(ap=>ap.id===x.aluno_plano_id)));setClasses((turmas||[]).map(x=>({...x,joined_at:(ta||[]).find(j=>j.turma_id===x.id)?.joined_at,left_at:(ta||[]).find(j=>j.turma_id===x.id)?.left_at})));setPlans(pl||[]);setTeachers(tp||[]);
  }
