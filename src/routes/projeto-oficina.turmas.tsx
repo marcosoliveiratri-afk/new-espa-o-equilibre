@@ -34,6 +34,13 @@ function TurmasPage() {
     setTurmas((t ?? []) as Turma[]);
     setProfessores((p ?? []) as Pessoa[]);
     setAlunos((a ?? []) as Pessoa[]);
+    const namesById = new Map((a ?? []).map(x=>[x.id,x.full_name]));
+    const grouped: Record<string,string[]> = {};
+    (links ?? []).forEach(x=>{
+      const name = namesById.get(x.aluno_id);
+      if (name) (grouped[x.turma_id] ??= []).push(name);
+    });
+    setAlunosPorTurma(grouped);
   }
 
   useEffect(()=>{ void load(); },[]);
@@ -111,6 +118,10 @@ function TurmasPage() {
       {turmas.map(t=><article key={t.id} className={`rounded-2xl border p-5 ${t.active?"border-black/10":"border-black/10 bg-black/[.025] opacity-70"}`}>
         <div className="flex items-start justify-between gap-3"><div><h2 className="font-semibold text-[#111827]">{t.name}</h2><p className="mt-1 text-sm text-black/50">{days[t.weekday-1]} · {t.start_time.slice(0,5)}</p></div><span className="rounded-full bg-black/5 px-2.5 py-1 text-[11px] font-medium">{t.active?"Ativa":"Desativada"}</span></div>
         <div className="mt-4 space-y-2 text-sm text-black/60"><p className="flex items-center gap-2"><UserRoundCog size={15}/> {t.teacher_name || "Sem professor"}</p><p className="flex items-center gap-2"><Clock3 size={15}/> {t.duration_minutes} min · {money(Number(t.hourly_rate))}/h</p><p className="flex items-center gap-2"><CalendarDays size={15}/> {days[t.weekday-1]}</p></div>
+        <div className="mt-5 border-t border-black/10 pt-4">
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-black/45"><UsersRound size={14}/> Alunos ({alunosPorTurma[t.id]?.length ?? 0})</div>
+          {alunosPorTurma[t.id]?.length ? <div className="space-y-1.5">{alunosPorTurma[t.id].map(name=><div key={name} className="rounded-lg bg-black/[.035] px-3 py-2 text-sm text-black/70">{name}</div>)}</div> : <p className="text-sm text-black/40">Nenhum aluno vinculado.</p>}
+        </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <button onClick={()=>openStudents(t)} className="inline-flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2 text-xs font-medium"><UsersRound size={14}/> Alunos da turma</button>
           <button onClick={()=>toggleTurma(t)} className="inline-flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2 text-xs font-medium"><Power size={14}/>{t.active?"Desativar":"Ativar"}</button>
