@@ -290,11 +290,6 @@ function Osteopatia() {
               </div>
             </section>
 
-            <div className="mt-5 rounded-[14px] border border-[#e5e5e5] bg-white p-[17px]">
-              <div className="flex flex-wrap items-center justify-between gap-2"><div><div className="text-[13px] font-semibold">Lançamentos da competência</div><div className="mt-0.5 text-[11px] text-[#71717a]">{filtered.length} registro(s) · sem nomes de pacientes ou responsáveis</div></div><span className="rounded-[9px] bg-[#F4F4F5] px-2.5 py-1 text-[10px] text-[#71717a]">{SOURCES.find(x=>x[0]===source)?.[1]}</span></div>
-              <div className="mt-2 overflow-x-auto"><table className="w-full min-w-[680px] text-xs"><thead><tr><th className="py-2 text-left">Data</th><th className="py-2 text-left">Plano</th><th className="py-2 text-right">Status</th><th className="py-2 text-right">Método</th><th className="py-2 text-right">NF</th><th className="py-2 text-right">Valor</th></tr></thead><tbody>{filtered.slice(0,20).map(r=><tr key={r.id}><td className="text-left">{dayLabel(r.date)}</td><td className="text-left">{r.plan||"—"}</td><td><span className={`rounded-lg px-2 py-1 text-[10px] font-bold ${r.payment==="PAGO"?"bg-[#BFE8D6] text-[#2E8B68]":"bg-[#FBD5C0] text-[#C2643A]"}`}>{r.payment||"—"}</span></td><td>{r.method||"—"}</td><td>{r.invoice==="SIM"?"SIM":"—"}</td><td>{r.value!==null?money(r.value):"—"}</td></tr>)}</tbody></table></div>
-            </div>
-
             <footer className="mt-5 flex flex-wrap justify-between gap-2 text-[10.5px] text-[#71717a]"><span>Fonte: Google Sheets · {SOURCES.find(x=>x[0]===source)?.[1]} · sem nomes de pacientes ou responsáveis</span><span>Atualização automática a cada 60 segundos</span></footer>
           </>}
         </main>
