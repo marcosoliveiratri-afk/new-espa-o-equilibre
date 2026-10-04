@@ -107,37 +107,37 @@ const ProjetoOficinaIndexRoute = ProjetoOficinaIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjetoOficinaAlertasRoute = ProjetoOficinaAlertasRouteImport.update({
-  id: '/alertas',
-  path: '/alertas',
-  getParentRoute: () => ProjetoOficinaRoute,
+  id: '/projeto-oficina/alertas',
+  path: '/projeto-oficina/alertas',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProjetoOficinaAulasRoute = ProjetoOficinaAulasRouteImport.update({
-  id: '/aulas',
-  path: '/aulas',
-  getParentRoute: () => ProjetoOficinaRoute,
+  id: '/projeto-oficina/aulas',
+  path: '/projeto-oficina/aulas',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProjetoOficinaFechamentosRoute =
   ProjetoOficinaFechamentosRouteImport.update({
-    id: '/fechamentos',
-    path: '/fechamentos',
-    getParentRoute: () => ProjetoOficinaRoute,
+    id: '/projeto-oficina/fechamentos',
+    path: '/projeto-oficina/fechamentos',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ProjetoOficinaFinanceiroRoute =
   ProjetoOficinaFinanceiroRouteImport.update({
-    id: '/financeiro',
-    path: '/financeiro',
-    getParentRoute: () => ProjetoOficinaRoute,
+    id: '/projeto-oficina/financeiro',
+    path: '/projeto-oficina/financeiro',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ProjetoOficinaPlanosRoute = ProjetoOficinaPlanosRouteImport.update({
-  id: '/planos',
-  path: '/planos',
-  getParentRoute: () => ProjetoOficinaRoute,
+  id: '/projeto-oficina/planos',
+  path: '/projeto-oficina/planos',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProjetoOficinaProfessoresRoute =
   ProjetoOficinaProfessoresRouteImport.update({
-    id: '/professores',
-    path: '/professores',
-    getParentRoute: () => ProjetoOficinaRoute,
+    id: '/projeto-oficina/professores',
+    path: '/projeto-oficina/professores',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const VisualizacaoOsteopatiaRoute = VisualizacaoOsteopatiaRouteImport.update({
   id: '/osteopatia',
@@ -162,9 +162,9 @@ const ProjetoOficinaAlunosIndexRoute =
   } as any)
 const ProjetoOficinaAlunosAlunoIdRoute =
   ProjetoOficinaAlunosAlunoIdRouteImport.update({
-    id: '/$alunoId',
-    path: '/$alunoId',
-    getParentRoute: () => ProjetoOficinaAlunosRoute,
+    id: '/projeto-oficina/alunos/$alunoId',
+    path: '/projeto-oficina/alunos/$alunoId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -339,7 +339,14 @@ export interface RootRouteChildren {
   OsteopatiaRoute: typeof OsteopatiaRouteWithChildren
   PilatesRoute: typeof PilatesRouteWithChildren
   VisualizacaoRoute: typeof VisualizacaoRouteWithChildren
+  ProjetoOficinaAlertasRoute: typeof ProjetoOficinaAlertasRoute
+  ProjetoOficinaAulasRoute: typeof ProjetoOficinaAulasRoute
+  ProjetoOficinaFechamentosRoute: typeof ProjetoOficinaFechamentosRoute
+  ProjetoOficinaFinanceiroRoute: typeof ProjetoOficinaFinanceiroRoute
+  ProjetoOficinaPlanosRoute: typeof ProjetoOficinaPlanosRoute
+  ProjetoOficinaProfessoresRoute: typeof ProjetoOficinaProfessoresRoute
   ProjetoOficinaIndexRoute: typeof ProjetoOficinaIndexRoute
+  ProjetoOficinaAlunosAlunoIdRoute: typeof ProjetoOficinaAlunosAlunoIdRoute
   ProjetoOficinaAlunosIndexRoute: typeof ProjetoOficinaAlunosIndexRoute
 }
 
@@ -445,45 +452,45 @@ declare module '@tanstack/react-router' {
     }
     '/projeto-oficina/alertas': {
       id: '/projeto-oficina/alertas'
-      path: '/alertas'
+      path: '/projeto-oficina/alertas'
       fullPath: '/projeto-oficina/alertas'
       preLoaderRoute: typeof ProjetoOficinaAlertasRouteImport
-      parentRoute: typeof ProjetoOficinaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/projeto-oficina/aulas': {
       id: '/projeto-oficina/aulas'
-      path: '/aulas'
+      path: '/projeto-oficina/aulas'
       fullPath: '/projeto-oficina/aulas'
       preLoaderRoute: typeof ProjetoOficinaAulasRouteImport
-      parentRoute: typeof ProjetoOficinaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/projeto-oficina/fechamentos': {
       id: '/projeto-oficina/fechamentos'
-      path: '/fechamentos'
+      path: '/projeto-oficina/fechamentos'
       fullPath: '/projeto-oficina/fechamentos'
       preLoaderRoute: typeof ProjetoOficinaFechamentosRouteImport
-      parentRoute: typeof ProjetoOficinaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/projeto-oficina/financeiro': {
       id: '/projeto-oficina/financeiro'
-      path: '/financeiro'
+      path: '/projeto-oficina/financeiro'
       fullPath: '/projeto-oficina/financeiro'
       preLoaderRoute: typeof ProjetoOficinaFinanceiroRouteImport
-      parentRoute: typeof ProjetoOficinaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/projeto-oficina/planos': {
       id: '/projeto-oficina/planos'
-      path: '/planos'
+      path: '/projeto-oficina/planos'
       fullPath: '/projeto-oficina/planos'
       preLoaderRoute: typeof ProjetoOficinaPlanosRouteImport
-      parentRoute: typeof ProjetoOficinaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/projeto-oficina/professores': {
       id: '/projeto-oficina/professores'
-      path: '/professores'
+      path: '/projeto-oficina/professores'
       fullPath: '/projeto-oficina/professores'
       preLoaderRoute: typeof ProjetoOficinaProfessoresRouteImport
-      parentRoute: typeof ProjetoOficinaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/visualizacao/osteopatia': {
       id: '/visualizacao/osteopatia'
@@ -515,10 +522,10 @@ declare module '@tanstack/react-router' {
     }
     '/projeto-oficina/alunos/$alunoId': {
       id: '/projeto-oficina/alunos/$alunoId'
-      path: '/$alunoId'
+      path: '/projeto-oficina/alunos/$alunoId'
       fullPath: '/projeto-oficina/alunos/$alunoId'
       preLoaderRoute: typeof ProjetoOficinaAlunosAlunoIdRouteImport
-      parentRoute: typeof ProjetoOficinaAlunosRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -590,7 +597,14 @@ const rootRouteChildren: RootRouteChildren = {
   OsteopatiaRoute: OsteopatiaRouteWithChildren,
   PilatesRoute: PilatesRouteWithChildren,
   VisualizacaoRoute: VisualizacaoRouteWithChildren,
+  ProjetoOficinaAlertasRoute: ProjetoOficinaAlertasRoute,
+  ProjetoOficinaAulasRoute: ProjetoOficinaAulasRoute,
+  ProjetoOficinaFechamentosRoute: ProjetoOficinaFechamentosRoute,
+  ProjetoOficinaFinanceiroRoute: ProjetoOficinaFinanceiroRoute,
+  ProjetoOficinaPlanosRoute: ProjetoOficinaPlanosRoute,
+  ProjetoOficinaProfessoresRoute: ProjetoOficinaProfessoresRoute,
   ProjetoOficinaIndexRoute: ProjetoOficinaIndexRoute,
+  ProjetoOficinaAlunosAlunoIdRoute: ProjetoOficinaAlunosAlunoIdRoute,
   ProjetoOficinaAlunosIndexRoute: ProjetoOficinaAlunosIndexRoute,
 }
 export const routeTree = rootRouteImport
