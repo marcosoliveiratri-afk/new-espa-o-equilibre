@@ -1,12 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CircleDollarSign, Plus, WalletCards, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
 import { TopBar } from "@/components/TopBar";
 import { OficinaSidebar } from "@/components/OficinaSidebar";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route=createFileRoute("/projeto-oficina/financeiro")({component:Financeiro});
+export const Route=createFileRoute("/projeto-oficina/financeiro")({
+ component:Financeiro,
+ head:()=>({meta:[
+  {title:"Financeiro — Projeto Oficina"},
+  {name:"description",content:"Resumo de receitas e despesas do Projeto Oficina."},
+  {property:"og:title",content:"Financeiro — Projeto Oficina"},
+  {property:"og:description",content:"Resumo de receitas e despesas do Projeto Oficina."},
+  {property:"og:type",content:"website"},
+  {name:"twitter:card",content:"summary"},
+ ]}),
+});
 const money=(v:any)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const localDate=(d:Date)=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`};
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";
