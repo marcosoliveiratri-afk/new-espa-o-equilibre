@@ -135,7 +135,7 @@ function Financeiro(){
   await ensureMonthlyCharges();
   const [{data:pDue,error:dueError},{data:pPaid,error:paidError},{data:t,error:turmaError},{data:e,error:expenseError}]=await Promise.all([
    supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").gte("due_date",start).lte("due_date",end).order("due_date"),
-   supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").eq("status","Pago").gte("due_date",start).lte("due_date").order("due_date"),
+   supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").eq("status","Pago").gte("due_date",start).lte("due_date",end).order("due_date"),
    supabase.from("oficina_turmas").select("*").eq("active",true).order("weekday").order("start_time"),
    supabase.from("oficina_despesas").select("*").gte("expense_date",start).lte("expense_date",end).order("expense_date")
   ]);
@@ -192,10 +192,10 @@ function Financeiro(){
     current.classes+=1;
     if(!current.turmas.some(x=>x.id===t.id)) current.turmas.push(t);
     const dayIndex=Number(t.weekday)-1;
-    if(dayIndex>=0&&dayIndex<7) current.weeklyByDay[dayIndex]+=hours;
+    if(dayIndex>=0&&dayIndex<7) current.weeklyByDay[dayIndex]=(current.weeklyByDay[dayIndex] ?? 0)+hours;
     map.set(key,current);
     if(!workedDays.has(key)) workedDays.set(key,new Set());
-    workedDays.get(key)!.add(dateKey);
+    workedDays.get(key)?.add(dateKey);
    }
   }
   for(const t of turmas){
