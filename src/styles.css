@@ -69,8 +69,8 @@
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.55 0.22 260);
+  --primary-foreground: oklch(0.985 0.002 247.858);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
@@ -168,5 +168,30 @@
   textarea,
   button {
     max-width: 100%;
+  }
+
+  /* Padrão visual único para todos os botões do sistema */
+  button,
+  [role="button"] {
+    border-radius: 0.5rem !important;
+  }
+
+  button:not(:disabled),
+  [role="button"] {
+    background-color: var(--color-primary) !important;
+    color: var(--color-primary-foreground) !important;
+    border-color: var(--color-primary) !important;
+  }
+
+  button:not(:disabled):hover,
+  [role="button"]:hover {
+    background-color: color-mix(in oklch, var(--color-primary) 90%, black) !important;
+  }
+
+  button:disabled {
+    background-color: var(--color-primary) !important;
+    color: var(--color-primary-foreground) !important;
+    border-color: var(--color-primary) !important;
+    opacity: 0.55;
   }
 }
