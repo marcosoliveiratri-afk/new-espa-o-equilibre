@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, LayoutDashboard, Menu, Settings, Users, FlaskConical, ReceiptText, BellRing, X, WalletCards } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const osteopatiaItems = [
   { label: "Dashboard", to: "/osteopatia", icon: LayoutDashboard },
@@ -20,10 +21,20 @@ const pilatesItems = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      supabase.from("user_profiles").select("role, active").eq("id", data.user.id).maybeSingle().then(({ data: profile }) => {
+        setIsAdmin(profile?.active === true && profile?.role === "admin");
+      });
+    });
+  }, []);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isOsteopatia = pathname.startsWith("/osteopatia");
   const items = isOsteopatia ? osteopatiaItems : pilatesItems;
   const sectionLabel = isOsteopatia ? "Osteopatia" : "Pilates";
+  const adminItems = isAdmin ? [{ label: "Usuários", to: "/usuarios", icon: Users }] : [];
 
   return (
     <div className="text-[#1b1b1b]">
@@ -36,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
           </div>
           <nav className="flex-1 space-y-1 px-3">
-            {items.map(({ label, to, icon: Icon }) => {
+            {[...items, ...adminItems].map(({ label, to, icon: Icon }) => {
               const active = to === "/pilates" || to === "/osteopatia"
                 ? pathname === to
                 : pathname === to || pathname.startsWith(`${to}/`);
