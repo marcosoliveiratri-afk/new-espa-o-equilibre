@@ -87,7 +87,7 @@ function Alunos(){
      <div style={{fontSize:12,color:"#64748B",background:"#F8FAFC",border:"1px solid #E5E7EB",borderRadius:9999,padding:"6px 10px"}}>{activity}</div>
     </div>
     <div style={{overflowX:"auto"}}>
-     <table style={{width:"100%",minWidth:1280,borderCollapse:"separate",borderSpacing:0,fontSize:13,textAlign:"left",tableLayout:"fixed"}}>
+     <table style={{width:"100%",minWidth:1450,borderCollapse:"separate",borderSpacing:0,fontSize:13,textAlign:"left",tableLayout:"auto"}}>
       <thead style={{background:"#F8FAFC",fontSize:11,textTransform:"uppercase",color:"#64748B",letterSpacing:"0.045em",fontWeight:650}}>
        <tr>{["Aluno","Telefone","Plano","Professor","Vencimento","Situação","Contrato","Financeiro","Destino",""].map(h=><th key={h} style={{padding:"12px 16px",fontWeight:650,borderBottom:"1px solid #E5E7EB",whiteSpace:"nowrap"}}>{h}</th>)}</tr>
       </thead>
@@ -100,10 +100,10 @@ function Alunos(){
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}>
           <Link to="/pilates/alunos/$alunoId" params={{alunoId:x.id}} style={{display:"flex",alignItems:"center",gap:11,color:"#111827",textDecoration:"none"}}>
            <span style={{width:34,height:34,borderRadius:10,background:"#F2F2F7",color:"#1D1D1F",display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{initials}</span>
-           <span style={{display:"flex",flexDirection:"column",gap:3,minWidth:150}}><strong style={{fontSize:13.5,fontWeight:600,color:"#111827"}}>{x.full_name}</strong><span style={{fontSize:11.5,color:"#94A3B8"}}>{x.active?"Aluno ativo":"Aluno inativo"}</span></span>
+           <span style={{display:"flex",flexDirection:"column",gap:3,minWidth:260,whiteSpace:"nowrap"}}><strong style={{fontSize:13.5,fontWeight:600,color:"#111827"}}>{x.full_name}</strong><span style={{fontSize:11.5,color:"#94A3B8"}}>{x.active?"Aluno ativo":"Aluno inativo"}</span></span>
           </Link>
          </td>
-         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#64748B",whiteSpace:"nowrap"}}>{x.phone||"—"}</td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#64748B",whiteSpace:"nowrap",minWidth:180}}>{x.phone||"—"}</td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#334155",fontWeight:500,whiteSpace:"nowrap"}}>{x.plan}</td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.teacher}</td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.due ? `Dia ${String(x.due).slice(8,10)}` : "—"}</td>
