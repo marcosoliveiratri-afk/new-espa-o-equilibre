@@ -30,7 +30,7 @@ function Fechamentos(){
     const [year=0,month=1]=selectedMonth.split("-").map(Number);
     const ref=localDate(new Date(year,month-1,1)),end=localDate(new Date(year,month,0));
     const [{data:p},{data:e},{data:a}]=await Promise.all([
-      supabase.from("oficina_pagamentos").select("amount").eq("status","Pago").gte("paid_at",ref).lte("paid_at",end),
+      supabase.from("oficina_pagamentos").select("amount").eq("status","Pago").gte("due_date",ref).lte("due_date",end),
       supabase.from("oficina_despesas").select("amount").gte("expense_date",ref).lte("expense_date",end),
       supabase.from("oficina_aulas").select("duration_minutes,hourly_rate").eq("status","realizada").gte("aula_date",ref).lte("aula_date",end)
     ]);
@@ -67,7 +67,7 @@ function Fechamentos(){
     const refDate=new Date(ref+"T12:00:00");
     const end=localDate(new Date(refDate.getFullYear(),refDate.getMonth()+1,0));
     const [{data:payments},{data:expenses},{data:classes}]=await Promise.all([
-      supabase.from("oficina_pagamentos").select("amount,due_date,paid_at,status,payment_method,destination").eq("status","Pago").gte("paid_at",ref).lte("paid_at",end).order("paid_at"),
+      supabase.from("oficina_pagamentos").select("amount,due_date,paid_at,status,payment_method,destination").eq("status","Pago").gte("due_date",ref).lte("due_date",end).order("due_date"),
       supabase.from("oficina_despesas").select("description,amount,expense_date,category,payment_method").gte("expense_date",ref).lte("expense_date",end).order("expense_date"),
       supabase.from("oficina_aulas").select("aula_date,start_time,duration_minutes,teacher_name,hourly_rate,teacher_amount,turma_name,status").eq("status","realizada").gte("aula_date",ref).lte("aula_date",end).order("aula_date").order("start_time")
     ]);
