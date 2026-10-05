@@ -54,6 +54,7 @@ function Financeiro(){
  const [search,setSearch]=useState("");
  const [statusFilter,setStatusFilter]=useState("Todos");
  const [expense,setExpense]=useState({description:"",amount:"",category:"Operacional",payment_method:"Pix",expense_date:localDate(new Date())});
+ const [syncingClasses,setSyncingClasses]=useState(false);
 
  const start=localDate(new Date(month.getFullYear(),month.getMonth(),1));
  const end=localDate(new Date(month.getFullYear(),month.getMonth()+1,0));
@@ -98,27 +99,57 @@ function Financeiro(){
   }finally{setGenerating(false)}
  }
 
+ async function ensureMonthlyClasses(currentTurmas:Turma[]){
+  if(syncingClasses||!currentTurmas.length)return;
+  setSyncingClasses(true);
+  try{
+   const existing=await supabase.from("oficina_aulas").select("turma_id,aula_date").gte("aula_date",start).lte("aula_date",end);
+   if(existing.error)throw existing.error;
+   const existingKeys=new Set((existing.data||[]).map(x=>String(x.turma_id)+"|"+String(x.aula_date)));
+   const rows:any[]=[];
+   const daysInMonth=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
+   for(let day=1;day<=daysInMonth;day++){
+    const date=new Date(month.getFullYear(),month.getMonth(),day);
+    const weekday=date.getDay()===0?7:date.getDay();
+    const dateKey=localDate(date);
+    for(const t of currentTurmas){
+     if(Number(t.weekday)!==weekday)continue;
+     const key=String(t.id)+"|"+dateKey;
+     if(existingKeys.has(key))continue;
+     rows.push({turma_id:t.id,aula_date:dateKey,start_time:t.start_time,duration_minutes:Number(t.duration_minutes||60),teacher_name:t.teacher_name||"Professor não informado",hourly_rate:Number(t.hourly_rate||0),status:"pendente",professor_id:t.professor_id,turma_name:t.name});
+    }
+   }
+   if(rows.length){
+    const inserted=await supabase.from("oficina_aulas").insert(rows);
+    if(inserted.error)throw inserted.error;
+   }
+  }catch(e:any){setError(e?.message||"Não foi possível preparar as aulas do mês.");}
+  finally{setSyncingClasses(false)}
+ }
+
  async function load(){
   setLoading(true);
   setError("");
   await ensureMonthlyCharges();
-  const [{data:pDue,error:dueError},{data:pPaid,error:paidError},{data:a,error:aulaError},{data:t,error:turmaError},{data:e,error:expenseError}]=await Promise.all([
+  const [{data:pDue,error:dueError},{data:pPaid,error:paidError},{data:t,error:turmaError},{data:e,error:expenseError}]=await Promise.all([
    supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").gte("due_date",start).lte("due_date",end).order("due_date"),
-   supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").eq("status","Pago").gte("due_date",start).lte("due_date",end).order("due_date"),
-   supabase.from("oficina_aulas").select("*").gte("aula_date",start).lte("aula_date",end).order("aula_date").order("start_time"),
+   supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").eq("status","Pago").gte("due_date",start).lte("due_date").order("due_date"),
    supabase.from("oficina_turmas").select("*").eq("active",true).order("weekday").order("start_time"),
    supabase.from("oficina_despesas").select("*").gte("expense_date",start).lte("expense_date",end).order("expense_date")
   ]);
-  if(dueError||paidError||aulaError||turmaError||expenseError){
-   setError(dueError?.message||paidError?.message||aulaError?.message||turmaError?.message||expenseError?.message||"Não foi possível carregar o financeiro.");
-   setLoading(false);
-   return;
+  if(dueError||paidError||turmaError||expenseError){
+   setError(dueError?.message||paidError?.message||turmaError?.message||expenseError?.message||"Não foi possível carregar o financeiro.");
+   setLoading(false); return;
   }
+  const activeTurmas=(t||[]) as Turma[];
+  await ensureMonthlyClasses(activeTurmas);
+  const {data:a,error:aulaError}=await supabase.from("oficina_aulas").select("*").gte("aula_date",start).lte("aula_date",end).order("aula_date").order("start_time");
+  if(aulaError){setError(aulaError.message||"Não foi possível carregar as aulas do mês.");setLoading(false);return;}
   const merged=new Map<string,Payment>();
   for(const p of [...(pDue||[]),...(pPaid||[])])merged.set(p.id,p as Payment);
   setPayments([...merged.values()].sort((a,b)=>String(a.due_date).localeCompare(String(b.due_date))));
   setAulas((a||[]) as Aula[]);
-  setTurmas((t||[]) as Turma[]);
+  setTurmas(activeTurmas);
   setExpenses(e||[]);
   setLoading(false);
  }
@@ -131,12 +162,14 @@ function Financeiro(){
   return (statusFilter==="Todos"||p.status===statusFilter)&&(!search||name.includes(search.toLowerCase())||responsible.includes(search.toLowerCase()));
  }),[payments,search,statusFilter]);
 
- const recebido=payments.filter(p=>p.status==="Pago"&&p.paid_at&&String(p.paid_at).slice(0,7)===start.slice(0,7)).reduce((s,p)=>s+Number(p.amount),0);
+ const recebido=payments.filter(p=>p.status==="Pago").reduce((s,p)=>s+Number(p.amount),0);
  const aberto=payments.filter(p=>p.status==="Em aberto").reduce((s,p)=>s+Number(p.amount),0);
  const despesas=expenses.reduce((s,e)=>s+Number(e.amount),0);
  const realizadas=aulas.filter(a=>a.status==="realizada");
  const horas=realizadas.reduce((s,a)=>s+Number(a.duration_minutes)/60,0);
  const professoresTotal=realizadas.reduce((s,a)=>s+(Number(a.duration_minutes)/60)*Number(a.hourly_rate),0);
+ const pendentes=aulas.filter(a=>a.status==="pendente").length;
+ const naoRealizadas=aulas.filter(a=>a.status==="nao_realizada").length;
 
  const scheduleSummary=useMemo<ProfessorSchedule[]>(()=>{
   const map=new Map<string,ProfessorSchedule>();
@@ -190,6 +223,12 @@ function Financeiro(){
   return [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
  },[aulas]);
 
+ async function updateLesson(a:Aula,patch:Partial<Aula>){
+  const {error}=await supabase.from("oficina_aulas").update(patch).eq("id",a.id);
+  if(error){setError(error.message);return}
+  await load();
+ }
+
  async function markPaid(p:Payment){
   const {error}=await supabase.from("oficina_pagamentos").update({status:"Pago",paid_at:localDate(new Date())}).eq("id",p.id);
   if(error){setError(error.message);return}
@@ -218,11 +257,11 @@ function Financeiro(){
  }
 
  function generateReport(){
-  const professorRows=scheduleSummary.map(v=>"<tr><td>"+esc(v.name)+"</td><td>"+v.weeklyHours.toFixed(2).replace(".",",")+" h</td><td>"+v.monthlyHours.toFixed(2).replace(".",",")+" h</td><td>"+money(v.monthlyAmount)+"</td></tr>").join("");
+  const professorRows=professorSummary.map(([name,v])=>"<tr><td>"+esc(name)+"</td><td>"+v.hours.toFixed(2).replace(".",",")+" h</td><td>"+v.classes+" aula(s)</td><td>"+money(v.amount)+"</td></tr>").join("");
   const paymentRows=payments.map(p=>"<tr><td>"+esc(p.oficina_aluno_planos?.oficina_alunos?.full_name||"—")+"</td><td>"+dateBR(p.due_date)+"</td><td>"+(p.paid_at?dateBR(p.paid_at):"—")+"</td><td>"+esc(p.status)+"</td><td>"+money(Number(p.amount))+"</td></tr>").join("");
   const classRows=realizadas.map(a=>"<tr><td>"+dateBR(a.aula_date)+"</td><td>"+esc(days[new Date(a.aula_date+"T12:00:00").getDay()] ?? "—")+"</td><td>"+esc(a.teacher_name||"—")+"</td><td>"+String(a.start_time||"").slice(0,5)+"</td><td>"+a.duration_minutes+" min</td><td>"+money((Number(a.duration_minutes)/60)*Number(a.hourly_rate))+"</td></tr>").join("");
   const expenseRows=expenses.map(e=>"<tr><td>"+dateBR(e.expense_date)+"</td><td>"+esc(e.description||"—")+"</td><td>"+esc(e.category||"—")+"</td><td>"+money(Number(e.amount))+"</td></tr>").join("");
-  const html="<!doctype html><html><head><meta charset='utf-8'><title>Relatório Financeiro - "+monthLabel(month)+"</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{margin:0 0 4px}h2{margin-top:28px;font-size:18px}p{color:#666}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left}th{background:#f5f5f5}.cards{display:flex;gap:12px;margin:20px 0}.card{border:1px solid #ddd;border-radius:10px;padding:12px;flex:1}.value{font-size:20px;font-weight:700;margin-top:4px}@media print{body{padding:12px}.no-print{display:none}}</style></head><body><h1>Relatório Financeiro</h1><p>Projeto Oficina · "+monthLabel(month)+"</p><div class='cards'><div class='card'>Recebido<div class='value'>"+money(recebido)+"</div></div><div class='card'>Em aberto<div class='value'>"+money(aberto)+"</div></div><div class='card'>Despesas<div class='value'>"+money(despesas)+"</div></div><div class='card'>Professores<div class='value'>"+money(professoresTotal)+"</div></div></div><h2>Pagamentos dos alunos</h2><table><thead><tr><th>Aluno</th><th>Vencimento</th><th>Pago em</th><th>Status</th><th>Valor</th></tr></thead><tbody>"+paymentRows+"</tbody></table><h2>Horas previstas dos professores</h2><table><thead><tr><th>Professor</th><th>Horas/semana</th><th>Horas no mês</th><th>Valor previsto</th></tr></thead><tbody>"+(professorRows||"<tr><td colspan='4'>Nenhuma aula realizada.</td></tr>")+"</tbody></table><h2>Aulas realizadas</h2><table><thead><tr><th>Data</th><th>Dia</th><th>Professor</th><th>Horário</th><th>Duração</th><th>Valor</th></tr></thead><tbody>"+(classRows||"<tr><td colspan='6'>Nenhuma aula realizada.</td></tr>")+"</tbody></table><h2>Despesas</h2><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>"+(expenseRows||"<tr><td colspan='4'>Nenhuma despesa.</td></tr>")+"</tbody></table><p style='margin-top:30px'>Relatório gerado em "+new Date().toLocaleString("pt-BR")+".</p></body></html>";
+  const html="<!doctype html><html><head><meta charset='utf-8'><title>Relatório Financeiro - "+monthLabel(month)+"</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{margin:0 0 4px}h2{margin-top:28px;font-size:18px}p{color:#666}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left}th{background:#f5f5f5}.cards{display:flex;gap:12px;margin:20px 0}.card{border:1px solid #ddd;border-radius:10px;padding:12px;flex:1}.value{font-size:20px;font-weight:700;margin-top:4px}@media print{body{padding:12px}.no-print{display:none}}</style></head><body><h1>Relatório Financeiro</h1><p>Projeto Oficina · "+monthLabel(month)+"</p><div class='cards'><div class='card'>Recebido<div class='value'>"+money(recebido)+"</div></div><div class='card'>Em aberto<div class='value'>"+money(aberto)+"</div></div><div class='card'>Despesas<div class='value'>"+money(despesas)+"</div></div><div class='card'>Professores<div class='value'>"+money(professoresTotal)+"</div></div></div><h2>Pagamentos dos alunos</h2><table><thead><tr><th>Aluno</th><th>Vencimento</th><th>Pago em</th><th>Status</th><th>Valor</th></tr></thead><tbody>"+paymentRows+"</tbody></table><h2>Horas dos professores (realizadas)</h2><table><thead><tr><th>Professor</th><th>Horas realizadas</th><th>Aulas</th><th>Valor</th></tr></thead><tbody>"+(professorRows||"<tr><td colspan='4'>Nenhuma aula realizada.</td></tr>")+"</tbody></table><h2>Aulas realizadas</h2><table><thead><tr><th>Data</th><th>Dia</th><th>Professor</th><th>Horário</th><th>Duração</th><th>Valor</th></tr></thead><tbody>"+(classRows||"<tr><td colspan='6'>Nenhuma aula realizada.</td></tr>")+"</tbody></table><h2>Despesas</h2><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>"+(expenseRows||"<tr><td colspan='4'>Nenhuma despesa.</td></tr>")+"</tbody></table><p style='margin-top:30px'>Relatório gerado em "+new Date().toLocaleString("pt-BR")+".</p></body></html>";
   const popup=window.open("","_blank");
   if(!popup){window.alert("Permita pop-ups para gerar o relatório.");return}
   popup.document.write(html);
@@ -238,7 +277,7 @@ function Financeiro(){
   <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
    <Card label="Recebido dos alunos" value={money(recebido)} icon={<WalletCards size={18}/>}/>
    <Card label="Em aberto" value={money(aberto)} icon={<CircleDollarSign size={18}/>}/>
-   <Card label="Horas previstas no mês" value={scheduleMonthlyHours.toFixed(1)+" h"} icon={<Clock3 size={18}/>}/>
+   <Card label="Horas realizadas no mês" value={horas.toFixed(1)+" h"} icon={<Clock3 size={18}/>}/>
    <Card label="A pagar aos professores" value={money(scheduleMonthlyAmount)} icon={<Users size={18}/>}/>
   </div>
 
@@ -250,12 +289,12 @@ function Financeiro(){
 
   {tab==="professores"&&<div className="grid gap-5 lg:grid-cols-2">
   <section className="rounded-2xl border border-black/10 bg-white lg:col-span-2">
-   <div className="border-b border-black/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">Carga horária dos professores</h2><p className="mt-1 text-xs text-black/45">Calculada pelas turmas ativas e pelos dias da semana cadastrados.</p></div><div className="text-right"><p className="text-xs text-black/45">Horas semanais</p><strong>{scheduleWeeklyHours.toFixed(2).replace(".",",")} h</strong></div></div></div>
-   <div className="overflow-x-auto"><table className="w-full min-w-[1100px] text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="p-4 text-left">Professor</th>{["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].map(d=><th key={d} className="p-4 text-center">{d}</th>)}<th className="p-4 text-right">Semana</th><th className="p-4 text-right">Mês</th><th className="p-4 text-right">Valor</th></tr></thead><tbody>{scheduleSummary.map(v=><tr key={v.professor_id||v.name} className="border-t border-black/10"><td className="p-4"><strong>{v.name}</strong><span className="block text-xs text-black/40">{v.classes} aula(s) previstas · {v.workDays} dia(s) de trabalho · {v.turmas.length} turma(s)</span></td>{v.weeklyByDay.map((h,i)=><td key={i} className="p-4 text-center">{h?h.toFixed(2).replace(".",",")+" h":"—"}</td>)}<td className="p-4 text-right font-semibold">{v.weeklyHours.toFixed(2).replace(".",",")} h</td><td className="p-4 text-right font-semibold">{v.monthlyHours.toFixed(2).replace(".",",")} h</td><td className="p-4 text-right font-semibold">{money(v.monthlyAmount)}</td></tr>)}{!scheduleSummary.length&&<tr><td colSpan={11} className="p-8 text-center text-sm text-black/45">Nenhuma turma ativa cadastrada.</td></tr>}</tbody></table></div>
-   <div className="grid gap-3 border-t border-black/10 p-4 sm:grid-cols-3"><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Carga semanal</p><strong className="mt-1 block">{scheduleWeeklyHours.toFixed(2).replace(".",",")} h</strong></div><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Carga da competência</p><strong className="mt-1 block">{scheduleMonthlyHours.toFixed(2).replace(".",",")} h</strong></div><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Valor previsto aos professores</p><strong className="mt-1 block">{money(scheduleMonthlyAmount)}</strong></div></div>
+   <div className="border-b border-black/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">Aulas do mês</h2><p className="mt-1 text-xs text-black/45">Registre o que realmente aconteceu. Edite duração, valor/hora e status. Aulas não realizadas não entram no pagamento.</p></div><div className="text-right text-xs text-black/45">{syncingClasses?"Preparando aulas...":aulas.length+" aula(s) · "+pendentes+" pendente(s) · "+naoRealizadas+" não realizada(s)"}</div></div></div>
+   <div className="overflow-x-auto"><table className="w-full min-w-[1100px] text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="p-4 text-left">Data</th><th className="p-4 text-left">Turma</th><th className="p-4 text-left">Professor</th><th className="p-4 text-left">Horário</th><th className="p-4 text-right">Horas</th><th className="p-4 text-right">Valor/h</th><th className="p-4 text-left">Status</th><th className="p-4 text-right">Total</th></tr></thead><tbody>{aulas.map(a=><tr key={a.id} className="border-t border-black/10"><td className="p-4">{dateBR(a.aula_date)}</td><td className="p-4">{a.turma_name||"—"}</td><td className="p-4">{a.teacher_name||"—"}</td><td className="p-4">{String(a.start_time||"").slice(0,5)}</td><td className="p-4 text-right"><input type="number" min="0.25" max="8" step="0.25" value={(Number(a.duration_minutes||0)/60).toFixed(2)} onChange={e=>setAulas(prev=>prev.map(x=>x.id===a.id?{...x,duration_minutes:Math.round(Number(e.target.value||0)*60)}:x))} onBlur={e=>void updateLesson(a,{duration_minutes:Math.round(Number(e.target.value||0)*60)})} className="h-9 w-24 rounded-lg border border-black/10 px-2 text-right text-xs"/></td><td className="p-4 text-right"><input type="number" min="0" step=".01" value={a.hourly_rate} onChange={e=>setAulas(prev=>prev.map(x=>x.id===a.id?{...x,hourly_rate:Number(e.target.value)}:x))} onBlur={e=>void updateLesson(a,{hourly_rate:Number(e.target.value)})} className="h-9 w-28 rounded-lg border border-black/10 px-2 text-right text-xs"/></td><td className="p-4"><select value={a.status} onChange={e=>void updateLesson(a,{status:e.target.value})} className="h-9 rounded-lg border border-black/10 px-2 text-xs"><option value="pendente">Pendente</option><option value="realizada">Realizada</option><option value="nao_realizada">Não realizada</option></select></td><td className="p-4 text-right font-semibold">{money((Number(a.duration_minutes||0)/60)*Number(a.hourly_rate||0))}</td></tr>)}{!aulas.length&&<tr><td colSpan={8} className="p-8 text-center text-sm text-black/45">Nenhuma aula encontrada neste mês.</td></tr>}</tbody></table></div>
+   <div className="grid gap-3 border-t border-black/10 p-4 sm:grid-cols-4"><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Horas realizadas</p><strong className="mt-1 block">{horas.toFixed(2).replace(".",",")} h</strong></div><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">A pagar aos professores</p><strong className="mt-1 block">{money(professoresTotal)}</strong></div><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Aulas pendentes</p><strong className="mt-1 block">{pendentes}</strong></div><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Não realizadas</p><strong className="mt-1 block">{naoRealizadas}</strong></div></div>
   </section>
-  <section className="rounded-2xl border border-black/10 bg-white lg:col-span-2"><div className="border-b border-black/10 p-4"><h2 className="font-semibold">Aulas realizadas</h2><p className="mt-1 text-xs text-black/45">Conferência do que foi efetivamente realizado no mês. Não altera a carga horária prevista.</p></div><div className="overflow-x-auto"><table className="w-full min-w-[760px] text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="p-4 text-left">Data</th><th className="p-4 text-left">Dia</th><th className="p-4 text-left">Professor</th><th className="p-4 text-left">Horário</th><th className="p-4 text-left">Duração</th><th className="p-4 text-right">Valor</th></tr></thead><tbody>{realizadas.map(a=><tr key={a.id} className="border-t border-black/10"><td className="p-4">{dateBR(a.aula_date)}</td><td className="p-4">{days[new Date(a.aula_date+"T12:00:00").getDay()]}</td><td className="p-4">{a.teacher_name||"—"}</td><td className="p-4">{String(a.start_time||"").slice(0,5)}</td><td className="p-4">{a.duration_minutes} min</td><td className="p-4 text-right font-semibold">{money((Number(a.duration_minutes)/60)*Number(a.hourly_rate))}</td></tr>)}{!realizadas.length&&<tr><td colSpan={6} className="p-8 text-center text-sm text-black/45">Nenhuma aula realizada neste mês.</td></tr>}</tbody></table></div></section>
- </div>}
+  <section className="rounded-2xl border border-black/10 bg-white lg:col-span-2"><div className="border-b border-black/10 p-4"><h2 className="font-semibold">Resumo das turmas</h2><p className="mt-1 text-xs text-black/45">A grade mostra a carga semanal cadastrada; o fechamento usa as aulas marcadas como realizadas.</p></div><div className="overflow-x-auto"><table className="w-full min-w-[1100px] text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="p-4 text-left">Professor</th>{["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].map(d=><th key={d} className="p-4 text-center">{d}</th>)}<th className="p-4 text-right">Semana</th><th className="p-4 text-right">Mês previsto</th></tr></thead><tbody>{scheduleSummary.map(v=><tr key={v.professor_id||v.name} className="border-t border-black/10"><td className="p-4"><strong>{v.name}</strong><span className="block text-xs text-black/40">{v.turmas.length} turma(s) · {v.workDays} dia(s) no mês</span></td>{v.weeklyByDay.map((h,i)=><td key={i} className="p-4 text-center">{h?h.toFixed(2).replace(".",",")+" h":"—"}</td>)}<td className="p-4 text-right font-semibold">{v.weeklyHours.toFixed(2).replace(".",",")} h</td><td className="p-4 text-right font-semibold">{v.monthlyHours.toFixed(2).replace(".",",")} h</td></tr>)}{!scheduleSummary.length&&<tr><td colSpan={10} className="p-8 text-center text-sm text-black/45">Nenhuma turma ativa cadastrada.</td></tr>}</tbody></table></div></section>
+  </div>}
 
   <section className="mt-6 rounded-2xl border border-black/10 bg-white p-5"><div className="flex items-center justify-between"><div><h2 className="font-semibold">Histórico financeiro da competência</h2><p className="mt-1 text-xs text-black/45">O mês selecionado no topo controla os pagamentos, aulas, professores e despesas exibidos.</p></div><div className="text-right"><p className="text-xs text-black/45">Despesas</p><strong>{money(despesas)}</strong></div></div><div className="mt-5 grid gap-3 sm:grid-cols-3"><div className="rounded-xl bg-emerald-50 p-4"><p className="text-xs text-emerald-700">Recebido</p><strong className="mt-1 block text-lg text-emerald-800">{money(recebido)}</strong></div><div className="rounded-xl bg-amber-50 p-4"><p className="text-xs text-amber-700">Em aberto</p><strong className="mt-1 block text-lg text-amber-800">{money(aberto)}</strong></div><div className="rounded-xl bg-gray-100 p-4"><p className="text-xs text-gray-600">A pagar aos professores</p><strong className="mt-1 block text-lg text-gray-800">{money(professoresTotal)}</strong></div></div></section>
 
