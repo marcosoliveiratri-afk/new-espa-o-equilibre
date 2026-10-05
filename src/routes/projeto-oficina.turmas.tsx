@@ -123,7 +123,7 @@ function TurmasPage() {
         <div className="mt-4 space-y-2 text-sm text-black/60"><p className="flex items-center gap-2"><UserRoundCog size={15}/> {t.teacher_name || "Sem professor"}</p><p className="flex items-center gap-2"><Clock3 size={15}/> {t.duration_minutes} min · {money(Number(t.hourly_rate))}/h</p><p className="flex items-center gap-2"><CalendarDays size={15}/> {days[t.weekday-1]}</p></div>
         <div className="mt-5 border-t border-black/10 pt-4">
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-black/45"><UsersRound size={14}/> Alunos ({alunosPorTurma[t.id]?.length ?? 0})</div>
-          {alunosPorTurma[t.id]?.length ? <div className="space-y-1.5">{alunosPorTurma[t.id].map(name=><div key={name} className="rounded-lg bg-black/[.035] px-3 py-2 text-sm text-black/70">{name}</div>)}</div> : <p className="text-sm text-black/40">Nenhum aluno vinculado.</p>}
+          {alunosPorTurma[t.id]?.length ? <div className="space-y-1.5">{(alunosPorTurma[t.id] ?? []).map(name=><div key={name} className="rounded-lg bg-black/[.035] px-3 py-2 text-sm text-black/70">{name}</div>)}</div> : <p className="text-sm text-black/40">Nenhum aluno vinculado.</p>}
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <button onClick={()=>openStudents(t)} className="inline-flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2 text-xs font-medium"><UsersRound size={14}/> Alunos da turma</button>
