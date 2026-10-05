@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheck, UserPlus, UserRound, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
+import { AppShell } from "@/components/AppShell";
+import { TopBar } from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 
 type ManagedUser = {
@@ -93,7 +95,10 @@ function Usuarios() {
 
   return (
     <AuthGuard>
-      <div className="mx-auto max-w-6xl">
+      <div className="min-h-screen bg-white">
+        <TopBar />
+        <AppShell>
+          <div className="mx-auto max-w-6xl">
         <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-[30px] font-bold tracking-tight text-[#111827]">Usuários</h1>
@@ -156,6 +161,8 @@ function Usuarios() {
             <div className="mt-6 flex justify-end gap-2"><button type="button" onClick={() => setShowForm(false)} className="rounded-xl border border-black/10 px-4 py-2.5 text-sm">Cancelar</button><button type="button" disabled={saving} onClick={createUser} className="rounded-xl bg-[#0057B8] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Criando..." : "Criar usuário"}</button></div>
           </div>
         </div>}
+          </div>
+        </AppShell>
       </div>
     </AuthGuard>
   );
