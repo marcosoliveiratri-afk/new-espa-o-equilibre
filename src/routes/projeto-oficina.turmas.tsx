@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Turma = { id:string; name:string; professor_id:string|null; teacher_name:string; weekday:number; start_time:string; duration_minutes:number; hourly_rate:number; active:boolean };
 type Pessoa = { id:string; full_name?:string; name?:string };
+type TurmaAluno = { turma_id:string; aluno_id:string };
 
 const days = ["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
 
@@ -17,6 +18,7 @@ function TurmasPage() {
   const [turmas,setTurmas] = useState<Turma[]>([]);
   const [professores,setProfessores] = useState<Pessoa[]>([]);
   const [alunos,setAlunos] = useState<Pessoa[]>([]);
+  const [alunosPorTurma,setAlunosPorTurma] = useState<Record<string,string[]>>({});
   const [selected,setSelected] = useState<Turma|null>(null);
   const [selectedStudents,setSelectedStudents] = useState<string[]>([]);
   const [showForm,setShowForm] = useState(false);
@@ -25,10 +27,11 @@ function TurmasPage() {
   const [form,setForm] = useState({name:"",professor_id:"",weekday:"1",start_time:"14:00",duration_minutes:"60",hourly_rate:"0"});
 
   async function load() {
-    const [{data:t,error:te},{data:p},{data:a}] = await Promise.all([
+    const [{data:t,error:te},{data:p},{data:a},{data:links}] = await Promise.all([
       supabase.from("oficina_turmas").select("*").order("weekday").order("start_time"),
       supabase.from("oficina_professores").select("id,name").eq("active",true).order("name"),
       supabase.from("oficina_alunos").select("id,full_name").eq("active",true).order("full_name"),
+      supabase.from("oficina_turma_alunos").select("turma_id,aluno_id").eq("active",true),
     ]);
     if (te) setError(te.message);
     setTurmas((t ?? []) as Turma[]);
@@ -36,7 +39,7 @@ function TurmasPage() {
     setAlunos((a ?? []) as Pessoa[]);
     const namesById = new Map((a ?? []).map(x=>[x.id,x.full_name]));
     const grouped: Record<string,string[]> = {};
-    (links ?? []).forEach(x=>{
+    ((links ?? []) as TurmaAluno[]).forEach(x=>{
       const name = namesById.get(x.aluno_id);
       if (name) (grouped[x.turma_id] ??= []).push(name);
     });
