@@ -221,6 +221,7 @@ export interface FileRoutesByTo {
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
   '/projeto-oficina/planos': typeof ProjetoOficinaPlanosRoute
   '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
+  '/projeto-oficina/turmas': typeof ProjetoOficinaTurmasRoute
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/projeto-oficina': typeof ProjetoOficinaIndexRoute
@@ -249,6 +250,7 @@ export interface FileRoutesById {
   '/projeto-oficina/financeiro': typeof ProjetoOficinaFinanceiroRoute
   '/projeto-oficina/planos': typeof ProjetoOficinaPlanosRoute
   '/projeto-oficina/professores': typeof ProjetoOficinaProfessoresRoute
+  '/projeto-oficina/turmas': typeof ProjetoOficinaTurmasRoute
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/projeto-oficina/': typeof ProjetoOficinaIndexRoute
@@ -306,6 +308,7 @@ export interface FileRouteTypes {
     | '/projeto-oficina/financeiro'
     | '/projeto-oficina/planos'
     | '/projeto-oficina/professores'
+    | '/projeto-oficina/turmas'
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/projeto-oficina'
@@ -333,6 +336,7 @@ export interface FileRouteTypes {
     | '/projeto-oficina/financeiro'
     | '/projeto-oficina/planos'
     | '/projeto-oficina/professores'
+    | '/projeto-oficina/turmas'
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/projeto-oficina/'
@@ -494,18 +498,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjetoOficinaPlanosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projeto-oficina/turmas': {
-      id: '/projeto-oficina/turmas'
-      path: '/projeto-oficina/turmas'
-      fullPath: '/projeto-oficina/turmas'
-      preLoaderRoute: typeof ProjetoOficinaTurmasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/projeto-oficina/professores': {
       id: '/projeto-oficina/professores'
       path: '/projeto-oficina/professores'
       fullPath: '/projeto-oficina/professores'
       preLoaderRoute: typeof ProjetoOficinaProfessoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projeto-oficina/turmas': {
+      id: '/projeto-oficina/turmas'
+      path: '/projeto-oficina/turmas'
+      fullPath: '/projeto-oficina/turmas'
+      preLoaderRoute: typeof ProjetoOficinaTurmasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/visualizacao/osteopatia': {
@@ -619,6 +623,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjetoOficinaFinanceiroRoute: ProjetoOficinaFinanceiroRoute,
   ProjetoOficinaPlanosRoute: ProjetoOficinaPlanosRoute,
   ProjetoOficinaProfessoresRoute: ProjetoOficinaProfessoresRoute,
+  ProjetoOficinaTurmasRoute: ProjetoOficinaTurmasRoute,
   ProjetoOficinaIndexRoute: ProjetoOficinaIndexRoute,
   ProjetoOficinaAlunosAlunoIdRoute: ProjetoOficinaAlunosAlunoIdRoute,
   ProjetoOficinaAlunosIndexRoute: ProjetoOficinaAlunosIndexRoute,
