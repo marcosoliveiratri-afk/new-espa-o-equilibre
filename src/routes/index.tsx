@@ -53,7 +53,6 @@ function Index() {
             </Link>
           </div>
         </div>
-</div>
       </main>
       </div>
     </AuthGuard>

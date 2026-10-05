@@ -13,7 +13,8 @@ type Relatorio={id:string;fechamento_id:string;reference_month:string;title:stri
 
 function Fechamentos(){
   const [rows,setRows]=useState<Fechamento[]>([]);
-  const [loadingReport,setLoadingReport]=useState(false);\n  const [deleting,setDeleting]=useState<string | null>(null);
+  const [loadingReport,setLoadingReport]=useState(false);
+  const [deleting,setDeleting]=useState<string | null>(null);
   const [reports,setReports]=useState<Record<string,Relatorio>>({});
 
   async function load(){

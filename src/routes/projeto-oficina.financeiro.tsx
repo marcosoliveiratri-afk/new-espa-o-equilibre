@@ -7,7 +7,8 @@ import { OficinaSidebar } from "@/components/OficinaSidebar";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route=createFileRoute("/projeto-oficina/financeiro")({component:Financeiro});
-const money=(v:any)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});\nconst localDate=(d:Date)=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`};
+const money=(v:any)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const localDate=(d:Date)=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`};
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";
 const statusClass=(s:string)=>s==="Pago"?"bg-emerald-50 text-emerald-700 border-emerald-200":s==="Cancelado"?"bg-gray-50 text-gray-600 border-gray-200":s==="Falhou"?"bg-red-50 text-red-700 border-red-200":"bg-amber-50 text-amber-700 border-amber-200";
 

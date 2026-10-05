@@ -477,6 +477,44 @@ export type Database = {
         }
         Relationships: []
       }
+      oficina_relatorios: {
+        Row: {
+          content_html: string
+          created_at: string
+          fechamento_id: string
+          id: string
+          reference_month: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content_html: string
+          created_at?: string
+          fechamento_id: string
+          id?: string
+          reference_month: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          content_html?: string
+          created_at?: string
+          fechamento_id?: string
+          id?: string
+          reference_month?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oficina_relatorios_fechamento_id_fkey"
+            columns: ["fechamento_id"]
+            isOneToOne: true
+            referencedRelation: "oficina_fechamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       oficina_turma_alunos: {
         Row: {
           active: boolean
@@ -1233,6 +1271,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       whatsapp_message_templates: {
         Row: {
