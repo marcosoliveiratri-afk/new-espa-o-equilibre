@@ -46,15 +46,12 @@ function Financeiro(){
  const [payments,setPayments]=useState<Payment[]>([]);
  const [aulas,setAulas]=useState<Aula[]>([]);
  const [turmas,setTurmas]=useState<Turma[]>([]);
- const [expenses,setExpenses]=useState<any[]>([]);
  const [loading,setLoading]=useState(true);
  const [generating,setGenerating]=useState(false);
  const [error,setError]=useState("");
- const [showExpense,setShowExpense]=useState(false);
  const [tab,setTab]=useState<"pagamentos"|"professores">("pagamentos");
  const [search,setSearch]=useState("");
  const [statusFilter,setStatusFilter]=useState("Todos");
- const [expense,setExpense]=useState({description:"",amount:"",category:"Operacional",payment_method:"Pix",expense_date:localDate(new Date())});
  const [syncingClasses,setSyncingClasses]=useState(false);
 
  const start=localDate(new Date(month.getFullYear(),month.getMonth(),1));
@@ -133,14 +130,13 @@ function Financeiro(){
   setLoading(true);
   setError("");
   await ensureMonthlyCharges();
-  const [{data:pDue,error:dueError},{data:pPaid,error:paidError},{data:t,error:turmaError},{data:e,error:expenseError}]=await Promise.all([
+  const [{data:pDue,error:dueError},{data:pPaid,error:paidError},{data:t,error:turmaError}]=await Promise.all([
    supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").gte("due_date",start).lte("due_date",end).order("due_date"),
    supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").eq("status","Pago").gte("due_date",start).lte("due_date",end).order("due_date"),
-   supabase.from("oficina_turmas").select("*").eq("active",true).order("weekday").order("start_time"),
-   supabase.from("oficina_despesas").select("*").gte("expense_date",start).lte("expense_date",end).order("expense_date")
+   supabase.from("oficina_turmas").select("*").eq("active",true).order("weekday").order("start_time")
   ]);
-  if(dueError||paidError||turmaError||expenseError){
-   setError(dueError?.message||paidError?.message||turmaError?.message||expenseError?.message||"Não foi possível carregar o financeiro.");
+  if(dueError||paidError||turmaError){
+   setError(dueError?.message||paidError?.message||turmaError?.message||"Não foi possível carregar o financeiro.");
    setLoading(false); return;
   }
   const activeTurmas=(t||[]) as Turma[];
@@ -152,7 +148,6 @@ function Financeiro(){
   setPayments([...merged.values()].sort((a,b)=>String(a.due_date).localeCompare(String(b.due_date))));
   setAulas((a||[]) as Aula[]);
   setTurmas(activeTurmas);
-  setExpenses(e||[]);
   setLoading(false);
  }
 
@@ -166,7 +161,6 @@ function Financeiro(){
 
  const recebido=payments.filter(p=>p.status==="Pago").reduce((s,p)=>s+Number(p.amount),0);
  const aberto=payments.filter(p=>p.status==="Em aberto").reduce((s,p)=>s+Number(p.amount),0);
- const despesas=expenses.reduce((s,e)=>s+Number(e.amount),0);
  const realizadas=aulas.filter(a=>a.status==="realizada");
  const horas=realizadas.reduce((s,a)=>s+Number(a.duration_minutes)/60,0);
  const professoresTotal=realizadas.reduce((s,a)=>s+(Number(a.duration_minutes)/60)*Number(a.hourly_rate),0);
@@ -266,7 +260,7 @@ function Financeiro(){
     reference_month:referenceMonth,
     status:"Fechado",
     total_receitas:recebido,
-    total_despesas:despesas,
+    total_despesas:0,
     total_professores:professoresTotal,
     closed_at:new Date().toISOString(),
     updated_at:new Date().toISOString()
