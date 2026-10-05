@@ -27,7 +27,7 @@ function Fechamentos(){
   useEffect(()=>{void load()},[]);
 
   async function closeMonth(){
-    const [year,month]=selectedMonth.split("-").map(Number);
+    const [year=0,month=1]=selectedMonth.split("-").map(Number);
     const ref=localDate(new Date(year,month-1,1)),end=localDate(new Date(year,month,0));
     const [{data:p},{data:e},{data:a}]=await Promise.all([
       supabase.from("oficina_pagamentos").select("amount").eq("status","Pago").gte("paid_at",ref).lte("paid_at",end),
