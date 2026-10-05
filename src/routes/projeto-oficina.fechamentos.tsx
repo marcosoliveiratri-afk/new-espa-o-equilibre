@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route=createFileRoute("/projeto-oficina/fechamentos")({component:Fechamentos});
 
-type Fechamento={id:string;reference_month:string;status:string;total_receitas:number;total_professores:number;closed_at:string|null};
+type Fechamento={id:string;reference_month:string;status:string;total_receitas:number;total_despesas:number;total_professores:number;closed_at:string|null};
 type Relatorio={id:string;fechamento_id:string;reference_month:string;title:string;content_html:string};
 
 function Fechamentos(){
