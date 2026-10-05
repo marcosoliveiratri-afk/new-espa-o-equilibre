@@ -2,13 +2,6 @@
 
 // On a Lovable preview surface, broker the auth session to the editor over
 // postMessage so the project's preview surfaces share one login; else localStorage.
-const REMEMBER_ME_KEY = 'equilibre:remember-me';
-
-export function setRememberMePreference(remember: boolean) {
-  if (typeof window === 'undefined') return;
-  window.localStorage.setItem(REMEMBER_ME_KEY, String(remember));
-}
-
 export function brokeredPreviewStorage() {
   if (typeof window === 'undefined') return undefined;
   const host = location.hostname;
