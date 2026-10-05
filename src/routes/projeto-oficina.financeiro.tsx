@@ -36,7 +36,8 @@ type ProfessorSchedule={name:string;professor_id:string|null;weeklyHours:number;
 
 const money=(v:number)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const dateBR=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";
-const localDate=(d:Date)=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const localDate=(d:Date)=>{if(!(d instanceof Date)||Number.isNaN(d.getTime()))throw new Error("Data inválida.");return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const isDateString=(v:unknown):v is string=>typeof v==="string"&&/^\\d{4}-\\d{2}-\\d{2}$/.test(v)&&!Number.isNaN(new Date(v+"T12:00:00").getTime());
 const monthLabel=(d:Date)=>d.toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
 const days=["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
 
@@ -70,11 +71,12 @@ function Financeiro(){
    if(result.error)throw result.error;
    const existing=await supabase.from("oficina_pagamentos").select("aluno_plano_id,due_date").gte("due_date",start).lte("due_date",end);
    if(existing.error)throw existing.error;
-   const existingKeys=new Set((existing.data||[]).map(x=>String(x.aluno_plano_id)+"|"+String(x.due_date).slice(0,7)));
+   const existingKeys=new Set((existing.data||[]).filter(x=>isDateString(x.due_date)).map(x=>String(x.aluno_plano_id)+"|"+x.due_date.slice(0,7)));
    const rows:any[]=[];
    for(const p of result.data||[]){
+    if(!isDateString(p.start_date))continue;
     const startDate=new Date(p.start_date+"T12:00:00");
-    const endDate=p.end_date?new Date(p.end_date+"T12:00:00"):null;
+    const endDate=isDateString(p.end_date)?new Date(p.end_date+"T12:00:00"):null;
     if(startDate>new Date(month.getFullYear(),month.getMonth()+1,0)||(endDate&&endDate<target))continue;
     const diff=(target.getFullYear()-startDate.getFullYear())*12+target.getMonth()-startDate.getMonth();
     const duration=Math.max(1,Number(p.oficina_planos?.duration_months||1));
@@ -230,6 +232,7 @@ function Financeiro(){
  }
 
  async function markPaid(p:Payment){
+  if(!isDateString(p.due_date)){setError("Este pagamento está sem uma data de vencimento válida.");return}
   const {error}=await supabase.from("oficina_pagamentos").update({status:"Pago",paid_at:localDate(new Date())}).eq("id",p.id);
   if(error){setError(error.message);return}
   await load();
@@ -242,6 +245,7 @@ function Financeiro(){
  }
 
  async function updatePayment(p:Payment,patch:any){
+  if("due_date" in patch && !isDateString(patch.due_date)){setError("Informe uma data de vencimento válida.");return}
   const {error}=await supabase.from("oficina_pagamentos").update(patch).eq("id",p.id);
   if(error){setError(error.message);return}
   await load();
