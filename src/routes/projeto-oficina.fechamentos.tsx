@@ -28,7 +28,7 @@ function Fechamentos(){
   async function closeMonth(){
     const d=new Date(),ref=localDate(new Date(d.getFullYear(),d.getMonth(),1)),end=localDate(new Date(d.getFullYear(),d.getMonth()+1,0));
     const [{data:p},{data:e},{data:a}]=await Promise.all([
-      supabase.from("oficina_pagamentos").select("amount").eq("status","Pago").gte("due_date",ref).lte("due_date",end),
+      supabase.from("oficina_pagamentos").select("amount").eq("status","Pago").gte("paid_at",ref).lte("paid_at",end),
       supabase.from("oficina_despesas").select("amount").gte("expense_date",ref).lte("expense_date",end),
       supabase.from("oficina_aulas").select("duration_minutes,hourly_rate").eq("status","realizada").gte("aula_date",ref).lte("aula_date",end)
     ]);
@@ -65,7 +65,7 @@ function Fechamentos(){
     const refDate=new Date(ref+"T12:00:00");
     const end=localDate(new Date(refDate.getFullYear(),refDate.getMonth()+1,0));
     const [{data:payments},{data:expenses},{data:classes}]=await Promise.all([
-      supabase.from("oficina_pagamentos").select("amount,due_date,status,payment_method,destination").eq("status","Pago").gte("due_date",ref).lte("due_date",end).order("due_date"),
+      supabase.from("oficina_pagamentos").select("amount,due_date,paid_at,status,payment_method,destination").eq("status","Pago").gte("paid_at",ref).lte("paid_at",end).order("paid_at"),
       supabase.from("oficina_despesas").select("description,amount,expense_date,category,payment_method").gte("expense_date",ref).lte("expense_date",end).order("expense_date"),
       supabase.from("oficina_aulas").select("aula_date,start_time,duration_minutes,teacher_name,hourly_rate,teacher_amount,turma_name,status").eq("status","realizada").gte("aula_date",ref).lte("aula_date",end).order("aula_date").order("start_time")
     ]);
@@ -81,7 +81,7 @@ function Fechamentos(){
 
     const classRows=aulas.map(a=>`<tr><td>${dateBR(a.aula_date)}</td><td>${esc(a.turma_name||"—")}</td><td>${esc(a.teacher_name||"—")}</td><td class="value">${money(Number(a.teacher_amount??(Number(a.duration_minutes)/60*Number(a.hourly_rate))))}</td></tr>`).join("");
     const professorRows=[...professorMap.entries()].map(([name,v])=>`<tr><td>${esc(name)}</td><td>${v.classes}</td><td>${v.hours.toFixed(2).replace(".",",")} h</td><td class="value">${money(v.amount)}</td></tr>`).join("");
-    const paymentRows=(payments??[]).map(p=>`<tr><td>${dateBR(p.due_date)}</td><td>${esc(p.payment_method||"—")}</td><td>${esc(p.destination||"—")}</td><td class="value">${money(Number(p.amount))}</td></tr>`).join("");
+    const paymentRows=(payments??[]).map(p=>`<tr><td>${dateBR(p.paid_at||p.due_date)}</td><td>${esc(p.payment_method||"—")}</td><td>${esc(p.destination||"—")}</td><td class="value">${money(Number(p.amount))}</td></tr>`).join("");
     const expenseRows=(expenses??[]).map(e=>`<tr><td>${dateBR(e.expense_date)}</td><td>${esc(e.description||"—")}</td><td>${esc(e.category||"—")}</td><td class="value">${money(Number(e.amount))}</td></tr>`).join("");
     const totalHours=aulas.reduce((s,a)=>s+Number(a.duration_minutes)/60,0);
     const saldo=Number(row.total_receitas)-Number(row.total_despesas)-Number(row.total_professores);
