@@ -2,23 +2,8 @@
 
 // On a Lovable preview surface, broker the auth session to the editor over
 // postMessage so the project's preview surfaces share one login; else localStorage.
-const REMEMBER_ME_KEY = 'equilibre:remember-me';
-let rememberMe = true;
-
-function readRememberMePreference() {
-  if (typeof window === 'undefined') return true;
-  return window.localStorage.getItem(REMEMBER_ME_KEY) !== 'false';
-}
-
-export function setRememberMePreference(remember: boolean) {
-  rememberMe = remember;
-  if (typeof window === 'undefined') return;
-  window.localStorage.setItem(REMEMBER_ME_KEY, String(remember));
-}
-
 export function brokeredPreviewStorage() {
   if (typeof window === 'undefined') return undefined;
-  rememberMe = readRememberMePreference();
   const host = location.hostname;
   const PREVIEW_ZONES = ['lovableproject.com', 'lovableproject-dev.com', 'lovable.app', 'gpt-eng.com', 'gptengineer.run'];
   const onPreviewZone = PREVIEW_ZONES.some((z) => host === z || host.endsWith('.' + z));
@@ -30,9 +15,7 @@ export function brokeredPreviewStorage() {
         ?? host.match(new RegExp('^(' + UUID + ')(?=[.-])', 'i'))?.[1])
     : undefined;
   const framed = window.parent && window.parent !== window;
-  if (!projectId || !framed) {
-    return createRememberAwareStorage(localStorage);
-  }
+  if (!projectId || !framed) return localStorage;
 
   // Post only to the real editor ancestor, validated as a Lovable origin, so the
   // session token can never reach an untrusted embedder.
@@ -77,7 +60,7 @@ export function brokeredPreviewStorage() {
   let firstGet = true;
   const RETRY_DELAY = 250;
 
-  const brokerStorage = {
+  return {
     getItem: async (key: string) => {
       let res = await request('lovable-preview-auth:get', key);
       if (!res && firstGet) {
@@ -105,32 +88,6 @@ export function brokeredPreviewStorage() {
     removeItem: (key: string) => {
       localStorage.removeItem(key);
       return request('lovable-preview-auth:remove', key).then(() => undefined);
-    },
-  };
-
-  return createRememberAwareStorage(brokerStorage);
-}
-
-function createRememberAwareStorage(persistentStorage: Storage | { getItem: (key: string) => Promise<string | null>; setItem: (key: string, value: string) => Promise<unknown>; removeItem: (key: string) => Promise<unknown> }) {
-  const sessionStorage = window.sessionStorage;
-
-  return {
-    getItem: async (key: string) => {
-      if (!rememberMe) return sessionStorage.getItem(key);
-      return persistentStorage.getItem(key);
-    },
-    setItem: async (key: string, value: string) => {
-      if (rememberMe) {
-        sessionStorage.removeItem(key);
-        await persistentStorage.setItem(key, value);
-        return;
-      }
-      await persistentStorage.removeItem(key);
-      sessionStorage.setItem(key, value);
-    },
-    removeItem: async (key: string) => {
-      sessionStorage.removeItem(key);
-      await persistentStorage.removeItem(key);
     },
   };
 }
