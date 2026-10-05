@@ -62,7 +62,7 @@ export function OficinaSidebar() {
         <div className="flex h-full flex-col">
           <div className={`flex h-[72px] items-center border-b border-black/10 ${collapsed ? "justify-center" : "justify-between px-5"}`}>
             {!collapsed && <div><p className="text-[10px] font-semibold uppercase tracking-[.14em] text-black/40">Espaço Equilibre</p><h2 className="mt-0.5 text-lg font-bold text-black/85">Projeto Oficina</h2></div>}
-            <button type="button" onClick={() => setCollapsed(value => !value)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-black/10 text-black/55 hover:bg-black/[.03]" title={collapsed ? "Expandir menu" : "Recolher menu"} aria-label={collapsed ? "Expandir menu" : "Recolher menu"}>{collapsed ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}</button>
+            <button type="button" onClick={() => setCollapsed(value => !value)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-black/10 bg-white text-black/55 hover:bg-gray-50" title={collapsed ? "Expandir menu" : "Recolher menu"} aria-label={collapsed ? "Expandir menu" : "Recolher menu"}>{collapsed ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}</button>
           </div>
           <nav className="flex-1 space-y-1 overflow-y-auto p-3">{renderItems()}</nav>
           <div className="border-t border-black/10 p-3"><Link to="/projeto-oficina" className={`flex items-center rounded-xl text-black/50 hover:bg-black/[.035] hover:text-black ${collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2.5"}`} title={collapsed ? "Início da Oficina" : undefined}><LogOut size={18} />{!collapsed && <span className="text-sm font-medium">Início da Oficina</span>}</Link></div>
