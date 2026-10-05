@@ -33,6 +33,7 @@ type Payment={
 type Aula={id:string;turma_id:string;aula_date:string;start_time:string;duration_minutes:number;teacher_name:string;hourly_rate:number;status:string;turma_name?:string|null;};
 type Turma={id:string;name:string;teacher_name:string;weekday:number;start_time:string;duration_minutes:number;hourly_rate:number;active:boolean;professor_id:string|null;};
 type ProfessorSchedule={name:string;professor_id:string|null;weeklyHours:number;monthlyHours:number;monthlyAmount:number;weeklyByDay:number[];classes:number;workDays:number;turmas:Turma[];};
+type Expense={id:string;description:string;amount:number;category:string|null;payment_method:string|null;expense_date:string;};
 
 const money=(v:number)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const dateBR=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";
@@ -46,6 +47,9 @@ function Financeiro(){
  const [payments,setPayments]=useState<Payment[]>([]);
  const [aulas,setAulas]=useState<Aula[]>([]);
  const [turmas,setTurmas]=useState<Turma[]>([]);
+ const [expenses,setExpenses]=useState<Expense[]>([]);
+ const [showExpense,setShowExpense]=useState(false);
+ const [expense,setExpense]=useState({description:"",amount:"",category:"Operacional",payment_method:"Pix",expense_date:localDate(new Date())});
  const [loading,setLoading]=useState(true);
  const [generating,setGenerating]=useState(false);
  const [error,setError]=useState("");
@@ -130,13 +134,14 @@ function Financeiro(){
   setLoading(true);
   setError("");
   await ensureMonthlyCharges();
-  const [{data:pDue,error:dueError},{data:pPaid,error:paidError},{data:t,error:turmaError}]=await Promise.all([
+  const [{data:pDue,error:dueError},{data:pPaid,error:paidError},{data:t,error:turmaError},{data:expenseData,error:expenseError}]=await Promise.all([
    supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").gte("due_date",start).lte("due_date",end).order("due_date"),
    supabase.from("oficina_pagamentos").select("*,oficina_aluno_planos(oficina_alunos(full_name,responsible_name),oficina_planos(name),oficina_professores(name))").eq("status","Pago").gte("due_date",start).lte("due_date",end).order("due_date"),
-   supabase.from("oficina_turmas").select("*").eq("active",true).order("weekday").order("start_time")
+   supabase.from("oficina_turmas").select("*").eq("active",true).order("weekday").order("start_time"),
+   supabase.from("oficina_despesas").select("*").gte("expense_date",start).lte("expense_date",end).order("expense_date")
   ]);
-  if(dueError||paidError||turmaError){
-   setError(dueError?.message||paidError?.message||turmaError?.message||"Não foi possível carregar o financeiro.");
+  if(dueError||paidError||turmaError||expenseError){
+   setError(dueError?.message||paidError?.message||turmaError?.message||expenseError?.message||"Não foi possível carregar o financeiro.");
    setLoading(false); return;
   }
   const activeTurmas=(t||[]) as Turma[];
@@ -148,6 +153,7 @@ function Financeiro(){
   setPayments([...merged.values()].sort((a,b)=>String(a.due_date).localeCompare(String(b.due_date))));
   setAulas((a||[]) as Aula[]);
   setTurmas(activeTurmas);
+  setExpenses((expenseData||[]) as Expense[]);
   setLoading(false);
  }
 
@@ -164,6 +170,7 @@ function Financeiro(){
  const realizadas=aulas.filter(a=>a.status==="realizada");
  const horas=realizadas.reduce((s,a)=>s+Number(a.duration_minutes)/60,0);
  const professoresTotal=realizadas.reduce((s,a)=>s+(Number(a.duration_minutes)/60)*Number(a.hourly_rate),0);
+ const despesas=expenses.reduce((sum,item)=>sum+Number(item.amount||0),0);
  const pendentes=aulas.filter(a=>a.status==="pendente").length;
  const naoRealizadas=aulas.filter(a=>a.status==="nao_realizada").length;
 
@@ -260,7 +267,7 @@ function Financeiro(){
     reference_month:referenceMonth,
     status:"Fechado",
     total_receitas:recebido,
-    total_despesas:0,
+    total_despesas:despesas,
     total_professores:professoresTotal,
     closed_at:new Date().toISOString(),
     updated_at:new Date().toISOString()
