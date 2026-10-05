@@ -11,7 +11,11 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       if (!data.session) { navigate({ to: "/login", replace: true }); return; }
-      setChecking(false);
+      supabase.from("user_profiles").select("active").eq("id", data.session.user.id).maybeSingle().then(({ data: profile }) => {
+        if (!active) return;
+        if (!profile?.active) { supabase.auth.signOut(); navigate({ to: "/login", replace: true }); return; }
+        setChecking(false);
+      });
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) navigate({ to: "/login", replace: true });
