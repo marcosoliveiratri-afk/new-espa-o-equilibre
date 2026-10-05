@@ -53,11 +53,18 @@ Deno.serve(async (req) => {
     const { data: created, error: createError } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
     if (createError || !created.user) return json({ error: createError?.message || "Não foi possível criar o usuário." }, 400);
 
-    const { error: profileError } = await admin.from("user_profiles").insert({ id: created.user.id, role, active: true });
+    // O banco já cria o user_profile automaticamente pelo trigger on_auth_user_created_profile.
+    // Aqui apenas aplicamos a função escolhida pelo administrador.
+    const { error: profileError } = await admin
+      .from("user_profiles")
+      .update({ role, active: true })
+      .eq("id", created.user.id);
+
     if (profileError) {
       await admin.auth.admin.deleteUser(created.user.id);
       return json({ error: profileError.message }, 400);
     }
+
     return json({ user: { id: created.user.id, email: created.user.email, role, active: true, created_at: created.user.created_at } }, 201);
   }
 
