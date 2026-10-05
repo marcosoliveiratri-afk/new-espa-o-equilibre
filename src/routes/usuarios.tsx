@@ -38,6 +38,17 @@ function Usuarios() {
   async function createUser() {
     setError("");
     setMessage("");
+
+    const normalizedEmail = form.email.trim().toLowerCase();
+    if (!normalizedEmail || !normalizedEmail.includes("@")) {
+      setError("Informe um e-mail válido.");
+      return;
+    }
+    if (form.password.length < 8) {
+      setError("A senha inicial precisa ter pelo menos 8 caracteres.");
+      return;
+    }
+
     setSaving(true);
     const { data, error: fnError } = await supabase.functions.invoke("manage-users", {
       method: "POST",
@@ -45,7 +56,16 @@ function Usuarios() {
     });
     setSaving(false);
     if (fnError || data?.error) {
-      setError(data?.error || fnError?.message || "Não foi possível criar o usuário.");
+      let detail = data?.error || "";
+      if (!detail && fnError) {
+        try {
+          const body = await (fnError as any).context?.json?.();
+          detail = body?.error || body?.message || "";
+        } catch {
+          // Mantém a mensagem padrão quando a resposta não puder ser lida.
+        }
+      }
+      setError(detail || fnError?.message || "Não foi possível criar o usuário.");
       return;
     }
     setMessage("Usuário criado com sucesso.");
@@ -129,8 +149,8 @@ function Usuarios() {
             <h2 className="text-xl font-bold text-[#111827]">Novo usuário</h2>
             <p className="mt-1 text-sm text-[#64748B]">Crie uma conta para acesso ao sistema.</p>
             <div className="mt-5 space-y-4">
-              <label className="block"><span className="mb-1.5 block text-sm font-medium">E-mail</span><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="usuario@equilibre.com" className="h-11 w-full rounded-xl border border-black/10 px-3 text-sm" /></label>
-              <label className="block"><span className="mb-1.5 block text-sm font-medium">Senha inicial</span><input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Mínimo de 8 caracteres" className="h-11 w-full rounded-xl border border-black/10 px-3 text-sm" /></label>
+              <label className="block"><span className="mb-1.5 block text-sm font-medium">E-mail</span><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} autoComplete="email" placeholder="usuario@equilibre.com" className="h-11 w-full rounded-xl border border-black/10 px-3 text-sm" /></label>
+              <label className="block"><span className="mb-1.5 block text-sm font-medium">Senha inicial</span><input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} minLength={8} autoComplete="new-password" placeholder="Mínimo de 8 caracteres" className="h-11 w-full rounded-xl border border-black/10 px-3 text-sm" /></label>
               <label className="block"><span className="mb-1.5 block text-sm font-medium">Perfil</span><select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as "admin" | "staff" })} className="h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-sm"><option value="staff">Staff — acesso operacional</option><option value="admin">Administrador — gerenciamento completo</option></select></label>
             </div>
             <div className="mt-6 flex justify-end gap-2"><button type="button" onClick={() => setShowForm(false)} className="rounded-xl border border-black/10 px-4 py-2.5 text-sm">Cancelar</button><button type="button" disabled={saving} onClick={createUser} className="rounded-xl bg-[#0057B8] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Criando..." : "Criar usuário"}</button></div>
