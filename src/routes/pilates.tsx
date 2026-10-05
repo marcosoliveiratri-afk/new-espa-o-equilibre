@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDataSync } from "@/hooks/useDataSync";
 import { getServiceModuleId } from "@/lib/serviceModule";
-import { Activity, CalendarClock, CheckCircle2, CircleDollarSign, Landmark, Users, UserRoundCheck, UserX, Wallet, ClipboardList, UserRound } from "lucide-react";
+import { Activity, Cake, CalendarClock, CheckCircle2, CircleDollarSign, Landmark, Users, UserRoundCheck, UserX, Wallet, ClipboardList, UserRound } from "lucide-react";
 
 export const Route = createFileRoute("/pilates")({ component: Pilates });
 
@@ -84,6 +84,10 @@ function Dashboard() {
     const active = sp.filter((x: any) => x.status === "Ativo" && (x.start_date || "0000-00-00") <= monthEnd && (!x.end_date || x.end_date >= monthStart) && (teacherFilter === "all" || x.teacher_id === teacherFilter));
     const activeStudents = s.filter((x: any) => x.active);
     const inactiveStudents = s.filter((x: any) => !x.active);
+    const birthdayStudentIds = new Set(active.filter((x: any) => teacherFilter === "all" || x.teacher_id === teacherFilter).map((x: any) => x.student_id));
+    const birthdays = activeStudents
+      .filter((x: any) => birthdayStudentIds.has(x.id) && x.birth_date && String(x.birth_date).slice(5, 7) === month.slice(5, 7))
+      .sort((a: any, b: any) => Number(String(a.birth_date).slice(8, 10)) - Number(String(b.birth_date).slice(8, 10)));
     const activeIds = new Set(activeStudents.map((x: any) => x.id));
     const financialPayments = p.filter((x: any) => activeIds.has(x.student_id) && matchTeacher(x.plan_id) && x.status !== "Cancelado" && x.due_date >= monthStart && x.due_date <= monthEnd);
     const clinicReceived = financialPayments.filter((x: any) => x.status === "Pago" && x.destination === "Clínica").reduce((a: number, x: any) => a + Number(x.amount || 0), 0);
@@ -111,6 +115,7 @@ function Dashboard() {
       done: t.filter((x: any) => x.status === "Realizada" && (!x.scheduled_date || (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))).length,
       converted: t.filter((x: any) => x.status === "Convertida" && (!x.scheduled_date || (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))).length,
       cancelled: t.filter((x: any) => x.status === "Cancelada" && (!x.scheduled_date || (x.scheduled_date >= monthStart && x.scheduled_date <= monthEnd))).length,
+      birthdays,
       byPlan: pl.map((x: any) => [x.name, active.filter((y: any) => y.plan_id === x.id).length]),
       byTeacher: te.map((x: any) => [x.name, active.filter((y: any) => y.teacher_id === x.id).length]).filter((x: any) => x[1]),
     };
@@ -174,6 +179,13 @@ function Dashboard() {
           </div>
         </section>
       ))}
+
+      <div className="mb-5 rounded-2xl border border-black/10 bg-white p-6" style={{ boxShadow: "0 8px 24px rgba(16, 24, 40, 0.05)" }}>
+        <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FFF4E5]"><Cake size={18} color="#D97706" /></div><div><h2 className="text-lg font-bold tracking-tight text-black/80">Aniversariantes do mês</h2><p className="mt-1 text-sm text-black/45">Alunos ativos do Pilates no período selecionado.</p></div></div><span className="rounded-full bg-[#FFF7ED] px-3 py-1 text-xs font-semibold text-[#B45309]">{m.birthdays?.length || 0} {m.birthdays?.length === 1 ? "aniversariante" : "aniversariantes"}</span></div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {m.birthdays?.length ? m.birthdays.map((x: any) => <div key={x.id} className="flex items-center justify-between rounded-xl border border-black/5 bg-[#FAFAFA] px-4 py-3"><div className="min-w-0"><p className="truncate text-sm font-semibold text-[#111827]">{x.full_name}</p><p className="mt-1 text-xs text-black/45">Aniversário em {String(x.birth_date).slice(8, 10)}</p></div><div className="ml-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-[#B45309] shadow-sm">{String(x.birth_date).slice(8, 10)}</div></div>) : <p className="rounded-xl bg-[#FAFAFA] px-4 py-6 text-center text-sm text-black/45 sm:col-span-2 lg:col-span-3">Nenhum aniversariante neste mês.</p>}
+        </div>
+      </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div className="rounded-2xl border border-black/10 bg-white p-6" style={{ boxShadow: "0 8px 24px rgba(16, 24, 40, 0.05)" }}>
