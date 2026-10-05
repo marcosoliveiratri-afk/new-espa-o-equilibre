@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between px-4 py-4">
             {!collapsed && <span className="text-xs font-semibold uppercase tracking-[0.12em] text-black/40">{sectionLabel}</span>}
-            <button onClick={() => setCollapsed((value) => !value)} className="hidden rounded-lg p-2 text-black/55 hover:bg-black/5 hover:text-black lg:inline-flex" aria-label={collapsed ? "Expandir sidebar" : "Recolher sidebar"} title={collapsed ? "Expandir sidebar" : "Recolher sidebar"}>
+            <button onClick={() => setCollapsed((value) => !value)} className="hidden rounded-lg border border-black/10 bg-white p-2 text-black/55 hover:bg-gray-50 hover:text-black lg:inline-flex" aria-label={collapsed ? "Expandir sidebar" : "Recolher sidebar"} title={collapsed ? "Expandir sidebar" : "Recolher sidebar"}>
               {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
           </div>
