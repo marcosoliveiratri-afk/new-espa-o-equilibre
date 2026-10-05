@@ -32,7 +32,7 @@ type Payment={
 
 type Aula={id:string;turma_id:string;aula_date:string;start_time:string;duration_minutes:number;teacher_name:string;hourly_rate:number;status:string;turma_name?:string|null;};
 type Turma={id:string;name:string;teacher_name:string;weekday:number;start_time:string;duration_minutes:number;hourly_rate:number;active:boolean;professor_id:string|null;};
-type ProfessorSchedule={name:string;professor_id:string|null;weeklyHours:number;monthlyHours:number;monthlyAmount:number;weeklyByDay:number[];classes:number;turmas:Turma[];};
+type ProfessorSchedule={name:string;professor_id:string|null;weeklyHours:number;monthlyHours:number;monthlyAmount:number;weeklyByDay:number[];classes:number;workDays:number;turmas:Turma[];};
 
 const money=(v:number)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const dateBR=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";
@@ -141,25 +141,36 @@ function Financeiro(){
  const scheduleSummary=useMemo<ProfessorSchedule[]>(()=>{
   const map=new Map<string,ProfessorSchedule>();
   const daysInMonth=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
+  const workedDays=new Map<string,Set<string>>();
+  for(let day=1;day<=daysInMonth;day++){
+   const date=new Date(month.getFullYear(),month.getMonth(),day);
+   const weekday=date.getDay()===0?7:date.getDay();
+   const dateKey=localDate(date);
+   for(const t of turmas){
+    if(Number(t.weekday)!==weekday) continue;
+    const name=t.teacher_name||"Professor não informado";
+    const key=t.professor_id||name;
+    const current=map.get(key)||{name,professor_id:t.professor_id,weeklyHours:0,monthlyHours:0,monthlyAmount:0,weeklyByDay:[0,0,0,0,0,0,0],classes:0,workDays:0,turmas:[]};
+    const hours=Number(t.duration_minutes||0)/60;
+    current.monthlyHours+=hours;
+    current.monthlyAmount+=hours*Number(t.hourly_rate||0);
+    current.classes+=1;
+    if(!current.turmas.some(x=>x.id===t.id)) current.turmas.push(t);
+    const dayIndex=Number(t.weekday)-1;
+    if(dayIndex>=0&&dayIndex<7) current.weeklyByDay[dayIndex]+=hours;
+    map.set(key,current);
+    if(!workedDays.has(key)) workedDays.set(key,new Set());
+    workedDays.get(key)!.add(dateKey);
+   }
+  }
   for(const t of turmas){
    const name=t.teacher_name||"Professor não informado";
    const key=t.professor_id||name;
-   const current=map.get(key)||{name,professor_id:t.professor_id,weeklyHours:0,monthlyHours:0,monthlyAmount:0,weeklyByDay:[0,0,0,0,0,0,0],classes:0,turmas:[]};
-   const hours=Number(t.duration_minutes||0)/60;
-   let occurrences=0;
-   for(let day=1;day<=daysInMonth;day++){
-    const d=new Date(month.getFullYear(),month.getMonth(),day);
-    const weekday=d.getDay()===0?7:d.getDay();
-    if(weekday===Number(t.weekday)) occurrences++;
-   }
-   current.weeklyHours+=hours;
-   current.monthlyHours+=hours*occurrences;
-   current.monthlyAmount+=hours*occurrences*Number(t.hourly_rate||0);
-   current.weeklyByDay[Number(t.weekday)-1]+=hours;
-   current.classes+=occurrences;
-   current.turmas.push(t);
-   map.set(key,current);
+   const current=map.get(key);
+   if(!current) continue;
+   current.weeklyHours+=Number(t.duration_minutes||0)/60;
   }
+  for(const [key,current] of map) current.workDays=workedDays.get(key)?.size||0;
   return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name));
  },[turmas,month]);
  const scheduleWeeklyHours=scheduleSummary.reduce((s,p)=>s+p.weeklyHours,0);
@@ -240,7 +251,7 @@ function Financeiro(){
   {tab==="professores"&&<div className="grid gap-5 lg:grid-cols-2">
   <section className="rounded-2xl border border-black/10 bg-white lg:col-span-2">
    <div className="border-b border-black/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">Carga horária dos professores</h2><p className="mt-1 text-xs text-black/45">Calculada pelas turmas ativas e pelos dias da semana cadastrados.</p></div><div className="text-right"><p className="text-xs text-black/45">Horas semanais</p><strong>{scheduleWeeklyHours.toFixed(2).replace(".",",")} h</strong></div></div></div>
-   <div className="overflow-x-auto"><table className="w-full min-w-[1100px] text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="p-4 text-left">Professor</th>{["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].map(d=><th key={d} className="p-4 text-center">{d}</th>)}<th className="p-4 text-right">Semana</th><th className="p-4 text-right">Mês</th><th className="p-4 text-right">Valor</th></tr></thead><tbody>{scheduleSummary.map(v=><tr key={v.professor_id||v.name} className="border-t border-black/10"><td className="p-4"><strong>{v.name}</strong><span className="block text-xs text-black/40">{v.classes} ocorrência(s) previstas · {v.turmas.length} turma(s)</span></td>{v.weeklyByDay.map((h,i)=><td key={i} className="p-4 text-center">{h?h.toFixed(2).replace(".",",")+" h":"—"}</td>)}<td className="p-4 text-right font-semibold">{v.weeklyHours.toFixed(2).replace(".",",")} h</td><td className="p-4 text-right font-semibold">{v.monthlyHours.toFixed(2).replace(".",",")} h</td><td className="p-4 text-right font-semibold">{money(v.monthlyAmount)}</td></tr>)}{!scheduleSummary.length&&<tr><td colSpan={11} className="p-8 text-center text-sm text-black/45">Nenhuma turma ativa cadastrada.</td></tr>}</tbody></table></div>
+   <div className="overflow-x-auto"><table className="w-full min-w-[1100px] text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="p-4 text-left">Professor</th>{["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].map(d=><th key={d} className="p-4 text-center">{d}</th>)}<th className="p-4 text-right">Semana</th><th className="p-4 text-right">Mês</th><th className="p-4 text-right">Valor</th></tr></thead><tbody>{scheduleSummary.map(v=><tr key={v.professor_id||v.name} className="border-t border-black/10"><td className="p-4"><strong>{v.name}</strong><span className="block text-xs text-black/40">{v.classes} aula(s) previstas · {v.workDays} dia(s) de trabalho · {v.turmas.length} turma(s)</span></td>{v.weeklyByDay.map((h,i)=><td key={i} className="p-4 text-center">{h?h.toFixed(2).replace(".",",")+" h":"—"}</td>)}<td className="p-4 text-right font-semibold">{v.weeklyHours.toFixed(2).replace(".",",")} h</td><td className="p-4 text-right font-semibold">{v.monthlyHours.toFixed(2).replace(".",",")} h</td><td className="p-4 text-right font-semibold">{money(v.monthlyAmount)}</td></tr>)}{!scheduleSummary.length&&<tr><td colSpan={11} className="p-8 text-center text-sm text-black/45">Nenhuma turma ativa cadastrada.</td></tr>}</tbody></table></div>
    <div className="grid gap-3 border-t border-black/10 p-4 sm:grid-cols-3"><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Carga semanal</p><strong className="mt-1 block">{scheduleWeeklyHours.toFixed(2).replace(".",",")} h</strong></div><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Carga da competência</p><strong className="mt-1 block">{scheduleMonthlyHours.toFixed(2).replace(".",",")} h</strong></div><div className="rounded-xl bg-black/[.035] p-3"><p className="text-xs text-black/45">Valor previsto aos professores</p><strong className="mt-1 block">{money(scheduleMonthlyAmount)}</strong></div></div>
   </section>
   <section className="rounded-2xl border border-black/10 bg-white lg:col-span-2"><div className="border-b border-black/10 p-4"><h2 className="font-semibold">Aulas realizadas</h2><p className="mt-1 text-xs text-black/45">Conferência do que foi efetivamente realizado no mês. Não altera a carga horária prevista.</p></div><div className="overflow-x-auto"><table className="w-full min-w-[760px] text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="p-4 text-left">Data</th><th className="p-4 text-left">Dia</th><th className="p-4 text-left">Professor</th><th className="p-4 text-left">Horário</th><th className="p-4 text-left">Duração</th><th className="p-4 text-right">Valor</th></tr></thead><tbody>{realizadas.map(a=><tr key={a.id} className="border-t border-black/10"><td className="p-4">{dateBR(a.aula_date)}</td><td className="p-4">{days[new Date(a.aula_date+"T12:00:00").getDay()]}</td><td className="p-4">{a.teacher_name||"—"}</td><td className="p-4">{String(a.start_time||"").slice(0,5)}</td><td className="p-4">{a.duration_minutes} min</td><td className="p-4 text-right font-semibold">{money((Number(a.duration_minutes)/60)*Number(a.hourly_rate))}</td></tr>)}{!realizadas.length&&<tr><td colSpan={6} className="p-8 text-center text-sm text-black/45">Nenhuma aula realizada neste mês.</td></tr>}</tbody></table></div></section>
