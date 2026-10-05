@@ -260,14 +260,40 @@ function Financeiro(){
   await load();
  }
 
- function generateReport(){
+ async function generateReport(){
+  const referenceMonth=start;
+  const closingPayload={
+    reference_month:referenceMonth,
+    status:"Fechado",
+    total_receitas:recebido,
+    total_despesas:despesas,
+    total_professores:professoresTotal,
+    closed_at:new Date().toISOString(),
+    updated_at:new Date().toISOString()
+  };
+  const {data:closing,error:closingError}=await supabase.from("oficina_fechamentos").upsert(closingPayload,{onConflict:"reference_month"}).select("id").single();
+  if(closingError||!closing){
+    setError(closingError?.message||"Não foi possível registrar o fechamento do mês.");
+    return;
+  }
   const professorRows=professorSummary.map(([name,v])=>"<tr><td>"+esc(name)+"</td><td>"+v.hours.toFixed(2).replace(".",",")+" h</td><td>"+v.classes+" aula(s)</td><td>"+money(v.amount)+"</td></tr>").join("");
   const paymentRows=payments.map(p=>"<tr><td>"+esc(p.oficina_aluno_planos?.oficina_alunos?.full_name||"—")+"</td><td>"+dateBR(p.due_date)+"</td><td>"+(p.paid_at?dateBR(p.paid_at):"—")+"</td><td>"+esc(p.status)+"</td><td>"+money(Number(p.amount))+"</td></tr>").join("");
   const classRows=realizadas.map(a=>"<tr><td>"+dateBR(a.aula_date)+"</td><td>"+esc(days[new Date(a.aula_date+"T12:00:00").getDay()] ?? "—")+"</td><td>"+esc(a.teacher_name||"—")+"</td><td>"+String(a.start_time||"").slice(0,5)+"</td><td>"+a.duration_minutes+" min</td><td>"+money((Number(a.duration_minutes)/60)*Number(a.hourly_rate))+"</td></tr>").join("");
   const expenseRows=expenses.map(e=>"<tr><td>"+dateBR(e.expense_date)+"</td><td>"+esc(e.description||"—")+"</td><td>"+esc(e.category||"—")+"</td><td>"+money(Number(e.amount))+"</td></tr>").join("");
   const html="<!doctype html><html><head><meta charset='utf-8'><title>Relatório Financeiro - "+monthLabel(month)+"</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{margin:0 0 4px}h2{margin-top:28px;font-size:18px}p{color:#666}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left}th{background:#f5f5f5}.cards{display:flex;gap:12px;margin:20px 0}.card{border:1px solid #ddd;border-radius:10px;padding:12px;flex:1}.value{font-size:20px;font-weight:700;margin-top:4px}@media print{body{padding:12px}.no-print{display:none}}</style></head><body><h1>Relatório Financeiro</h1><p>Projeto Oficina · "+monthLabel(month)+"</p><div class='cards'><div class='card'>Recebido<div class='value'>"+money(recebido)+"</div></div><div class='card'>Em aberto<div class='value'>"+money(aberto)+"</div></div><div class='card'>Despesas<div class='value'>"+money(despesas)+"</div></div><div class='card'>Professores<div class='value'>"+money(professoresTotal)+"</div></div></div><h2>Pagamentos dos alunos</h2><table><thead><tr><th>Aluno</th><th>Vencimento</th><th>Pago em</th><th>Status</th><th>Valor</th></tr></thead><tbody>"+paymentRows+"</tbody></table><h2>Horas dos professores (realizadas)</h2><table><thead><tr><th>Professor</th><th>Horas realizadas</th><th>Aulas</th><th>Valor</th></tr></thead><tbody>"+(professorRows||"<tr><td colspan='4'>Nenhuma aula realizada.</td></tr>")+"</tbody></table><h2>Aulas realizadas</h2><table><thead><tr><th>Data</th><th>Dia</th><th>Professor</th><th>Horário</th><th>Duração</th><th>Valor</th></tr></thead><tbody>"+(classRows||"<tr><td colspan='6'>Nenhuma aula realizada.</td></tr>")+"</tbody></table><h2>Despesas</h2><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>"+(expenseRows||"<tr><td colspan='4'>Nenhuma despesa.</td></tr>")+"</tbody></table><p style='margin-top:30px'>Relatório gerado em "+new Date().toLocaleString("pt-BR")+".</p></body></html>";
+  const {error:reportError}=await supabase.from("oficina_relatorios").upsert({
+    fechamento_id:closing.id,
+    reference_month:referenceMonth,
+    title:"Relatório de Fechamento - "+monthLabel(month),
+    content_html:html,
+    updated_at:new Date().toISOString()
+  },{onConflict:"fechamento_id"});
+  if(reportError){
+    setError("O fechamento foi salvo, mas não foi possível salvar o relatório: "+reportError.message);
+    return;
+  }
   const popup=window.open("","_blank");
-  if(!popup){window.alert("Permita pop-ups para gerar o relatório.");return}
+  if(!popup){window.alert("Permita pop-ups para visualizar o relatório. O fechamento e o relatório já foram salvos na aba Fechamentos.");return}
   popup.document.write(html);
   popup.document.close();
   setTimeout(()=>popup.print(),300);
