@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { KeyRound, Save, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
+import { AppShell } from "@/components/AppShell";
+import { TopBar } from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/minha-conta")({ component: MinhaConta });
@@ -48,7 +50,10 @@ function MinhaConta() {
 
   return (
     <AuthGuard>
-      <div className="mx-auto max-w-3xl">
+      <div className="min-h-screen bg-white">
+        <TopBar />
+        <AppShell>
+          <div className="mx-auto max-w-3xl">
         <div className="mb-7">
           <h1 className="text-[30px] font-bold tracking-tight text-[#111827]">Minha conta</h1>
           <p className="mt-1 text-sm text-[#64748B]">Gerencie seus dados de acesso ao sistema.</p>
@@ -115,6 +120,8 @@ function MinhaConta() {
             </div>
           </form>
         </div>
+          </div>
+        </AppShell>
       </div>
     </AuthGuard>
   );
