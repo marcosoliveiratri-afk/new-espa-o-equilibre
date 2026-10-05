@@ -87,9 +87,9 @@ function Alunos(){
      <div style={{fontSize:12,color:"#64748B",background:"#F8FAFC",border:"1px solid #E5E7EB",borderRadius:9999,padding:"6px 10px"}}>{activity}</div>
     </div>
     <div style={{overflowX:"auto"}}>
-     <table style={{width:"100%",minWidth:1420,borderCollapse:"separate",borderSpacing:0,fontSize:13,textAlign:"left"}}>
+     <table style={{width:"100%",minWidth:1280,borderCollapse:"separate",borderSpacing:0,fontSize:13,textAlign:"left",tableLayout:"fixed"}}>
       <thead style={{background:"#F8FAFC",fontSize:11,textTransform:"uppercase",color:"#64748B",letterSpacing:"0.045em",fontWeight:650}}>
-       <tr>{["Aluno","Telefone","Plano","Professor","Vencimento","Situação","Contrato","Avaliação","Financeiro","Destino",""].map(h=><th key={h} style={{padding:"12px 16px",fontWeight:650,borderBottom:"1px solid #E5E7EB",whiteSpace:"nowrap"}}>{h}</th>)}</tr>
+       <tr>{["Aluno","Telefone","Plano","Professor","Vencimento","Situação","Contrato","Financeiro","Destino",""].map(h=><th key={h} style={{padding:"12px 16px",fontWeight:650,borderBottom:"1px solid #E5E7EB",whiteSpace:"nowrap"}}>{h}</th>)}</tr>
       </thead>
       <tbody>
        {filtered.map(x=>{
@@ -109,13 +109,12 @@ function Alunos(){
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.due ? `Dia ${String(x.due).slice(8,10)}` : "—"}</td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:x.active?"#ECFDF5":"#F8FAFC",color:x.active?"#047857":"#64748B",border:`1px solid ${x.active?"#A7F3D0":"#E2E8F0"}`}}>{x.active?"Ativo":"Inativo"}</span></td>
          <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:contractRisk?"#FEF2F2":contractNext?"#FFFBEB":"#ECFDF5",color:contractRisk?"#B91C1C":contractNext?"#B45309":"#047857",border:`1px solid ${contractRisk?"#FECACA":contractNext?"#FDE68A":"#A7F3D0"}`}}>{x.contract||"—"}</span></td>
-         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",color:"#475569",whiteSpace:"nowrap"}}>{x.assessment||"—"}</td>
-         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:x.financial==="Em atraso"?"#FEF2F2":x.financial==="Próximo"?"#FFFBEB":"#ECFDF5",color:x.financial==="Em atraso"?"#B91C1C":x.financial==="Próximo"?"#B45309":"#047857",border:`1px solid ${x.financial==="Em atraso"?"#FECACA":x.financial==="Próximo"?"#FDE68A":"#A7F3D0"}`}}>{x.financial}</span></td>
-         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9"}}><span style={{display:"inline-flex",borderRadius:8,padding:"5px 8px",fontSize:11.5,fontWeight:500,background:"#F8FAFC",color:"#475569",border:"1px solid #E2E8F0"}}>{x.destination||"—"}</span></td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",whiteSpace:"nowrap"}}><span style={{display:"inline-flex",alignItems:"center",borderRadius:9999,padding:"5px 9px",fontSize:11.5,fontWeight:600,background:x.financial==="Em atraso"?"#FEF2F2":x.financial==="Próximo"?"#FFFBEB":"#ECFDF5",color:x.financial==="Em atraso"?"#B91C1C":x.financial==="Próximo"?"#B45309":"#047857",border:`1px solid ${x.financial==="Em atraso"?"#FECACA":x.financial==="Próximo"?"#FDE68A":"#A7F3D0"}`}}>{x.financial}</span></td>
+         <td style={{padding:"14px 16px",borderBottom:"1px solid #F1F5F9",whiteSpace:"nowrap"}}><span style={{display:"inline-flex",borderRadius:8,padding:"5px 8px",fontSize:11.5,fontWeight:500,background:"#F8FAFC",color:"#475569",border:"1px solid #E2E8F0"}}>{x.destination||"—"}</span></td>
          <td style={{padding:"14px 12px",borderBottom:"1px solid #F1F5F9",textAlign:"right"}}><button onClick={()=>setDeleting(x)} aria-label={`Excluir ${x.full_name}`} title="Excluir aluno" style={{width:32,height:32,borderRadius:9,background:"#FFFFFF",border:"1px solid #E5E7EB",cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",color:"#94A3B8"}}><Trash2 size={15}/></button></td>
         </tr>;
        })}
-       {!loading&&!filtered.length&&<tr><td colSpan={11} style={{padding:"64px 16px",textAlign:"center",color:"#94A3B8"}}><div style={{fontSize:14,fontWeight:500,color:"#475569"}}>Nenhum aluno encontrado</div><div style={{fontSize:13,marginTop:5}}>Tente ajustar os filtros ou a busca.</div></td></tr>}
+       {!loading&&!filtered.length&&<tr><td colSpan={10} style={{padding:"64px 16px",textAlign:"center",color:"#94A3B8"}}><div style={{fontSize:14,fontWeight:500,color:"#475569"}}>Nenhum aluno encontrado</div><div style={{fontSize:13,marginTop:5}}>Tente ajustar os filtros ou a busca.</div></td></tr>}
       </tbody>
      </table>
     </div>
