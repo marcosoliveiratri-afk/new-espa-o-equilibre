@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AlertCircle, CalendarDays, CheckCircle2, CircleDollarSign, FileCheck2, RefreshCw, Settings, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
@@ -114,6 +114,8 @@ function DailyChart({ rows }: { rows: Row[] }) {
 }
 
 function Osteopatia() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isConfiguracoes = pathname === "/osteopatia/configuracoes";
   const [source, setSource] = useState("202610");
   const [rows, setRows] = useState<Row[]>([]);
   const [allRows, setAllRows] = useState<Row[]>([]);
@@ -200,7 +202,7 @@ function Osteopatia() {
     <div className="min-h-screen bg-white text-[#0a0a0a]">
       <TopBar/>
       <AppShell>
-        <main className="mx-auto max-w-[1040px] pb-10 px-1 sm:px-0">
+        {isConfiguracoes ? <Outlet /> : <main className="mx-auto max-w-[1040px] pb-10 px-1 sm:px-0">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e5e5] pb-4">
             <div className="flex items-center gap-2.5 text-[14px] font-semibold">
               <div className="flex h-7 w-7 items-center justify-center rounded-full text-white" style={{background:"radial-gradient(circle at 30% 30%,#e3b7a6,#a8705e)"}}>
@@ -292,7 +294,9 @@ function Osteopatia() {
 
             <footer className="mt-5 flex flex-wrap justify-between gap-2 text-[10.5px] text-[#71717a]"><span>Fonte: Google Sheets · {SOURCES.find(x=>x[0]===source)?.[1]} · sem nomes de pacientes ou responsáveis</span><span>Atualização automática a cada 60 segundos</span></footer>
           </>}
-        </main>
+        </main>}
+        {!isConfiguracoes && null}
+        {isConfiguracoes && <Outlet />}
       </AppShell>
     </div>
   </AuthGuard>;
