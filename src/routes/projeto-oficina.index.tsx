@@ -39,14 +39,14 @@ function ProjetoOficina(){
   {title:"Aulas realizadas",value:stats.realizadas,icon:CalendarCheck2,to:"/projeto-oficina/aulas",desc:"no mês atual"},
  ];
 
- return <AuthGuard><div className="min-h-screen bg-[#f7f8fa]"><TopBar/><div className="flex min-h-[calc(100vh-64px)]"><OficinaSidebar/><div className="min-w-0 flex-1"><main className="p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-7xl">
+ return <AuthGuard><div className="min-h-screen bg-white"><TopBar/><div className="flex min-h-[calc(100vh-64px)]"><OficinaSidebar/><div className="min-w-0 flex-1"><main className="p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-7xl">
   <header className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
    <div><p className="text-xs font-semibold uppercase tracking-[.14em] text-black/40">Projeto Oficina</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-[#111827]">Dashboard</h1><p className="mt-2 text-sm text-black/55">Visão geral da operação, financeiro e aulas do mês.</p></div>
    <div className="rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm"><span className="text-black/45">Competência</span><strong className="ml-2 capitalize">{new Intl.DateTimeFormat("pt-BR",{month:"long",year:"numeric"}).format(new Date())}</strong></div>
   </header>
 
   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-   {cards.map(c=><Link key={c.title} to={c.to} className="group rounded-2xl border border-black/10 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md"><div className="flex items-start justify-between"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#111827] text-white"><c.icon size={19}/></div><ArrowUpRight size={18} className="text-black/25 transition group-hover:text-black/60"/></div><div className="mt-5 text-3xl font-bold tracking-tight">{loading?"—":c.value}</div><div className="mt-1 text-sm font-medium text-[#111827]">{c.title}</div><div className="mt-1 text-xs text-black/45">{c.desc}</div></Link>)}
+   {cards.map(c=><Link key={c.title} to={c.to} className="group rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-gray-300"><div className="flex items-start justify-between"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2F2F7] text-[#985c52]"><c.icon size={19}/></div><ArrowUpRight size={18} className="text-[#985c52]/45 transition group-hover:text-[#985c52]"/></div><div className="mt-5 text-3xl font-bold tracking-tight text-[#111827]">{loading?"—":c.value}</div><div className="mt-1 text-sm font-medium text-[#111827]">{c.title}</div><div className="mt-1 text-xs text-[#64748B]">{c.desc}</div></Link>)}
   </div>
 
   <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -63,7 +63,7 @@ function ProjetoOficina(){
       <Status label="Pendentes" value={stats.pendentes} icon={<Clock3 size={17}/>} />
       <Status label="Não realizadas" value={stats.naoRealizadas} icon={<AlertCircle size={17}/>} />
     </div>
-    <div className="mt-5 rounded-xl bg-[#f7f8fa] p-4"><div className="flex items-center justify-between text-sm"><span className="text-black/50">Execução do mês</span><strong>{stats.realizadas+stats.pendentes+stats.naoRealizadas>0?Math.round((stats.realizadas/(stats.realizadas+stats.pendentes+stats.naoRealizadas))*100):0}%</strong></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-black/10"><div className="h-full rounded-full bg-[#111827]" style={{width:`${stats.realizadas+stats.pendentes+stats.naoRealizadas>0?Math.round((stats.realizadas/(stats.realizadas+stats.pendentes+stats.naoRealizadas))*100):0}%`}}/></div></div>
+    <div className="mt-5 rounded-xl bg-[#F2F2F7] p-4"><div className="flex items-center justify-between text-sm"><span className="text-[#64748B]">Execução do mês</span><strong>{stats.realizadas+stats.pendentes+stats.naoRealizadas>0?Math.round((stats.realizadas/(stats.realizadas+stats.pendentes+stats.naoRealizadas))*100):0}%</strong></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-black/10"><div className="h-full rounded-full bg-[#985c52]" style={{width:`${stats.realizadas+stats.pendentes+stats.naoRealizadas>0?Math.round((stats.realizadas/(stats.realizadas+stats.pendentes+stats.naoRealizadas))*100):0}%`}}/></div></div>
    </Panel>
    <Panel title="Fechamento do mês" icon={<CircleDollarSign size={18}/>} action={<Link to="/projeto-oficina/fechamentos" className="text-xs font-semibold text-black/55 hover:text-black">Ver fechamentos</Link>}>
     <div className="space-y-3 text-sm"><Metric label="Recebido" value={money(stats.receitas)}/><Metric label="A pagar professores" value={money(stats.professor)}/><Metric label="Saldo" value={money(stats.receitas-stats.professor)} strong/></div>
@@ -75,9 +75,9 @@ function ProjetoOficina(){
  </div></main></div></div></div></AuthGuard>
 }
 
-function Panel(p:{title:string;icon:React.ReactNode;action?:React.ReactNode;children:React.ReactNode}){return <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-4"><div className="flex items-center gap-2 font-semibold text-[#111827]">{p.icon}{p.title}</div>{p.action}</div><div className="mt-5">{p.children}</div></section>}
-function Kpi(p:{title:string;value:string;icon:React.ReactNode}){return <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm"><div className="flex items-center gap-2 text-xs font-medium text-black/45">{p.icon}{p.title}</div><div className="mt-3 text-xl font-bold tracking-tight">{p.value}</div></div>}
-function Status(p:{label:string;value:number;icon:React.ReactNode}){return <div className="rounded-xl border border-black/10 p-4"><div className="flex items-center gap-2 text-xs text-black/50">{p.icon}{p.label}</div><div className="mt-2 text-2xl font-bold">{p.value}</div></div>}
+function Panel(p:{title:string;icon:React.ReactNode;action?:React.ReactNode;children:React.ReactNode}){return <section className="rounded-2xl border border-gray-200 bg-white p-5"><div className="flex items-center justify-between gap-4"><div className="flex items-center gap-3 font-semibold text-[#111827]"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F2F2F7] text-[#985c52]">{p.icon}</span>{p.title}</div>{p.action}</div><div className="mt-5">{p.children}</div></section>}
+function Kpi(p:{title:string;value:string;icon:React.ReactNode}){return <div className="rounded-2xl border border-gray-200 bg-white p-5"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F2F2F7] text-[#985c52]">{p.icon}</div><div className="mt-4 text-xs font-medium text-[#64748B]">{p.title}</div><div className="mt-1 text-[26px] font-bold leading-none text-[#111827]">{p.value}</div></div>}
+ function Status(p:{label:string;value:number;icon:React.ReactNode}){return <div className="rounded-xl border border-gray-200 p-4"><div className="flex items-center gap-2 text-xs text-[#64748B]"><span className="text-[#985c52]">{p.icon}</span>{p.label}</div><div className="mt-2 text-2xl font-bold text-[#111827]">{p.value}</div></div>}
 function Metric(p:{label:string;value:string;strong?:boolean}){return <div className="flex items-center justify-between border-b border-black/10 py-2 last:border-0"><span className="text-black/50">{p.label}</span><strong className={p.strong?"text-base":"text-sm"}>{p.value}</strong></div>}
 function money(v:number){return new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(v)}
 function monthStart(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1).toISOString().slice(0,10)}
