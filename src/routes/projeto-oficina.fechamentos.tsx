@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route=createFileRoute("/projeto-oficina/fechamentos")({component:Fechamentos});
 
-type Fechamento={id:string;reference_month:string;status:string;total_receitas:number;total_despesas:number;total_professores:number;closed_at:string|null};
+type Fechamento={id:string;reference_month:string;status:string;total_receitas:number;total_professores:number;closed_at:string|null};
 type Relatorio={id:string;fechamento_id:string;reference_month:string;title:string;content_html:string};
 
 function Fechamentos(){
@@ -29,19 +29,18 @@ function Fechamentos(){
   async function closeMonth(){
     const [year=0,month=1]=selectedMonth.split("-").map(Number);
     const ref=localDate(new Date(year,month-1,1)),end=localDate(new Date(year,month,0));
-    const [{data:p},{data:e},{data:a}]=await Promise.all([
+    const [{data:p},{data:a}]=await Promise.all([
       supabase.from("oficina_pagamentos").select("amount").eq("status","Pago").gte("due_date",ref).lte("due_date",end),
-      supabase.from("oficina_despesas").select("amount").gte("expense_date",ref).lte("expense_date",end),
       supabase.from("oficina_aulas").select("duration_minutes,hourly_rate").eq("status","realizada").gte("aula_date",ref).lte("aula_date",end)
     ]);
-    const receita=(p??[]).reduce((s,x)=>s+Number(x.amount),0),desp=(e??[]).reduce((s,x)=>s+Number(x.amount),0),prof=(a??[]).reduce((s,x)=>s+Number(x.duration_minutes)/60*Number(x.hourly_rate),0);
-    const {error}=await supabase.from("oficina_fechamentos").upsert({reference_month:ref,status:"Fechado",total_receitas:receita,total_despesas:desp,total_professores:prof,closed_at:new Date().toISOString()},{onConflict:"reference_month"});
+    const receita=(p??[]).reduce((s,x)=>s+Number(x.amount),0),prof=(a??[]).reduce((s,x)=>s+Number(x.duration_minutes)/60*Number(x.hourly_rate),0);
+    const {error}=await supabase.from("oficina_fechamentos").upsert({reference_month:ref,status:"Fechado",total_receitas:receita,total_professores:prof,closed_at:new Date().toISOString()},{onConflict:"reference_month"});
     if(error){window.alert(error.message);return}
     await load();
   }
 
   async function deleteClosing(row:Fechamento){
-    if(!window.confirm(`Excluir o fechamento de ${monthBR(row.reference_month)}? O relatório gerado também será excluído. Os lançamentos financeiros, despesas e aulas do período não serão alterados.`)) return;
+    if(!window.confirm(`Excluir o fechamento de ${monthBR(row.reference_month)}? O relatório gerado também será excluído. Os lançamentos financeiros e aulas do período não serão alterados.`)) return;
     setDeleting(row.id);
     try{
       const report=reports[row.id];
@@ -66,9 +65,8 @@ function Fechamentos(){
     const ref=row.reference_month;
     const refDate=new Date(ref+"T12:00:00");
     const end=localDate(new Date(refDate.getFullYear(),refDate.getMonth()+1,0));
-    const [{data:payments},{data:expenses},{data:classes}]=await Promise.all([
+    const [{data:payments},{data:classes}]=await Promise.all([
       supabase.from("oficina_pagamentos").select("amount,due_date,paid_at,status,payment_method,destination").eq("status","Pago").gte("due_date",ref).lte("due_date",end).order("due_date"),
-      supabase.from("oficina_despesas").select("description,amount,expense_date,category,payment_method").gte("expense_date",ref).lte("expense_date",end).order("expense_date"),
       supabase.from("oficina_aulas").select("aula_date,start_time,duration_minutes,teacher_name,hourly_rate,teacher_amount,turma_name,status").eq("status","realizada").gte("aula_date",ref).lte("aula_date",end).order("aula_date").order("start_time")
     ]);
 
@@ -84,9 +82,8 @@ function Fechamentos(){
     const classRows=aulas.map(a=>`<tr><td>${dateBR(a.aula_date)}</td><td>${esc(a.turma_name||"—")}</td><td>${esc(a.teacher_name||"—")}</td><td class="value">${money(Number(a.teacher_amount??(Number(a.duration_minutes)/60*Number(a.hourly_rate))))}</td></tr>`).join("");
     const professorRows=[...professorMap.entries()].map(([name,v])=>`<tr><td>${esc(name)}</td><td>${v.classes}</td><td>${v.hours.toFixed(2).replace(".",",")} h</td><td class="value">${money(v.amount)}</td></tr>`).join("");
     const paymentRows=(payments??[]).map(p=>`<tr><td>${dateBR(p.paid_at||p.due_date)}</td><td>${esc(p.payment_method||"—")}</td><td>${esc(p.destination||"—")}</td><td class="value">${money(Number(p.amount))}</td></tr>`).join("");
-    const expenseRows=(expenses??[]).map(e=>`<tr><td>${dateBR(e.expense_date)}</td><td>${esc(e.description||"—")}</td><td>${esc(e.category||"—")}</td><td class="value">${money(Number(e.amount))}</td></tr>`).join("");
     const totalHours=aulas.reduce((s,a)=>s+Number(a.duration_minutes)/60,0);
-    const saldo=Number(row.total_receitas)-Number(row.total_despesas)-Number(row.total_professores);
+    const saldo=Number(row.total_receitas)-Number(row.total_professores);
     const periodEnd=new Date(refDate.getFullYear(),refDate.getMonth()+1,0);
     const logo="/__l5e/assets-v1/6c7fcdfc-705e-4b26-9799-c2d14e1fe6ae/logo-equilibre.png";
 
@@ -98,7 +95,7 @@ function Fechamentos(){
       const chunk=aulas.slice(start,start+pageSize).map(a=>`<tr><td>${dateBR(a.aula_date)}</td><td>${esc(a.turma_name||"—")}</td><td>${esc(a.teacher_name||"—")}</td><td class="value">${money(Number(a.teacher_amount??(Number(a.duration_minutes)/60*Number(a.hourly_rate))))}</td></tr>`).join("");
       const isFirst=pageIndex===0;
       const isLast=pageIndex===totalClassPages-1;
-      const summary=isLast?`<div class="summary"><div class="summary-title">Resumo do período</div><div class="summary-row"><span>Total de aulas realizadas</span><strong>${aulas.length}</strong></div><div class="summary-row"><span>Total de horas realizadas</span><strong>${totalHours.toFixed(2).replace(".",",")} h</strong></div><div class="summary-row"><span>Total de receitas recebidas</span><strong>${money(Number(row.total_receitas))}</strong></div><div class="summary-row"><span>Total de despesas</span><strong>${money(Number(row.total_despesas))}</strong></div><div class="summary-row"><span>Total a pagar aos professores</span><strong>${money(Number(row.total_professores))}</strong></div><div class="summary-row total"><span>Saldo final do fechamento</span><strong>${money(saldo)}</strong></div></div><div class="prof-summary"><div class="summary-title">Resumo por professor</div><table><thead><tr><th>Professor</th><th>Aulas</th><th>Horas</th><th>Valor</th></tr></thead><tbody>${professorRows||"<tr><td colspan='4'>Nenhum professor com aulas realizadas.</td></tr>"}</tbody></table></div>${paymentRows?`<div class="mini-section"><div class="mini-title">Receitas recebidas</div><table><thead><tr><th>Data</th><th>Forma</th><th>Destino</th><th>Valor</th></tr></thead><tbody>${paymentRows}</tbody></table></div>`:''}${expenseRows?`<div class="mini-section"><div class="mini-title">Despesas</div><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>${expenseRows}</tbody></table></div>`:''}<div class="last-footer">Relatório gerado pelo Projeto Oficina</div>`:'';
+      const summary=isLast?`<div class="summary"><div class="summary-title">Resumo do período</div><div class="summary-row"><span>Total de aulas realizadas</span><strong>${aulas.length}</strong></div><div class="summary-row"><span>Total de horas realizadas</span><strong>${totalHours.toFixed(2).replace(".",",")} h</strong></div><div class="summary-row"><span>Total de receitas recebidas</span><strong>${money(Number(row.total_receitas))}</strong></div><div class="summary-row"><span>Total a pagar aos professores</span><strong>${money(Number(row.total_professores))}</strong></div><div class="summary-row total"><span>Saldo final do fechamento</span><strong>${money(saldo)}</strong></div></div><div class="prof-summary"><div class="summary-title">Resumo por professor</div><table><thead><tr><th>Professor</th><th>Aulas</th><th>Horas</th><th>Valor</th></tr></thead><tbody>${professorRows||"<tr><td colspan='4'>Nenhum professor com aulas realizadas.</td></tr>"}</tbody></table></div>${paymentRows?`<div class="mini-section"><div class="mini-title">Receitas recebidas</div><table><thead><tr><th>Data</th><th>Forma</th><th>Destino</th><th>Valor</th></tr></thead><tbody>${paymentRows}</tbody></table></div>`:''}<div class="last-footer">Relatório gerado pelo Projeto Oficina</div>`:'';
       pages.push(`<section class="page${isLast?' summary-page':''}"><header class="running"><span>${new Date().toLocaleDateString("pt-BR")}</span><span>Gerador de Relatório de Fechamentos</span></header>${isFirst?`<div class="brand"><img src="${logo}" onerror="this.style.display='none'"/></div><h1>RELATÓRIO DE FECHAMENTO - OFICINA</h1><div class="subtitle">Competência: ${monthBR(ref)} | Período: ${dateBR(ref)} a ${dateBR(localDate(periodEnd))}</div>`:''}<table class="main-table"><thead><tr><th>Data</th><th>Turma</th><th>Professor</th><th>Valor</th></tr></thead><tbody>${chunk||"<tr><td colspan='4'>Nenhuma aula realizada no período.</td></tr>"}</tbody></table>${summary}<footer>${pageIndex+1}/${totalClassPages}</footer></section>`);
     }
 
