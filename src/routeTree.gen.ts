@@ -210,7 +210,6 @@ export interface FileRoutesByFullPath {
   '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
   '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
   '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
-  '/minha-conta': typeof MinhaContaRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/usuarios': typeof UsuariosRoute
