@@ -61,7 +61,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <nav className="flex-1 space-y-1 px-3">
             {[...items, ...accountItems, ...adminItems].map(({ label, to, icon: Icon }) => {
-              const active = to === "/pilates" || to === "/osteopatia"
+              const active = to === "/pilates" || to === "/osteopatia" || to === "/gerador-de-horas"
                 ? pathname === to
                 : pathname === to || pathname.startsWith(`${to}/`);
               return (
