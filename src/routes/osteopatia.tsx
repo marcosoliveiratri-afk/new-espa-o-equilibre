@@ -295,8 +295,6 @@ function Osteopatia() {
             <footer className="mt-5 flex flex-wrap justify-between gap-2 text-[10.5px] text-[#71717a]"><span>Fonte: Google Sheets · {SOURCES.find(x=>x[0]===source)?.[1]} · sem nomes de pacientes ou responsáveis</span><span>Atualização automática a cada 60 segundos</span></footer>
           </>}
         </main>}
-        {!isConfiguracoes && null}
-        {isConfiguracoes && <Outlet />}
       </AppShell>
     </div>
   </AuthGuard>;
