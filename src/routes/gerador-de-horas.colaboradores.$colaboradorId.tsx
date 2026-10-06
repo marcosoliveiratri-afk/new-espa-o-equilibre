@@ -18,7 +18,7 @@ function ColaboradorHoras() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const year = new Date().getFullYear();
+  const [year, setYear] = useState(new Date().getFullYear());
 
   async function load() {
     setLoading(true);
@@ -56,7 +56,7 @@ function ColaboradorHoras() {
         <div>
           <Link to="/gerador-de-horas" className="inline-flex items-center gap-1 text-sm text-[#6B7280] hover:text-[#374151]"><ArrowLeft size={15}/> Colaboradores</Link>
           <h1 className="mt-3 text-[30px] font-bold tracking-tight text-[#1F2937]">{collaborator.name}</h1>
-          <p className="mt-1 text-sm text-[#6B7280]">Histórico de relatórios de {year}.</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2"><p className="text-sm text-[#6B7280]">Histórico de relatórios</p><select value={year} onChange={e=>setYear(Number(e.target.value))} className="h-9 rounded-lg border border-black/10 bg-white px-3 text-sm text-[#374151]">{Array.from({length:5},(_,i)=>new Date().getFullYear()+2-i).map(y=><option key={y} value={y}>{y}</option>)}</select></div>
         </div>
         <Link to="/gerador-de-horas/gerador" search={{ colaboradorId, month: `${year}-${String(new Date().getMonth()+1).padStart(2,"0")}` }} className="inline-flex items-center gap-2 rounded-xl bg-[#60A5FA] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#3B82F6]"><Play size={16}/> Gerar relatório</Link>
       </div>
@@ -64,7 +64,7 @@ function ColaboradorHoras() {
       {error && <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
       <section className="rounded-2xl border border-black/10 bg-white p-5">
-        <div className="mb-5 flex items-center justify-between gap-3"><div><h2 className="font-semibold text-[#1F2937]">Meses de referência</h2><p className="mt-1 text-xs text-[#6B7280]">Cada mês pode ter um único relatório salvo para este colaborador.</p></div><span className="rounded-full bg-[#F2F2F7] px-3 py-1 text-xs font-semibold text-[#4B5563]">{reports.length} salvo(s)</span></div>
+        <div className="mb-5 flex items-center justify-between gap-3"><div><h2 className="font-semibold text-[#1F2937]">Meses de referência</h2><p className="mt-1 text-xs text-[#6B7280]">Cada mês pode ter um único relatório salvo para este colaborador.</p></div><span className="rounded-full bg-[#F2F2F7] px-3 py-1 text-xs font-semibold text-[#4B5563]">{reports.filter(r=>r.reference_month.startsWith(String(year))).length} salvo(s)</span></div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {MONTHS.map((label, i)=>{
             const report=reportFor(i);
