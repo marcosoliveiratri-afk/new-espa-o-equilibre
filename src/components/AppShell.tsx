@@ -38,11 +38,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search });
   const moduleFromQuery = new URLSearchParams(search).get("module");
-  const isOsteopatia = pathname.startsWith("/osteopatia") || (pathname === "/minha-conta" || pathname === "/usuarios") && moduleFromQuery === "osteopatia";
-  const items = isOsteopatia ? osteopatiaItems : pilatesItems;
-  const sectionLabel = isOsteopatia ? "Osteopatia" : "Pilates";
-  const accountTo = isOsteopatia ? "/minha-conta?module=osteopatia" : "/minha-conta?module=pilates";
-  const usersTo = isOsteopatia ? "/usuarios?module=osteopatia" : "/usuarios?module=pilates";
+  const isGlobalContextRoute = pathname === "/minha-conta" || pathname === "/usuarios";
+  const isOsteopatia = pathname.startsWith("/osteopatia") || (isGlobalContextRoute && moduleFromQuery === "osteopatia");
+  const isGeradorHoras = pathname.startsWith("/gerador-de-horas") || (isGlobalContextRoute && moduleFromQuery === "gerador-de-horas");
+  const items = isOsteopatia ? osteopatiaItems : isGeradorHoras ? geradorHorasItems : pilatesItems;
+  const sectionLabel = isOsteopatia ? "Osteopatia" : isGeradorHoras ? "Gerador de Horas" : "Pilates";
+  const accountModule = isOsteopatia ? "osteopatia" : isGeradorHoras ? "gerador-de-horas" : "pilates";
+  const accountTo = `/minha-conta?module=${accountModule}`;
+  const usersTo = `/usuarios?module=${accountModule}`;
   const accountItems = [{ label: "Minha conta", to: accountTo, icon: UserCircle }];
   const adminItems = isAdmin ? [{ label: "Usuários", to: usersTo, icon: Users }] : [];
 
