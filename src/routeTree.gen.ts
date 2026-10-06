@@ -62,8 +62,8 @@ const GeradorDeHorasRoute = GeradorDeHorasRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const GeradorDeHorasColaboradoresColaboradorIdRoute = GeradorDeHorasColaboradoresColaboradorIdRouteImport.update({
-  id: '/$colaboradorId',
-  path: '/$colaboradorId',
+  id: '/colaboradores/$colaboradorId',
+  path: '/colaboradores/$colaboradorId',
   getParentRoute: () => GeradorDeHorasRoute,
 } as any)
 const GeradorDeHorasGeradorRoute = GeradorDeHorasGeradorRouteImport.update({
@@ -207,15 +207,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/minha-conta': typeof MinhaContaRoute
-  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
-  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
-  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
-  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
-  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
-  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
-  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
-  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
-  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
   '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
   '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
   '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
@@ -399,7 +390,7 @@ export interface FileRouteTypes {
     | '/projeto-oficina/alunos/'
   fileRoutesById: FileRoutesById
 }
-export interface GeradorDeHorasRouteChildren {
+interface GeradorDeHorasRouteChildren {
   GeradorDeHorasColaboradoresColaboradorIdRoute: typeof GeradorDeHorasColaboradoresColaboradorIdRoute
   GeradorDeHorasGeradorRoute: typeof GeradorDeHorasGeradorRoute
 }
@@ -413,7 +404,7 @@ const GeradorDeHorasRouteWithChildren = GeradorDeHorasRoute._addFileChildren(
   GeradorDeHorasRouteChildren,
 )
 
-interface RootRouteChildren {
+export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   MinhaContaRoute: typeof MinhaContaRoute
