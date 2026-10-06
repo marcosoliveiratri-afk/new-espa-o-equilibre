@@ -19,20 +19,22 @@ export function parseAttendance(txt: string, periodStart: string): ParsedAttenda
     if (!l) return;
     const m = l.match(/^(\d{1,2})\/(\d{1,2})(\*?)\s+(.+)$/);
     if (!m) return;
-    let rest = m[4].trim();
+    const [, day, month, star = "", name] = m;
+    if (!day || !month || !name) return;
+    let rest = name.trim();
     let val: number | null = null;
     if (/sem\s+valor/i.test(rest)) {
       rest = rest.replace(/[\s\-–]*sem\s+valor.*$/i, "").trim();
     } else {
       const v = rest.match(/^(.*?)[\s\-–:]*(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?|\d+(?:\.\d{1,2})?)\s*$/);
-      if (v) {
+      if (v?.[1] !== undefined && v[2] !== undefined) {
         rest = v[1].trim();
         let n = v[2];
         n = n.includes(",") ? n.replace(/\./g, "").replace(",", ".") : n;
         val = parseFloat(n);
       }
     }
-    out.push({ d: +m[1], m: +m[2], star: m[3], nome: rest, val, i });
+    out.push({ d: +day, m: +month, star, nome: rest, val, i });
   });
 
   const im = parseInt((periodStart.split("/")[1]) || "1", 10);
