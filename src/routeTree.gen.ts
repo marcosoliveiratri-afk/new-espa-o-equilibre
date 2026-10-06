@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
+import { Route as GeradorDeHorasRouteImport } from './routes/gerador-de-horas'
+import { Route as GeradorDeHorasColaboradoresColaboradorIdRouteImport } from './routes/gerador-de-horas.colaboradores.$colaboradorId'
+import { Route as GeradorDeHorasGeradorRouteImport } from './routes/gerador-de-horas.gerador'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
 import { Route as PilatesRouteImport } from './routes/pilates'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
@@ -52,6 +55,21 @@ const MinhaContaRoute = MinhaContaRouteImport.update({
   id: '/minha-conta',
   path: '/minha-conta',
   getParentRoute: () => rootRouteImport,
+} as any)
+const GeradorDeHorasRoute = GeradorDeHorasRouteImport.update({
+  id: '/gerador-de-horas',
+  path: '/gerador-de-horas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeradorDeHorasColaboradoresColaboradorIdRoute = GeradorDeHorasColaboradoresColaboradorIdRouteImport.update({
+  id: '/$colaboradorId',
+  path: '/$colaboradorId',
+  getParentRoute: () => GeradorDeHorasRoute,
+} as any)
+const GeradorDeHorasGeradorRoute = GeradorDeHorasGeradorRouteImport.update({
+  id: '/gerador',
+  path: '/gerador',
+  getParentRoute: () => GeradorDeHorasRoute,
 } as any)
 const OsteopatiaRoute = OsteopatiaRouteImport.update({
   id: '/osteopatia',
@@ -189,6 +207,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
+  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
+  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
+  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/usuarios': typeof UsuariosRoute
@@ -369,10 +399,25 @@ export interface FileRouteTypes {
     | '/projeto-oficina/alunos/'
   fileRoutesById: FileRoutesById
 }
-export interface RootRouteChildren {
+export interface GeradorDeHorasRouteChildren {
+  GeradorDeHorasColaboradoresColaboradorIdRoute: typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+  GeradorDeHorasGeradorRoute: typeof GeradorDeHorasGeradorRoute
+}
+
+const GeradorDeHorasRouteChildren: GeradorDeHorasRouteChildren = {
+  GeradorDeHorasColaboradoresColaboradorIdRoute: GeradorDeHorasColaboradoresColaboradorIdRoute,
+  GeradorDeHorasGeradorRoute: GeradorDeHorasGeradorRoute,
+}
+
+const GeradorDeHorasRouteWithChildren = GeradorDeHorasRoute._addFileChildren(
+  GeradorDeHorasRouteChildren,
+)
+
+interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   MinhaContaRoute: typeof MinhaContaRoute
+  GeradorDeHorasRoute: typeof GeradorDeHorasRouteWithChildren
   OsteopatiaRoute: typeof OsteopatiaRouteWithChildren
   PilatesRoute: typeof PilatesRouteWithChildren
   UsuariosRoute: typeof UsuariosRoute
@@ -411,6 +456,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/minha-conta'
       preLoaderRoute: typeof MinhaContaRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/gerador-de-horas': {
+      id: '/gerador-de-horas'
+      path: '/gerador-de-horas'
+      fullPath: '/gerador-de-horas'
+      preLoaderRoute: typeof GeradorDeHorasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gerador-de-horas/colaboradores/$colaboradorId': {
+      id: '/gerador-de-horas/colaboradores/$colaboradorId'
+      path: '/colaboradores/$colaboradorId'
+      fullPath: '/gerador-de-horas/colaboradores/$colaboradorId'
+      preLoaderRoute: typeof GeradorDeHorasColaboradoresColaboradorIdRouteImport
+      parentRoute: typeof GeradorDeHorasRoute
+    }
+    '/gerador-de-horas/gerador': {
+      id: '/gerador-de-horas/gerador'
+      path: '/gerador'
+      fullPath: '/gerador-de-horas/gerador'
+      preLoaderRoute: typeof GeradorDeHorasGeradorRouteImport
+      parentRoute: typeof GeradorDeHorasRoute
     }
     '/osteopatia': {
       id: '/osteopatia'
@@ -655,6 +721,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   MinhaContaRoute: MinhaContaRoute,
+  GeradorDeHorasRoute: GeradorDeHorasRouteWithChildren,
   OsteopatiaRoute: OsteopatiaRouteWithChildren,
   PilatesRoute: PilatesRouteWithChildren,
   UsuariosRoute: UsuariosRoute,
