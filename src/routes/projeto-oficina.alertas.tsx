@@ -10,12 +10,16 @@ export const Route=createFileRoute("/projeto-oficina/alertas")({component:Alerta
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";
 const money=(v:any)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const days=(d:string)=>Math.ceil((new Date(d+"T12:00:00").getTime()-new Date(new Date().toISOString().slice(0,10)+"T12:00:00").getTime())/86400000);
+const monthLabel=(value:string)=>{const [year,month]=value.split("-").map(Number);return new Intl.DateTimeFormat("pt-BR",{month:"long",year:"numeric"}).format(new Date(year,month-1,1)).replace(/^./,c=>c.toUpperCase())};
+const shiftMonth=(value:string,delta:number)=>{const [year,month]=value.split("-").map(Number);const d=new Date(year,month-1+delta,1);return d.toISOString().slice(0,7)};
 function Badge({tone,children}:{tone:string;children:any}){const c=tone==="danger"?"bg-red-100 text-red-700 ring-red-200":tone==="warning"?"bg-amber-100 text-amber-800 ring-amber-200":tone==="ok"?"bg-emerald-100 text-emerald-700 ring-emerald-200":"bg-slate-100 text-slate-600 ring-slate-200";return <span className={"inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 "+c}>{children}</span>}
 function urgency(n:number){return n<0?["danger",`Vencido há ${Math.abs(n)} dia(s)`]:n===0?["danger","Vence hoje"]:n<=7?["warning",`Vence em ${n} dia(s)`]:["neutral",`Vence em ${n} dias`]}
 function initials(name:string){return name.split(" ").filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
 
 function Alertas(){
  const [data,setData]=useState<any>({students:[],plans:[],studentPlans:[],payments:[]}),[loading,setLoading]=useState(true),[error,setError]=useState("");
+ const initialMonth=(()=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-1);return d.toISOString().slice(0,7)})();
+ const [selectedMonth,setSelectedMonth]=useState(initialMonth);
  async function load(){
   setLoading(true);setError("");
   const [s,pl,sp,p]=await Promise.all([
@@ -33,16 +37,17 @@ function Alertas(){
   const aps=new Map<string,any>(data.studentPlans.map((x:any)=>[x.id,x]));
   const plans=new Map<string,any>(data.plans.map((x:any)=>[x.id,x]));
   const planByStudent=new Map<string,any>();data.studentPlans.forEach((x:any)=>{if(!planByStudent.has(x.aluno_id))planByStudent.set(x.aluno_id,x)});
-  const previousStart=new Date();previousStart.setDate(1);previousStart.setMonth(previousStart.getMonth()-1);
-  const previousEnd=new Date(previousStart.getFullYear(),previousStart.getMonth()+1,0);
-  const ps=previousStart.toISOString().slice(0,10),pe=previousEnd.toISOString().slice(0,10);
+  const [selectedYear,selectedMonthNumber]=selectedMonth.split("-").map(Number);
+  const selectedStart=new Date(selectedYear,selectedMonthNumber-1,1);
+  const selectedEnd=new Date(selectedYear,selectedMonthNumber,0);
+  const ps=selectedStart.toISOString().slice(0,10),pe=selectedEnd.toISOString().slice(0,10);
   const paymentAlerts=data.payments.filter((x:any)=>aps.has(x.aluno_plano_id)&&x.status!=="Pago"&&x.status!=="Cancelado"&&x.due_date>=ps&&x.due_date<=pe).map((x:any)=>({...x,studentPlan:aps.get(x.aluno_plano_id),student:students.get(aps.get(x.aluno_plano_id)?.aluno_id)})).filter((x:any)=>x.student);
   const currentAlerts=data.payments.filter((x:any)=>students.has(aps.get(x.aluno_plano_id)?.aluno_id)&&x.status!=="Pago"&&x.status!=="Cancelado"&&days(x.due_date)<=7&&days(x.due_date)>=-60).map((x:any)=>({...x,studentPlan:aps.get(x.aluno_plano_id),student:students.get(aps.get(x.aluno_plano_id)?.aluno_id)})).filter((x:any)=>x.student).sort((a:any,b:any)=>a.due_date.localeCompare(b.due_date));
   const planAlerts=data.studentPlans.map((x:any)=>{const student=students.get(x.aluno_id),plan=plans.get(x.plano_id);return {...x,student,plan,left:x.end_date?days(x.end_date):null}}).filter((x:any)=>x.student&&x.end_date&&x.left<=15).sort((a:any,b:any)=>a.end_date.localeCompare(b.end_date));
   const noPlan=data.students.filter((x:any)=>!planByStudent.has(x.id));
   const noCharge=data.students.filter((x:any)=>{const ap=planByStudent.get(x.id);return ap&&!data.payments.some((p:any)=>p.aluno_plano_id===ap.id)});
-  return {students,aps,plans,paymentAlerts,currentAlerts,planAlerts,noPlan,noCharge,previousLabel:new Intl.DateTimeFormat("pt-BR",{month:"long",year:"numeric"}).format(previousStart).replace(/^./,c=>c.toUpperCase())};
- },[data]);
+  return {students,aps,plans,paymentAlerts,currentAlerts,planAlerts,noPlan,noCharge,selectedLabel:monthLabel(selectedMonth)};
+ },[data,selectedMonth]);
  const sendCharge=(x:any)=>{const phone=String(x.student?.whatsapp||x.student?.phone||"").replace(/\D/g,"");if(!phone){setError("O aluno não possui telefone/WhatsApp cadastrado.");return}const p=phone.startsWith("55")?phone:"55"+phone;const text=`Olá! Tudo bem? Passando para lembrar a cobrança da Oficina no valor de ${money(x.amount)}, com vencimento em ${fmt(x.due_date)}.`;window.open("https://wa.me/"+p+"?text="+encodeURIComponent(text),"_blank","noopener,noreferrer")};
  if(loading)return <AuthGuard><div className="p-8 text-center text-sm text-black/45">Carregando central de alertas...</div></AuthGuard>;
  return <AuthGuard><div className="min-h-screen bg-white"><TopBar/><div className="flex min-h-[calc(100vh-64px)]"><OficinaSidebar/><div className="min-w-0 flex-1 overflow-x-hidden"><main className="p-4 sm:p-5 lg:p-6"><div className="mx-auto w-full max-w-[1400px]">
@@ -50,7 +55,22 @@ function Alertas(){
   {error&&<div className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</div>}
   <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Card icon={<CreditCard size={18}/>} label="Cobranças pendentes" value={m.currentAlerts.length}/><Card icon={<CalendarClock size={18}/>} label="Planos em vencimento" value={m.planAlerts.length}/><Card icon={<AlertTriangle size={18}/>} label="Itens vencidos" value={m.currentAlerts.filter((x:any)=>days(x.due_date)<0).length}/><Card icon={<UsersRound size={18}/>} label="Alunos sem plano" value={m.noPlan.length}/></div>
 
-  <Section title={`Mensalidades pendentes — ${m.previousLabel}`} count={m.paymentAlerts.length}><Table><thead><tr><th>Aluno</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Destino</th><th>Status</th><th>Ação</th></tr></thead><tbody>{m.paymentAlerts.map((x:any)=>{const u=urgency(days(x.due_date));return <tr key={x.id}><td><Student name={x.student.full_name} id={x.student.id}/></td><td>{fmt(x.due_date)}</td><td>{money(x.amount)}</td><td>{x.payment_method||"—"}</td><td>{x.destination||"—"}</td><td><Badge tone={u[0] as string}>{u[1]} · {x.status}</Badge></td><td><div className="flex gap-2"><button onClick={()=>sendCharge(x)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium">Enviar cobrança</button><Link to="/projeto-oficina/alunos/$alunoId" params={{alunoId:x.student.id}} className="px-2 py-1.5 text-xs font-medium underline">Abrir</Link></div></td></tr>})}{!m.paymentAlerts.length&&<tr><td colSpan={7} className="p-8 text-center text-black/45">Nenhuma mensalidade do mês anterior está pendente.</td></tr>}</tbody></Table></Section>
+  <section className="mb-6 rounded-xl border border-gray-200 bg-gray-50/70 p-4">
+   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+     <p className="text-xs font-semibold uppercase tracking-[.1em] text-black/40">Período das mensalidades</p>
+     <h2 className="mt-1 text-base font-bold tracking-tight text-black/80">Visualizar alertas por mês</h2>
+     <p className="mt-1 text-sm text-black/50">Selecione o mês para consultar somente as mensalidades pendentes daquele período.</p>
+    </div>
+    <div className="flex items-center gap-2">
+     <button type="button" onClick={()=>setSelectedMonth(shiftMonth(selectedMonth,-1))} className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50" aria-label="Mês anterior">‹</button>
+     <input type="month" value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)} className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-800 outline-none focus:border-gray-400"/>
+     <button type="button" onClick={()=>setSelectedMonth(shiftMonth(selectedMonth,1))} className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50" aria-label="Próximo mês">›</button>
+    </div>
+   </div>
+  </section>
+
+  <Section title={`Mensalidades pendentes — ${m.selectedLabel}`} count={m.paymentAlerts.length}><Table><thead><tr><th>Aluno</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Destino</th><th>Status</th><th>Ação</th></tr></thead><tbody>{m.paymentAlerts.map((x:any)=>{const u=urgency(days(x.due_date));return <tr key={x.id}><td><Student name={x.student.full_name} id={x.student.id}/></td><td>{fmt(x.due_date)}</td><td>{money(x.amount)}</td><td>{x.payment_method||"—"}</td><td>{x.destination||"—"}</td><td><Badge tone={u[0] as string}>{u[1]} · {x.status}</Badge></td><td><div className="flex gap-2"><button onClick={()=>sendCharge(x)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium">Enviar cobrança</button><Link to="/projeto-oficina/alunos/$alunoId" params={{alunoId:x.student.id}} className="px-2 py-1.5 text-xs font-medium underline">Abrir</Link></div></td></tr>})}{!m.paymentAlerts.length&&<tr><td colSpan={7} className="p-8 text-center text-black/45">Nenhuma mensalidade do mês anterior está pendente.</td></tr>}</tbody></Table></Section>
 
   <Section title="Cobranças vencidas e próximas" count={m.currentAlerts.length}><Table><thead><tr><th>Aluno</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Destino</th><th>Status</th><th>Ação</th></tr></thead><tbody>{m.currentAlerts.map((x:any)=>{const u=urgency(days(x.due_date));return <tr key={x.id}><td><Student name={x.student.full_name} id={x.student.id}/></td><td>{fmt(x.due_date)}</td><td>{money(x.amount)}</td><td>{x.payment_method||"—"}</td><td>{x.destination||"—"}</td><td><Badge tone={u[0] as string}>{u[1]}</Badge></td><td><div className="flex gap-2"><button onClick={()=>sendCharge(x)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium">Enviar lembrete</button><Link to="/projeto-oficina/alunos/$alunoId" params={{alunoId:x.student.id}} className="text-xs font-medium underline">Atualizar</Link></div></td></tr>})}{!m.currentAlerts.length&&<tr><td colSpan={7} className="p-8 text-center text-black/45">Nenhuma cobrança vencida ou próxima do vencimento.</td></tr>}</tbody></Table></Section>
 
