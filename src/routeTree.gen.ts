@@ -10,15 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GeradorDeHorasRouteImport } from './routes/gerador-de-horas'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
-import { Route as GeradorDeHorasRouteImport } from './routes/gerador-de-horas'
-import { Route as GeradorDeHorasColaboradoresColaboradorIdRouteImport } from './routes/gerador-de-horas.colaboradores.$colaboradorId'
-import { Route as GeradorDeHorasGeradorRouteImport } from './routes/gerador-de-horas.gerador'
 import { Route as OsteopatiaRouteImport } from './routes/osteopatia'
 import { Route as PilatesRouteImport } from './routes/pilates'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as VisualizacaoRouteImport } from './routes/visualizacao'
+import { Route as GeradorDeHorasGeradorRouteImport } from './routes/gerador-de-horas.gerador'
 import { Route as OsteopatiaConfiguracoesRouteImport } from './routes/osteopatia.configuracoes'
 import { Route as PilatesAlertasRouteImport } from './routes/pilates.alertas'
 import { Route as PilatesAlunosRouteImport } from './routes/pilates.alunos'
@@ -37,6 +36,7 @@ import { Route as ProjetoOficinaProfessoresRouteImport } from './routes/projeto-
 import { Route as ProjetoOficinaTurmasRouteImport } from './routes/projeto-oficina.turmas'
 import { Route as VisualizacaoOsteopatiaRouteImport } from './routes/visualizacao.osteopatia'
 import { Route as VisualizacaoPilatesRouteImport } from './routes/visualizacao.pilates'
+import { Route as GeradorDeHorasColaboradoresColaboradorIdRouteImport } from './routes/gerador-de-horas.colaboradores.$colaboradorId'
 import { Route as PilatesAlunosAlunoIdRouteImport } from './routes/pilates.alunos.$alunoId'
 import { Route as ProjetoOficinaAlunosIndexRouteImport } from './routes/projeto-oficina.alunos.index'
 import { Route as ProjetoOficinaAlunosAlunoIdRouteImport } from './routes/projeto-oficina.alunos.$alunoId'
@@ -44,6 +44,11 @@ import { Route as ProjetoOficinaAlunosAlunoIdRouteImport } from './routes/projet
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeradorDeHorasRoute = GeradorDeHorasRouteImport.update({
+  id: '/gerador-de-horas',
+  path: '/gerador-de-horas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -55,21 +60,6 @@ const MinhaContaRoute = MinhaContaRouteImport.update({
   id: '/minha-conta',
   path: '/minha-conta',
   getParentRoute: () => rootRouteImport,
-} as any)
-const GeradorDeHorasRoute = GeradorDeHorasRouteImport.update({
-  id: '/gerador-de-horas',
-  path: '/gerador-de-horas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GeradorDeHorasColaboradoresColaboradorIdRoute = GeradorDeHorasColaboradoresColaboradorIdRouteImport.update({
-  id: '/colaboradores/$colaboradorId',
-  path: '/colaboradores/$colaboradorId',
-  getParentRoute: () => GeradorDeHorasRoute,
-} as any)
-const GeradorDeHorasGeradorRoute = GeradorDeHorasGeradorRouteImport.update({
-  id: '/gerador',
-  path: '/gerador',
-  getParentRoute: () => GeradorDeHorasRoute,
 } as any)
 const OsteopatiaRoute = OsteopatiaRouteImport.update({
   id: '/osteopatia',
@@ -90,6 +80,11 @@ const VisualizacaoRoute = VisualizacaoRouteImport.update({
   id: '/visualizacao',
   path: '/visualizacao',
   getParentRoute: () => rootRouteImport,
+} as any)
+const GeradorDeHorasGeradorRoute = GeradorDeHorasGeradorRouteImport.update({
+  id: '/gerador',
+  path: '/gerador',
+  getParentRoute: () => GeradorDeHorasRoute,
 } as any)
 const OsteopatiaConfiguracoesRoute = OsteopatiaConfiguracoesRouteImport.update({
   id: '/configuracoes',
@@ -185,6 +180,12 @@ const VisualizacaoPilatesRoute = VisualizacaoPilatesRouteImport.update({
   path: '/pilates',
   getParentRoute: () => VisualizacaoRoute,
 } as any)
+const GeradorDeHorasColaboradoresColaboradorIdRoute =
+  GeradorDeHorasColaboradoresColaboradorIdRouteImport.update({
+    id: '/colaboradores/$colaboradorId',
+    path: '/colaboradores/$colaboradorId',
+    getParentRoute: () => GeradorDeHorasRoute,
+  } as any)
 const PilatesAlunosAlunoIdRoute = PilatesAlunosAlunoIdRouteImport.update({
   id: '/$alunoId',
   path: '/$alunoId',
@@ -205,15 +206,14 @@ const ProjetoOficinaAlunosAlunoIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
   '/login': typeof LoginRoute
   '/minha-conta': typeof MinhaContaRoute
-  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
-  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
-  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/usuarios': typeof UsuariosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
   '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
@@ -232,22 +232,21 @@ export interface FileRoutesByFullPath {
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/projeto-oficina/': typeof ProjetoOficinaIndexRoute
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
   '/projeto-oficina/alunos/$alunoId': typeof ProjetoOficinaAlunosAlunoIdRoute
   '/projeto-oficina/alunos/': typeof ProjetoOficinaAlunosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/minha-conta': typeof MinhaContaRoute
   '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
-  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
-  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
+  '/login': typeof LoginRoute
   '/minha-conta': typeof MinhaContaRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/usuarios': typeof UsuariosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
   '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
@@ -266,6 +265,7 @@ export interface FileRoutesByTo {
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/projeto-oficina': typeof ProjetoOficinaIndexRoute
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
   '/projeto-oficina/alunos/$alunoId': typeof ProjetoOficinaAlunosAlunoIdRoute
   '/projeto-oficina/alunos': typeof ProjetoOficinaAlunosIndexRoute
@@ -273,16 +273,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/minha-conta': typeof MinhaContaRoute
   '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
-  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
-  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
+  '/login': typeof LoginRoute
   '/minha-conta': typeof MinhaContaRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/usuarios': typeof UsuariosRoute
   '/visualizacao': typeof VisualizacaoRouteWithChildren
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
   '/osteopatia/configuracoes': typeof OsteopatiaConfiguracoesRoute
   '/pilates/alertas': typeof PilatesAlertasRoute
   '/pilates/alunos': typeof PilatesAlunosRouteWithChildren
@@ -301,6 +299,7 @@ export interface FileRoutesById {
   '/visualizacao/osteopatia': typeof VisualizacaoOsteopatiaRoute
   '/visualizacao/pilates': typeof VisualizacaoPilatesRoute
   '/projeto-oficina/': typeof ProjetoOficinaIndexRoute
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
   '/pilates/alunos/$alunoId': typeof PilatesAlunosAlunoIdRoute
   '/projeto-oficina/alunos/$alunoId': typeof ProjetoOficinaAlunosAlunoIdRoute
   '/projeto-oficina/alunos/': typeof ProjetoOficinaAlunosIndexRoute
@@ -308,16 +307,15 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/gerador-de-horas'
-    | '/gerador-de-horas/colaboradores/$colaboradorId'
-    | '/gerador-de-horas/gerador'
     | '/'
+    | '/gerador-de-horas'
     | '/login'
     | '/minha-conta'
     | '/osteopatia'
     | '/pilates'
     | '/usuarios'
     | '/visualizacao'
+    | '/gerador-de-horas/gerador'
     | '/osteopatia/configuracoes'
     | '/pilates/alertas'
     | '/pilates/alunos'
@@ -336,21 +334,21 @@ export interface FileRouteTypes {
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/projeto-oficina/'
+    | '/gerador-de-horas/colaboradores/$colaboradorId'
     | '/pilates/alunos/$alunoId'
     | '/projeto-oficina/alunos/$alunoId'
     | '/projeto-oficina/alunos/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/gerador-de-horas'
-    | '/gerador-de-horas/colaboradores/$colaboradorId'
-    | '/gerador-de-horas/gerador'
     | '/'
+    | '/gerador-de-horas'
     | '/login'
     | '/minha-conta'
     | '/osteopatia'
     | '/pilates'
     | '/usuarios'
     | '/visualizacao'
+    | '/gerador-de-horas/gerador'
     | '/osteopatia/configuracoes'
     | '/pilates/alertas'
     | '/pilates/alunos'
@@ -369,21 +367,21 @@ export interface FileRouteTypes {
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/projeto-oficina'
+    | '/gerador-de-horas/colaboradores/$colaboradorId'
     | '/pilates/alunos/$alunoId'
     | '/projeto-oficina/alunos/$alunoId'
     | '/projeto-oficina/alunos'
   id:
-    | '/gerador-de-horas'
-    | '/gerador-de-horas/colaboradores/$colaboradorId'
-    | '/gerador-de-horas/gerador'
     | '__root__'
     | '/'
+    | '/gerador-de-horas'
     | '/login'
     | '/minha-conta'
     | '/osteopatia'
     | '/pilates'
     | '/usuarios'
     | '/visualizacao'
+    | '/gerador-de-horas/gerador'
     | '/osteopatia/configuracoes'
     | '/pilates/alertas'
     | '/pilates/alunos'
@@ -402,30 +400,17 @@ export interface FileRouteTypes {
     | '/visualizacao/osteopatia'
     | '/visualizacao/pilates'
     | '/projeto-oficina/'
+    | '/gerador-de-horas/colaboradores/$colaboradorId'
     | '/pilates/alunos/$alunoId'
     | '/projeto-oficina/alunos/$alunoId'
     | '/projeto-oficina/alunos/'
   fileRoutesById: FileRoutesById
 }
-interface GeradorDeHorasRouteChildren {
-  GeradorDeHorasColaboradoresColaboradorIdRoute: typeof GeradorDeHorasColaboradoresColaboradorIdRoute
-  GeradorDeHorasGeradorRoute: typeof GeradorDeHorasGeradorRoute
-}
-
-const GeradorDeHorasRouteChildren: GeradorDeHorasRouteChildren = {
-  GeradorDeHorasColaboradoresColaboradorIdRoute: GeradorDeHorasColaboradoresColaboradorIdRoute,
-  GeradorDeHorasGeradorRoute: GeradorDeHorasGeradorRoute,
-}
-
-const GeradorDeHorasRouteWithChildren = GeradorDeHorasRoute._addFileChildren(
-  GeradorDeHorasRouteChildren,
-)
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GeradorDeHorasRoute: typeof GeradorDeHorasRouteWithChildren
   LoginRoute: typeof LoginRoute
   MinhaContaRoute: typeof MinhaContaRoute
-  GeradorDeHorasRoute: typeof GeradorDeHorasRouteWithChildren
   OsteopatiaRoute: typeof OsteopatiaRouteWithChildren
   PilatesRoute: typeof PilatesRouteWithChildren
   UsuariosRoute: typeof UsuariosRoute
@@ -451,6 +436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gerador-de-horas': {
+      id: '/gerador-de-horas'
+      path: '/gerador-de-horas'
+      fullPath: '/gerador-de-horas'
+      preLoaderRoute: typeof GeradorDeHorasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -464,27 +456,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/minha-conta'
       preLoaderRoute: typeof MinhaContaRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/gerador-de-horas': {
-      id: '/gerador-de-horas'
-      path: '/gerador-de-horas'
-      fullPath: '/gerador-de-horas'
-      preLoaderRoute: typeof GeradorDeHorasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gerador-de-horas/colaboradores/$colaboradorId': {
-      id: '/gerador-de-horas/colaboradores/$colaboradorId'
-      path: '/colaboradores/$colaboradorId'
-      fullPath: '/gerador-de-horas/colaboradores/$colaboradorId'
-      preLoaderRoute: typeof GeradorDeHorasColaboradoresColaboradorIdRouteImport
-      parentRoute: typeof GeradorDeHorasRoute
-    }
-    '/gerador-de-horas/gerador': {
-      id: '/gerador-de-horas/gerador'
-      path: '/gerador'
-      fullPath: '/gerador-de-horas/gerador'
-      preLoaderRoute: typeof GeradorDeHorasGeradorRouteImport
-      parentRoute: typeof GeradorDeHorasRoute
     }
     '/osteopatia': {
       id: '/osteopatia'
@@ -513,6 +484,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/visualizacao'
       preLoaderRoute: typeof VisualizacaoRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/gerador-de-horas/gerador': {
+      id: '/gerador-de-horas/gerador'
+      path: '/gerador'
+      fullPath: '/gerador-de-horas/gerador'
+      preLoaderRoute: typeof GeradorDeHorasGeradorRouteImport
+      parentRoute: typeof GeradorDeHorasRoute
     }
     '/osteopatia/configuracoes': {
       id: '/osteopatia/configuracoes'
@@ -640,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VisualizacaoPilatesRouteImport
       parentRoute: typeof VisualizacaoRoute
     }
+    '/gerador-de-horas/colaboradores/$colaboradorId': {
+      id: '/gerador-de-horas/colaboradores/$colaboradorId'
+      path: '/colaboradores/$colaboradorId'
+      fullPath: '/gerador-de-horas/colaboradores/$colaboradorId'
+      preLoaderRoute: typeof GeradorDeHorasColaboradoresColaboradorIdRouteImport
+      parentRoute: typeof GeradorDeHorasRoute
+    }
     '/pilates/alunos/$alunoId': {
       id: '/pilates/alunos/$alunoId'
       path: '/$alunoId'
@@ -663,6 +648,21 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface GeradorDeHorasRouteChildren {
+  GeradorDeHorasGeradorRoute: typeof GeradorDeHorasGeradorRoute
+  GeradorDeHorasColaboradoresColaboradorIdRoute: typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+}
+
+const GeradorDeHorasRouteChildren: GeradorDeHorasRouteChildren = {
+  GeradorDeHorasGeradorRoute: GeradorDeHorasGeradorRoute,
+  GeradorDeHorasColaboradoresColaboradorIdRoute:
+    GeradorDeHorasColaboradoresColaboradorIdRoute,
+}
+
+const GeradorDeHorasRouteWithChildren = GeradorDeHorasRoute._addFileChildren(
+  GeradorDeHorasRouteChildren,
+)
 
 interface OsteopatiaRouteChildren {
   OsteopatiaConfiguracoesRoute: typeof OsteopatiaConfiguracoesRoute
@@ -727,9 +727,9 @@ const VisualizacaoRouteWithChildren = VisualizacaoRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GeradorDeHorasRoute: GeradorDeHorasRouteWithChildren,
   LoginRoute: LoginRoute,
   MinhaContaRoute: MinhaContaRoute,
-  GeradorDeHorasRoute: GeradorDeHorasRouteWithChildren,
   OsteopatiaRoute: OsteopatiaRouteWithChildren,
   PilatesRoute: PilatesRouteWithChildren,
   UsuariosRoute: UsuariosRoute,
