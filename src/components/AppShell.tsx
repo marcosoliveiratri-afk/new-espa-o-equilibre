@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, LayoutDashboard, Menu, Settings, Users, FlaskConical, ReceiptText, BellRing, X, WalletCards, UserCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard, Menu, Settings, Users, FlaskConical, ReceiptText, BellRing, X, WalletCards, UserCircle, FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -8,7 +8,7 @@ const osteopatiaItems = [
   { label: "Configurações", to: "/osteopatia/configuracoes", icon: Settings },
 ] as const;
 
-const pilatesItems = [
+const geradorHorasItems = [\n  { label: "Colaboradores", to: "/gerador-de-horas", icon: Users },\n  { label: "Gerador de relatório", to: "/gerador-de-horas/gerador", icon: FileText },\n] as const;\n\nconst pilatesItems = [
   { label: "Alunos", to: "/pilates/alunos", icon: Users },
   { label: "Aulas experimentais", to: "/pilates/aulas-experimentais", icon: FlaskConical },
   { label: "Central de alertas", to: "/pilates/alertas", icon: BellRing },
