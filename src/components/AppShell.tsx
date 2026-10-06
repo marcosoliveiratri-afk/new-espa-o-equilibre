@@ -31,11 +31,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     });
   }, []);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isOsteopatia = pathname.startsWith("/osteopatia");
+  const search = useRouterState({ select: (s) => s.location.search });
+  const moduleFromQuery = new URLSearchParams(search).get("module");
+  const isOsteopatia = pathname.startsWith("/osteopatia") || (pathname === "/minha-conta" || pathname === "/usuarios") && moduleFromQuery === "osteopatia";
   const items = isOsteopatia ? osteopatiaItems : pilatesItems;
   const sectionLabel = isOsteopatia ? "Osteopatia" : "Pilates";
-  const accountItems = [{ label: "Minha conta", to: "/minha-conta", icon: UserCircle }];
-  const adminItems = isAdmin ? [{ label: "Usuários", to: "/usuarios", icon: Users }] : [];
+  const accountTo = isOsteopatia ? "/minha-conta?module=osteopatia" : "/minha-conta?module=pilates";
+  const usersTo = isOsteopatia ? "/usuarios?module=osteopatia" : "/usuarios?module=pilates";
+  const accountItems = [{ label: "Minha conta", to: accountTo, icon: UserCircle }];
+  const adminItems = isAdmin ? [{ label: "Usuários", to: usersTo, icon: Users }] : [];
 
   return (
     <div className="text-[#1b1b1b]">
