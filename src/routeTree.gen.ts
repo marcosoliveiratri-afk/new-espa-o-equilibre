@@ -210,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
   '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
   '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
+  '/minha-conta': typeof MinhaContaRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/usuarios': typeof UsuariosRoute
@@ -239,6 +240,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
   '/minha-conta': typeof MinhaContaRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
@@ -271,6 +276,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/gerador-de-horas': typeof GeradorDeHorasRouteWithChildren
+  '/gerador-de-horas/colaboradores/$colaboradorId': typeof GeradorDeHorasColaboradoresColaboradorIdRoute
+  '/gerador-de-horas/gerador': typeof GeradorDeHorasGeradorRoute
+  '/minha-conta': typeof MinhaContaRoute
   '/osteopatia': typeof OsteopatiaRouteWithChildren
   '/pilates': typeof PilatesRouteWithChildren
   '/usuarios': typeof UsuariosRoute
@@ -300,18 +309,12 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/gerador-de-horas'
+    | '/gerador-de-horas/colaboradores/$colaboradorId'
+    | '/gerador-de-horas/gerador'
     | '/'
     | '/login'
     | '/minha-conta'
-    | '/gerador-de-horas'
-    | '/gerador-de-horas/colaboradores/$colaboradorId'
-    | '/gerador-de-horas/gerador'
-    | '/gerador-de-horas'
-    | '/gerador-de-horas/colaboradores/$colaboradorId'
-    | '/gerador-de-horas/gerador'
-    | '/gerador-de-horas'
-    | '/gerador-de-horas/colaboradores/$colaboradorId'
-    | '/gerador-de-horas/gerador'
     | '/osteopatia'
     | '/pilates'
     | '/usuarios'
@@ -339,6 +342,9 @@ export interface FileRouteTypes {
     | '/projeto-oficina/alunos/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/gerador-de-horas'
+    | '/gerador-de-horas/colaboradores/$colaboradorId'
+    | '/gerador-de-horas/gerador'
     | '/'
     | '/login'
     | '/minha-conta'
@@ -368,6 +374,9 @@ export interface FileRouteTypes {
     | '/projeto-oficina/alunos/$alunoId'
     | '/projeto-oficina/alunos'
   id:
+    | '/gerador-de-horas'
+    | '/gerador-de-horas/colaboradores/$colaboradorId'
+    | '/gerador-de-horas/gerador'
     | '__root__'
     | '/'
     | '/login'
