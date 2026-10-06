@@ -391,30 +391,30 @@ function Fechamentos() {
       timeStyle: "short",
     }).format(new Date());
 
-    const periodLabel = \`${MONTHS[Number(monthNum) - 1]} de ${year}\`;
+    const periodLabel = `${MONTHS[Number(monthNum) - 1]} de ${year}`;
     const statusLabel =
       m.status === "equal"
         ? "Fechamento equilibrado"
         : m.status === "professor"
-        ? \`Professor deve repassar \${brl(m.adjustment)} para a Clínica\`
-        : \`Clínica deve repassar \${brl(m.adjustment)} para o Professor\`;
+        ? `Professor deve repassar ${brl(m.adjustment)} para a Clínica`
+        : `Clínica deve repassar ${brl(m.adjustment)} para o Professor`;
 
     const statusDetail =
       m.status === "equal"
         ? "Os valores recebidos estão alinhados com a divisão configurada."
-        : \`Diferença identificada de \${brl(m.adjustment)} para equalização do fechamento.\`;
+        : `Diferença identificada de ${brl(m.adjustment)} para equalização do fechamento.`;
 
     const rows = m.rows
       .map(
         (x) =>
-          \`<tr>
-            <td class="c">\${e(fmtDate(x.date))}</td>
-            <td><strong>\${e(x.student)}</strong></td>
-            <td>\${e(x.type)}</td>
-            <td>\${e(x.method || "—")}</td>
-            <td class="r">\${e(brl(x.amount))}</td>
-            <td>\${e(x.destination)}</td>
-          </tr>\`
+          `<tr>
+            <td class="c">${e(fmtDate(x.date))}</td>
+            <td><strong>${e(x.student)}</strong></td>
+            <td>${e(x.type)}</td>
+            <td>${e(x.method || "—")}</td>
+            <td class="r">${e(brl(x.amount))}</td>
+            <td>${e(x.destination)}</td>
+          </tr>`
       )
       .join("");
 
@@ -422,7 +422,7 @@ function Fechamentos() {
       .sort((a, b) => Number(b[1]) - Number(a[1]))
       .map(
         ([type, value]) =>
-          \`<tr><td>\${e(type)}</td><td class="r">\${e(brl(value))}</td></tr>\`
+          `<tr><td>${e(type)}</td><td class="r">${e(brl(value))}</td></tr>`
       )
       .join("");
 
@@ -431,12 +431,12 @@ function Fechamentos() {
 
     w.document.open();
     w.document.write(
-      \`<!DOCTYPE html>
+      `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fechamento Pilates - \${e(teacherName)} - \${e(periodLabel)}</title>
+<title>Fechamento Pilates - ${e(teacherName)} - ${e(periodLabel)}</title>
 <style>
 :root{--bg:#f6f1ef;--panel:#fff;--ink:#3a2a27;--muted:#777;--line:#e3c6bf;--head:#c98072;--title:#8b5048;--alt:#f8eeeb}
 *{box-sizing:border-box}
@@ -474,21 +474,21 @@ tbody tr:nth-child(even){background:var(--alt)}
 <div class="paper" id="paper">
 <img src="/__l5e/assets-v1/6c7fcdfc-705e-4b26-9799-c2d14e1fe6ae/logo-equilibre.png" alt="Espaço Equilibre">
 <h1>FECHAMENTO FINANCEIRO - PILATES</h1>
-<div class="sub">Competência: \${e(periodLabel)} | \${e(teacherName)}</div>
+<div class="sub">Competência: ${e(periodLabel)} | ${e(teacherName)}</div>
 
 <div class="meta">
-  <div><span>Período</span><strong>\${e(periodLabel)}</strong></div>
-  <div><span>Gerado em</span><strong>\${e(generatedAt)}</strong></div>
+  <div><span>Período</span><strong>${e(periodLabel)}</strong></div>
+  <div><span>Gerado em</span><strong>${e(generatedAt)}</strong></div>
 </div>
 
 <div class="scroll">
 <table>
 <thead><tr><th>Indicador</th><th class="r">Valor</th></tr></thead>
 <tbody>
-<tr><td>Total efetivamente recebido</td><td class="r">\${e(brl(m.total))}</td></tr>
-<tr><td>Professor recebeu</td><td class="r">\${e(brl(m.receivedProfessor))}</td></tr>
-<tr><td>Clínica recebeu</td><td class="r">\${e(brl(m.receivedClinic))}</td></tr>
-<tr class="highlight"><td>Total de lançamentos</td><td class="r">\${e(String(m.rows.length))}</td></tr>
+<tr><td>Total efetivamente recebido</td><td class="r">${e(brl(m.total))}</td></tr>
+<tr><td>Professor recebeu</td><td class="r">${e(brl(m.receivedProfessor))}</td></tr>
+<tr><td>Clínica recebeu</td><td class="r">${e(brl(m.receivedClinic))}</td></tr>
+<tr class="highlight"><td>Total de lançamentos</td><td class="r">${e(String(m.rows.length))}</td></tr>
 </tbody>
 </table>
 </div>
@@ -499,8 +499,8 @@ tbody tr:nth-child(even){background:var(--alt)}
 <table>
 <thead><tr><th>Destino</th><th>Percentual</th><th class="r">Valor da cota</th><th class="r">Recebido</th></tr></thead>
 <tbody>
-<tr><td>Professor</td><td>\${e(String(split.professor_percentage))}%</td><td class="r">\${e(brl(m.shareProfessor))}</td><td class="r">\${e(brl(m.receivedProfessor))}</td></tr>
-<tr><td>Clínica</td><td>\${e(String(split.clinic_percentage))}%</td><td class="r">\${e(brl(m.shareClinic))}</td><td class="r">\${e(brl(m.receivedClinic))}</td></tr>
+<tr><td>Professor</td><td>${e(String(split.professor_percentage))}%</td><td class="r">${e(brl(m.shareProfessor))}</td><td class="r">${e(brl(m.receivedProfessor))}</td></tr>
+<tr><td>Clínica</td><td>${e(String(split.clinic_percentage))}%</td><td class="r">${e(brl(m.shareClinic))}</td><td class="r">${e(brl(m.receivedClinic))}</td></tr>
 </tbody>
 </table>
 </div>
@@ -511,14 +511,14 @@ tbody tr:nth-child(even){background:var(--alt)}
 <div class="scroll">
 <table>
 <thead><tr><th>Tipo</th><th class="r">Valor</th></tr></thead>
-<tbody>\${compositionRows || '<tr><td colspan="2">Nenhum recebimento no período.</td></tr>'}</tbody>
+<tbody>${compositionRows || '<tr><td colspan="2">Nenhum recebimento no período.</td></tr>'}</tbody>
 </table>
 </div>
 </div>
 
 <div class="status">
-<strong>Status:</strong> \${e(statusLabel)}<br>
-\${e(statusDetail)}
+<strong>Status:</strong> ${e(statusLabel)}<br>
+${e(statusDetail)}
 </div>
 
 <div class="section">
@@ -526,8 +526,8 @@ tbody tr:nth-child(even){background:var(--alt)}
 <div class="scroll">
 <table>
 <thead><tr><th class="c" style="width:80px">Data</th><th>Aluno / descrição</th><th>Tipo</th><th>Forma</th><th class="r">Valor</th><th>Destino</th></tr></thead>
-<tbody>\${rows || '<tr><td colspan="6" class="c">Nenhum recebimento no período selecionado.</td></tr>'}</tbody>
-\${m.rows.length ? \`<tfoot><tr><td colspan="4"><strong>Total recebido</strong></td><td class="r"><strong>\${e(brl(m.total))}</strong></td><td></td></tr></tfoot>\` : ""}
+<tbody>${rows || '<tr><td colspan="6" class="c">Nenhum recebimento no período selecionado.</td></tr>'}</tbody>
+${m.rows.length ? `<tfoot><tr><td colspan="4"><strong>Total recebido</strong></td><td class="r"><strong>${e(brl(m.total))}</strong></td><td></td></tr></tfoot>` : ""}
 </table>
 </div>
 </div>
@@ -542,7 +542,7 @@ tbody tr:nth-child(even){background:var(--alt)}
 window.onload=()=>setTimeout(()=>window.print(),180);
 </script>
 </body>
-</html>\`
+</html>`
     );
     w.document.close();
   };
