@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppShell } from "@/components/AppShell";
@@ -16,6 +16,12 @@ type Collaborator = {
 };
 
 function GeradorDeHoras() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  if (pathname !== "/gerador-de-horas") {
+    return <Outlet />;
+  }
+
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [reportCounts, setReportCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
