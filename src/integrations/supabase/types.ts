@@ -93,6 +93,77 @@ export type Database = {
           },
         ]
       }
+      hour_generator_collaborators: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hour_generator_reports: {
+        Row: {
+          collaborator_id: string
+          generated_at: string
+          id: string
+          input_data: string
+          period_end: string | null
+          period_start: string | null
+          reference_month: string
+          repasse_percent: number
+          report_html: string
+          updated_at: string
+        }
+        Insert: {
+          collaborator_id: string
+          generated_at?: string
+          id?: string
+          input_data?: string
+          period_end?: string | null
+          period_start?: string | null
+          reference_month: string
+          repasse_percent?: number
+          report_html?: string
+          updated_at?: string
+        }
+        Update: {
+          collaborator_id?: string
+          generated_at?: string
+          id?: string
+          input_data?: string
+          period_end?: string | null
+          period_start?: string | null
+          reference_month?: string
+          repasse_percent?: number
+          report_html?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hour_generator_reports_collaborator_id_fkey"
+            columns: ["collaborator_id"]
+            isOneToOne: false
+            referencedRelation: "hour_generator_collaborators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       oficina_aluno_planos: {
         Row: {
           agreed_value: number
