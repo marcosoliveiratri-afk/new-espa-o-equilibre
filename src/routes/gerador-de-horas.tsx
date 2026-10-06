@@ -18,10 +18,6 @@ type Collaborator = {
 function GeradorDeHoras() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  if (pathname !== "/gerador-de-horas") {
-    return <Outlet />;
-  }
-
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [reportCounts, setReportCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -48,6 +44,10 @@ function GeradorDeHoras() {
   }
 
   useEffect(() => { void load(); }, []);
+
+  if (pathname !== "/gerador-de-horas") {
+    return <Outlet />;
+  }
 
   async function createCollaborator() {
     const normalized = name.trim();
