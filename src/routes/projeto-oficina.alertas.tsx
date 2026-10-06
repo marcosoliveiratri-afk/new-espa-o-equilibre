@@ -53,8 +53,6 @@ function Alertas(){
  return <AuthGuard><div className="min-h-screen bg-white"><TopBar/><div className="flex min-h-[calc(100vh-64px)]"><OficinaSidebar/><div className="min-w-0 flex-1 overflow-x-hidden"><main className="p-4 sm:p-5 lg:p-6"><div className="mx-auto w-full max-w-[1400px]">
   <header className="mb-6"><p className="text-xs font-semibold uppercase tracking-[.12em] text-black/40">Projeto Oficina</p><h1 className="mt-1 text-[28px] font-bold leading-tight text-[#111827]">Central de Alertas</h1><p className="mt-2 text-sm text-black/55">Acompanhe cobranças, vencimentos e pendências dos alunos da Oficina.</p></header>
   {error&&<div className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</div>}
-  <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Card icon={<CreditCard size={18}/>} label="Cobranças pendentes" value={m.currentAlerts.length}/><Card icon={<CalendarClock size={18}/>} label="Planos em vencimento" value={m.planAlerts.length}/><Card icon={<AlertTriangle size={18}/>} label="Itens vencidos" value={m.currentAlerts.filter((x:any)=>days(x.due_date)<0).length}/><Card icon={<UsersRound size={18}/>} label="Alunos sem plano" value={m.noPlan.length}/></div>
-
   <section className="mb-6 rounded-xl border border-gray-200 bg-gray-50/70 p-4">
    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
     <div>
@@ -69,6 +67,8 @@ function Alertas(){
     </div>
    </div>
   </section>
+
+  <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Card icon={<CreditCard size={18}/>} label="Cobranças pendentes" value={m.currentAlerts.length}/><Card icon={<CalendarClock size={18}/>} label="Planos em vencimento" value={m.planAlerts.length}/><Card icon={<AlertTriangle size={18}/>} label="Itens vencidos" value={m.currentAlerts.filter((x:any)=>days(x.due_date)<0).length}/><Card icon={<UsersRound size={18}/>} label="Alunos sem plano" value={m.noPlan.length}/></div>
 
   <Section title={`Mensalidades pendentes — ${m.selectedLabel}`} count={m.paymentAlerts.length}><Table><thead><tr><th>Aluno</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Destino</th><th>Status</th><th>Ação</th></tr></thead><tbody>{m.paymentAlerts.map((x:any)=>{const u=urgency(days(x.due_date));return <tr key={x.id}><td><Student name={x.student.full_name} id={x.student.id}/></td><td>{fmt(x.due_date)}</td><td>{money(x.amount)}</td><td>{x.payment_method||"—"}</td><td>{x.destination||"—"}</td><td><Badge tone={u[0] as string}>{u[1]} · {x.status}</Badge></td><td><div className="flex gap-2"><button onClick={()=>sendCharge(x)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium">Enviar cobrança</button><Link to="/projeto-oficina/alunos/$alunoId" params={{alunoId:x.student.id}} className="px-2 py-1.5 text-xs font-medium underline">Abrir</Link></div></td></tr>})}{!m.paymentAlerts.length&&<tr><td colSpan={7} className="p-8 text-center text-black/45">Nenhuma mensalidade do mês anterior está pendente.</td></tr>}</tbody></Table></Section>
 
