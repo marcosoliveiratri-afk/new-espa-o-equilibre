@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Link2, RefreshCw, Settings2 } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
-import { TopBar } from "@/components/TopBar";
-import { AuthGuard } from "@/components/AuthGuard";
 
 export const Route = createFileRoute("/osteopatia/configuracoes")({ component: OsteopatiaConfiguracoes });
 
@@ -55,7 +52,7 @@ function OsteopatiaConfiguracoes() {
     }
   }
 
-  return <AuthGuard><div className="min-h-screen bg-[#f7f7f6]"><TopBar/><AppShell><main className="mx-auto max-w-[1050px] pb-12">
+  return <main className="mx-auto max-w-[1050px] pb-12">
     <div className="mb-7 flex items-center gap-3">
       <Link to="/osteopatia" className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-black/10 bg-white shadow-sm hover:bg-black/[.02]"><ArrowLeft size={17}/></Link>
       <div><p className="text-xs font-semibold uppercase tracking-[.16em] text-black/35">Osteopatia</p><h1 className="mt-1 text-[30px] font-semibold tracking-[-.03em]">Configurações</h1><p className="mt-1 text-sm text-black/45">Defina a planilha que será usada como fonte de dados do painel.</p></div>
@@ -69,5 +66,5 @@ function OsteopatiaConfiguracoes() {
       <div className="mt-7 rounded-xl bg-black/[.025] p-4 text-sm text-black/55"><p className="font-semibold text-black/70">Como conectar</p><ol className="mt-2 list-decimal space-y-1.5 pl-5"><li>Abra a planilha no Google Sheets.</li><li>Clique em <b>Compartilhar</b>.</li><li>Em acesso geral, selecione <b>Qualquer pessoa com o link → Leitor</b>.</li><li>Cole o link acima e clique em <b>Salvar e testar</b>.</li></ol></div>
     </section>
     <div className="mt-5 flex justify-end"><button onClick={()=>navigate({to:"/osteopatia"})} className="rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium hover:bg-black/[.02]">Voltar ao painel</button></div>
-  </main></AppShell></div></AuthGuard>;
+  </main>;
 }
