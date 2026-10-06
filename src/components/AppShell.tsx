@@ -8,7 +8,12 @@ const osteopatiaItems = [
   { label: "Configurações", to: "/osteopatia/configuracoes", icon: Settings },
 ] as const;
 
-const geradorHorasItems = [\n  { label: "Colaboradores", to: "/gerador-de-horas", icon: Users },\n  { label: "Gerador de relatório", to: "/gerador-de-horas/gerador", icon: FileText },\n] as const;\n\nconst pilatesItems = [
+const geradorHorasItems = [
+  { label: "Colaboradores", to: "/gerador-de-horas", icon: Users },
+  { label: "Gerador de relatório", to: "/gerador-de-horas/gerador", icon: FileText },
+] as const;
+
+const pilatesItems = [
   { label: "Alunos", to: "/pilates/alunos", icon: Users },
   { label: "Aulas experimentais", to: "/pilates/aulas-experimentais", icon: FlaskConical },
   { label: "Central de alertas", to: "/pilates/alertas", icon: BellRing },
