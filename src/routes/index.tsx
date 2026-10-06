@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Clock3, Dumbbell, HeartPulse, Wrench } from "lucide-react";
+import { ArrowRight, Clock3, Dumbbell, HeartPulse, Baby } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { AuthGuard } from "@/components/AuthGuard";
 
@@ -43,7 +43,7 @@ function Index() {
 
             <Link to="/projeto-oficina" className="group flex min-h-[210px] flex-col rounded-3xl border border-black/10 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition duration-200 hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
               <div className="flex items-start justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/[0.04]"><Wrench size={21} className="text-black/70" /></div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/[0.04]"><Baby size={21} className="text-black/70" /></div>
                 <ArrowRight className="text-black/30 transition duration-200 group-hover:translate-x-1 group-hover:text-black/70" size={20} />
               </div>
               <div className="mt-auto pt-8">
