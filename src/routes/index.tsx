@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Dumbbell, HeartPulse, Wrench } from "lucide-react";
+import { ArrowRight, Clock3, Dumbbell, HeartPulse, Wrench } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { AuthGuard } from "@/components/AuthGuard";
 
@@ -18,7 +18,7 @@ function Index() {
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-black/50">Escolha um módulo para acessar a operação correspondente.</p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             <Link to="/pilates" className="group flex min-h-[210px] flex-col rounded-3xl border border-black/10 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition duration-200 hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
               <div className="flex items-start justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/[0.04]"><Dumbbell size={21} className="text-black/70" /></div>
@@ -49,6 +49,16 @@ function Index() {
               <div className="mt-auto pt-8">
                 <h2 className="text-lg font-semibold">Projeto Oficina</h2>
                 <p className="mt-2 text-sm leading-6 text-black/50">Gerencie projetos e ordens de serviço da oficina.</p>
+              </div>
+            </Link>
+            <Link to="/gerador-de-horas" className="group flex min-h-[210px] flex-col rounded-3xl border border-black/10 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition duration-200 hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+              <div className="flex items-start justify-between">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/[0.04]"><Clock3 size={21} className="text-black/70" /></div>
+                <ArrowRight className="text-black/30 transition duration-200 group-hover:translate-x-1 group-hover:text-black/70" size={20} />
+              </div>
+              <div className="mt-auto pt-8">
+                <h2 className="text-lg font-semibold">Gerador de Horas</h2>
+                <p className="mt-2 text-sm leading-6 text-black/50">Gere, organize e arquive relatórios mensais dos colaboradores.</p>
               </div>
             </Link>
           </div>
