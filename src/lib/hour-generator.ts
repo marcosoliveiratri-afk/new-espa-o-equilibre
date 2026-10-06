@@ -145,7 +145,7 @@ export function parseHourlyEntries(txt: string, periodStart: string): ParsedHour
     const line = raw.replace(/^[\s\-•]+/, "").trim();
     if (!line) return;
     const m = line.match(/^(\d{1,2})\/(\d{1,2})\s+(\d+(?:[.,]\d+)?)\s*(?:h|hora|horas)\b/i);
-    if (!m) return;
+    if (!m || m[3] === undefined) return;
 
     const day = Number(m[1]);
     const month = Number(m[2]);

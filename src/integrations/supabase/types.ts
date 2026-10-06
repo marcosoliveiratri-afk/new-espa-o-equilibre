@@ -121,6 +121,8 @@ export type Database = {
         Row: {
           collaborator_id: string
           generated_at: string
+          generator_type: string
+          hourly_rate: number
           id: string
           input_data: string
           period_end: string | null
@@ -133,6 +135,8 @@ export type Database = {
         Insert: {
           collaborator_id: string
           generated_at?: string
+          generator_type?: string
+          hourly_rate?: number
           id?: string
           input_data?: string
           period_end?: string | null
@@ -145,6 +149,8 @@ export type Database = {
         Update: {
           collaborator_id?: string
           generated_at?: string
+          generator_type?: string
+          hourly_rate?: number
           id?: string
           input_data?: string
           period_end?: string | null
