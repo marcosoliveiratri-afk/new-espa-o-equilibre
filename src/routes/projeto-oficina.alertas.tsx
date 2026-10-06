@@ -10,8 +10,8 @@ export const Route=createFileRoute("/projeto-oficina/alertas")({component:Alerta
 const fmt=(d:string|null)=>d?new Intl.DateTimeFormat("pt-BR").format(new Date(d+"T12:00:00")):"—";
 const money=(v:any)=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const days=(d:string)=>Math.ceil((new Date(d+"T12:00:00").getTime()-new Date(new Date().toISOString().slice(0,10)+"T12:00:00").getTime())/86400000);
-const monthLabel=(value:string)=>{const [year,month]=value.split("-").map(Number);return new Intl.DateTimeFormat("pt-BR",{month:"long",year:"numeric"}).format(new Date(year,month-1,1)).replace(/^./,c=>c.toUpperCase())};
-const shiftMonth=(value:string,delta:number)=>{const [year,month]=value.split("-").map(Number);const d=new Date(year,month-1+delta,1);return d.toISOString().slice(0,7)};
+const monthLabel=(value:string)=>{const [year=0,month=1]=value.split("-").map(Number);return new Intl.DateTimeFormat("pt-BR",{month:"long",year:"numeric"}).format(new Date(year,month-1,1)).replace(/^./,c=>c.toUpperCase())};
+const shiftMonth=(value:string,delta:number)=>{const [year=0,month=1]=value.split("-").map(Number);const d=new Date(year,month-1+delta,1);return d.toISOString().slice(0,7)};
 function Badge({tone,children}:{tone:string;children:any}){const c=tone==="danger"?"bg-red-100 text-red-700 ring-red-200":tone==="warning"?"bg-amber-100 text-amber-800 ring-amber-200":tone==="ok"?"bg-emerald-100 text-emerald-700 ring-emerald-200":"bg-slate-100 text-slate-600 ring-slate-200";return <span className={"inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 "+c}>{children}</span>}
 function urgency(n:number){return n<0?["danger",`Vencido há ${Math.abs(n)} dia(s)`]:n===0?["danger","Vence hoje"]:n<=7?["warning",`Vence em ${n} dia(s)`]:["neutral",`Vence em ${n} dias`]}
 function initials(name:string){return name.split(" ").filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
@@ -37,7 +37,7 @@ function Alertas(){
   const aps=new Map<string,any>(data.studentPlans.map((x:any)=>[x.id,x]));
   const plans=new Map<string,any>(data.plans.map((x:any)=>[x.id,x]));
   const planByStudent=new Map<string,any>();data.studentPlans.forEach((x:any)=>{if(!planByStudent.has(x.aluno_id))planByStudent.set(x.aluno_id,x)});
-  const [selectedYear,selectedMonthNumber]=selectedMonth.split("-").map(Number);
+   const [selectedYear=0,selectedMonthNumber=1]=selectedMonth.split("-").map(Number);
   const selectedStart=new Date(selectedYear,selectedMonthNumber-1,1);
   const selectedEnd=new Date(selectedYear,selectedMonthNumber,0);
   const ps=selectedStart.toISOString().slice(0,10),pe=selectedEnd.toISOString().slice(0,10);
