@@ -20,8 +20,11 @@ const TABLES = [
 ] as const;
 
 /**
- * Mantém a tela sincronizada: recarrega no mount, em qualquer mudança no banco
- * (realtime), ao voltar o foco/aba e a cada 30s como rede de segurança.
+ * Mantém os dados sincronizados sem interromper a navegação.
+ *
+ * A atualização acontece no mount e quando há mudanças relevantes no banco.
+ * Evitamos atualizações periódicas, por foco/visibilidade ou durante rolagem,
+ * pois elas podem reconstruir listas e alterar a posição do scroll.
  */
 export function useDataSync(load: () => void | Promise<void>, deps: unknown[] = []) {
   const ref = useRef(load);
@@ -29,34 +32,47 @@ export function useDataSync(load: () => void | Promise<void>, deps: unknown[] = 
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let loading = false;
+    let pending = false;
+
     const run = () => {
       if (timer) clearTimeout(timer);
-      timer = setTimeout(() => void ref.current(), 120);
+
+      timer = setTimeout(async () => {
+        if (loading) {
+          pending = true;
+          return;
+        }
+
+        loading = true;
+        try {
+          await ref.current();
+        } finally {
+          loading = false;
+
+          if (pending) {
+            pending = false;
+            run();
+          }
+        }
+      }, 250);
     };
 
+    // Carrega os dados apenas na entrada da tela.
     void ref.current();
 
     const db = supabase as any;
     const channel = db.channel(`sync-${Math.random().toString(36).slice(2)}`);
+
     TABLES.forEach((table) =>
       channel.on("postgres_changes", { event: "*", schema: "public", table }, run)
     );
-    channel.subscribe();
 
-    const onFocus = () => run();
-    const onVisible = () => {
-      if (document.visibilityState === "visible") run();
-    };
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVisible);
-    const interval = window.setInterval(run, 30000);
+    channel.subscribe();
 
     return () => {
       if (timer) clearTimeout(timer);
       db.removeChannel(channel);
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVisible);
-      window.clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
