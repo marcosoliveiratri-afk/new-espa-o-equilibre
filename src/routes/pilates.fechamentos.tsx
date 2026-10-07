@@ -500,6 +500,15 @@ tbody tr:nth-child(even){background:var(--alt)}
 .status{margin-top:20px;padding:10px 12px;border:1px solid var(--line);background:var(--alt);font-size:12px}
 .status strong{color:var(--title)}
 .note{font-size:11.5px;color:#555;margin-top:10px}
+.movement{padding:12px;border-radius:10px;border:1px solid}
+.movement.entry{background:#eef8f0;border-color:#c7e6cd}
+.movement.exit{background:#fdf0f0;border-color:#efcccc}
+.movement.entry .section-title{color:#477653}
+.movement.exit .section-title{color:#a15b5b}
+.movement.entry th{background:#78a985}
+.movement.exit th{background:#c98282}
+.movement.entry td{border-color:#cfe7d3}
+.movement.exit td{border-color:#efd0d0}
 .footer{display:flex;justify-content:space-between;gap:12px;margin-top:18px;padding-top:10px;border-top:1px solid var(--line);font-size:9px;color:#777}
 @media print{body{background:#fff}.wrap{padding:0;max-width:none}.paper{border:0;padding:0}th,tr,td{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4;margin:12mm}}
 </style>
@@ -557,6 +566,17 @@ ${e(statusDetail)}
 </div>
 
 <div class="section">
+<div class="section-title">Detalhamento dos recebimentos</div>
+<div class="scroll">
+<table>
+<thead><tr><th class="c" style="width:80px">Data</th><th>Aluno / descrição</th><th>Tipo</th><th>Forma</th><th class="r">Valor</th><th>Destino</th></tr></thead>
+<tbody>${rows || '<tr><td colspan="6" class="c">Nenhum recebimento no período selecionado.</td></tr>'}</tbody>
+${m.rows.length ? `<tfoot><tr><td colspan="4"><strong>Total recebido</strong></td><td class="r"><strong>${e(brl(m.total))}</strong></td><td></td></tr></tfoot>` : ""}
+</table>
+</div>
+</div>
+
+<div class="section movement entry">
 <div class="section-title">Entradas de alunos no período</div>
 <div class="scroll">
 <table>
@@ -566,23 +586,12 @@ ${e(statusDetail)}
 </div>
 </div>
 
-<div class="section">
+<div class="section movement exit">
 <div class="section-title">Saídas de alunos no período</div>
 <div class="scroll">
 <table>
 <thead><tr><th class="c">Data</th><th>Aluno</th><th>Plano</th><th class="r">Valor</th></tr></thead>
 <tbody>${deactivatedStudentRows || '<tr><td colspan="4" class="c">Nenhum aluno desativado no período para o professor selecionado.</td></tr>'}</tbody>
-</table>
-</div>
-</div>
-
-<div class="section">
-<div class="section-title">Detalhamento dos recebimentos</div>
-<div class="scroll">
-<table>
-<thead><tr><th class="c" style="width:80px">Data</th><th>Aluno / descrição</th><th>Tipo</th><th>Forma</th><th class="r">Valor</th><th>Destino</th></tr></thead>
-<tbody>${rows || '<tr><td colspan="6" class="c">Nenhum recebimento no período selecionado.</td></tr>'}</tbody>
-${m.rows.length ? `<tfoot><tr><td colspan="4"><strong>Total recebido</strong></td><td class="r"><strong>${e(brl(m.total))}</strong></td><td></td></tr></tfoot>` : ""}
 </table>
 </div>
 </div>
