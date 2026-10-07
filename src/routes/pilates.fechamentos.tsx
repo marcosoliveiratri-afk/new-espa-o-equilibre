@@ -166,6 +166,7 @@ function Fechamentos() {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
+  const [planCatalog, setPlanCatalog] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [lessons, setLessons] = useState<any[]>([]);
   const [entries, setEntries] = useState<any[]>([]);
@@ -183,21 +184,23 @@ function Fechamentos() {
     const db = supabase as any;
     const moduleId = await getServiceModuleId("pilates");
     if (!moduleId) { setError("Módulo Pilates não configurado."); return; }
-    const [t, sp, p, st, pl, e, fs] = await Promise.all([
+    const [t, sp, p, st, planRef, pl, e, fs] = await Promise.all([
       db.from("teachers").select("*").eq("module_id", moduleId).order("name"),
       db.from("student_plans").select("*").eq("module_id", moduleId),
       db.from("student_payments").select("*").eq("module_id", moduleId),
-      db.from("students").select("id,full_name").eq("module_id", moduleId),
+      db.from("students").select("id,full_name,active,updated_at").eq("module_id", moduleId),
+      db.from("plans").select("id,name").eq("module_id", moduleId),
       db.from("private_lesson_students").select("*").eq("module_id", moduleId),
       db.from("teacher_financial_entries").select("*").eq("module_id", moduleId),
       db.from("financial_split_settings").select("*").eq("module_id", moduleId).limit(1).maybeSingle(),
     ]);
-    const err = [t, sp, p, st, pl, e, fs].find((x: any) => x?.error);
+    const err = [t, sp, p, st, planRef, pl, e, fs].find((x: any) => x?.error);
     setError(err ? err.error.message : "");
     setTeachers(t.data || []);
     setPlans(sp.data || []);
     setPayments(p.data || []);
     setStudents(st.data || []);
+    setPlanCatalog(planRef.data || []);
     setLessons(pl.data || []);
     setEntries(e.data || []);
     if (fs.data)
@@ -300,6 +303,26 @@ function Fechamentos() {
         ? "professor"
         : "clinic";
 
+    const planName = (planId: string | null | undefined) =>
+      planCatalog.find((p: any) => p.id === planId)?.name || "Sem plano";
+
+    const addedStudents = teacher === "all" ? [] : plans
+      .filter((p: any) => p.teacher_id === teacher && p.start_date && p.start_date.slice(0, 7) === month)
+      .map((p: any) => {
+        const student = students.find((s: any) => s.id === p.student_id);
+        return { id: `add-${p.id}`, student: student?.full_name || "Aluno", plan: planName(p.plan_id), amount: Number(p.monthly_value || 0), date: p.start_date };
+      });
+
+    const deactivatedStudents = teacher === "all" ? [] : students
+      .filter((s: any) => !s.active && s.updated_at && String(s.updated_at).slice(0, 7) === month)
+      .map((s: any) => {
+        const studentPlans = plans.filter((p: any) => p.student_id === s.id && p.teacher_id === teacher)
+          .sort((a: any, b: any) => String(b.start_date || "").localeCompare(String(a.start_date || "")));
+        const p = studentPlans[0];
+        if (!p) return null;
+        return { id: `out-${s.id}`, student: s.full_name || "Aluno", plan: planName(p.plan_id), amount: Number(p.monthly_value || 0), date: String(s.updated_at).slice(0, 10) };
+      }).filter(Boolean);
+
     const byType = filtered.reduce<Record<string, number>>((acc, x) => {
       acc[x.type] = (acc[x.type] || 0) + x.amount;
       return acc;
@@ -307,6 +330,8 @@ function Fechamentos() {
 
     return {
       rows: filtered,
+      addedStudents,
+      deactivatedStudents,
       total,
       receivedProfessor,
       receivedClinic,
@@ -318,7 +343,7 @@ function Fechamentos() {
       status,
       byType,
     };
-  }, [payments, lessons, entries, plans, students, month, teacher, split]);
+  }, [payments, lessons, entries, plans, students, planCatalog, month, teacher, split]);
 
   const teacherName =
     teacher === "all"
@@ -377,6 +402,8 @@ function Fechamentos() {
           adjustment: m.adjustment,
           status: statusUi.label,
           rows: m.rows,
+          addedStudents: m.addedStudents,
+          deactivatedStudents: m.deactivatedStudents,
         },
       });
     if (error) setError(error.message);
@@ -425,6 +452,14 @@ function Fechamentos() {
           `<tr><td>${e(type)}</td><td class="r">${e(brl(value))}</td></tr>`
       )
       .join("");
+
+    const addedStudentRows = m.addedStudents.map((x: any) =>
+      `<tr><td class="c">${e(fmtDate(x.date))}</td><td><strong>${e(x.student)}</strong></td><td>${e(x.plan)}</td><td class="r">${e(brl(x.amount))}</td></tr>`
+    ).join("");
+
+    const deactivatedStudentRows = m.deactivatedStudents.map((x: any) =>
+      `<tr><td class="c">${e(fmtDate(x.date))}</td><td><strong>${e(x.student)}</strong></td><td>${e(x.plan)}</td><td class="r">${e(brl(x.amount))}</td></tr>`
+    ).join("");
 
     const w = window.open("", "_blank");
     if (!w) return;
@@ -519,6 +554,26 @@ tbody tr:nth-child(even){background:var(--alt)}
 <div class="status">
 <strong>Status:</strong> ${e(statusLabel)}<br>
 ${e(statusDetail)}
+</div>
+
+<div class="section">
+<div class="section-title">Entradas de alunos no período</div>
+<div class="scroll">
+<table>
+<thead><tr><th class="c">Data</th><th>Aluno</th><th>Plano</th><th class="r">Valor</th></tr></thead>
+<tbody>${addedStudentRows || '<tr><td colspan="4" class="c">Nenhum aluno adicionado no período para o professor selecionado.</td></tr>'}</tbody>
+</table>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Saídas de alunos no período</div>
+<div class="scroll">
+<table>
+<thead><tr><th class="c">Data</th><th>Aluno</th><th>Plano</th><th class="r">Valor</th></tr></thead>
+<tbody>${deactivatedStudentRows || '<tr><td colspan="4" class="c">Nenhum aluno desativado no período para o professor selecionado.</td></tr>'}</tbody>
+</table>
+</div>
 </div>
 
 <div class="section">
