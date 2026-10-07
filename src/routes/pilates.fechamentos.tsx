@@ -188,7 +188,7 @@ function Fechamentos() {
       db.from("teachers").select("*").eq("module_id", moduleId).order("name"),
       db.from("student_plans").select("*").eq("module_id", moduleId),
       db.from("student_payments").select("*").eq("module_id", moduleId),
-      db.from("students").select("id,full_name,active,updated_at").eq("module_id", moduleId),
+      db.from("students").select("id,full_name,active,updated_at,deactivated_at").eq("module_id", moduleId),
       db.from("plans").select("id,name").eq("module_id", moduleId),
       db.from("private_lesson_students").select("*").eq("module_id", moduleId),
       db.from("teacher_financial_entries").select("*").eq("module_id", moduleId),
@@ -314,13 +314,14 @@ function Fechamentos() {
       });
 
     const deactivatedStudents = teacher === "all" ? [] : students
-      .filter((s: any) => !s.active && s.updated_at && String(s.updated_at).slice(0, 7) === month)
+      .filter((s: any) => !s.active && (s.deactivated_at || s.updated_at) && String(s.deactivated_at || s.updated_at).slice(0, 7) === month)
       .map((s: any) => {
         const studentPlans = plans.filter((p: any) => p.student_id === s.id && p.teacher_id === teacher)
           .sort((a: any, b: any) => String(b.start_date || "").localeCompare(String(a.start_date || "")));
         const p = studentPlans[0];
         if (!p) return null;
-        return { id: `out-${s.id}`, student: s.full_name || "Aluno", plan: planName(p.plan_id), amount: Number(p.monthly_value || 0), date: String(s.updated_at).slice(0, 10) };
+        const deactivatedAt = s.deactivated_at || s.updated_at;
+        return { id: `out-${s.id}`, student: s.full_name || "Aluno", plan: planName(p.plan_id), amount: Number(p.monthly_value || 0), date: String(deactivatedAt).slice(0, 10) };
       }).filter(Boolean);
 
     const byType = filtered.reduce<Record<string, number>>((acc, x) => {
